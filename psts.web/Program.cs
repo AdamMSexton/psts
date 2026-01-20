@@ -30,6 +30,8 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddRazorPages();
 
+builder.Services.AddControllers();      // For APIs later
+
 var app = builder.Build();
 
 // AMS - Apply migrations (for DB init and validation)
@@ -58,7 +60,7 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-//app.MapGet("/", () => "Hello World!");
+app.MapControllers();       // For APIs later
 
 app.MapGet("/", context =>
 {

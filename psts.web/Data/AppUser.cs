@@ -5,6 +5,7 @@ namespace Psts.Web.Data;
 public class AppUser : IdentityUser
 {
     // Optional extra fields
-    public string fName { get; set; } = string.Empty;
-    public string lName { get; set; } = string.Empty;
+    public enum LoginMode { LocalOnly, OidcOnly, LocalAndOidc};         // Login modes authorized
+    public bool PassswordChangeRequired { get; set; } = false;          // Account locked for password change, not hard locked
+    public DateTime PasswordExpire {  get; set; } = DateTime.Now + TimeSpan.FromDays(60);
 }
