@@ -187,6 +187,12 @@ namespace psts.web.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<bool>("PassswordChangeRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("PasswordExpire")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
@@ -206,14 +212,6 @@ namespace psts.web.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.Property<string>("fName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("lName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -224,6 +222,129 @@ namespace psts.web.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Psts.Web.Data.PstsClientProfile", b =>
+                {
+                    b.Property<Guid>("ClientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ClientName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientPOCeMail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientPOCfName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientPOClName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientPOCtPhone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EmployeePOCId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ShortCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ClientId");
+
+                    b.HasIndex("EmployeePOCId")
+                        .IsUnique();
+
+                    b.ToTable("PstsClientProfiles");
+                });
+
+            modelBuilder.Entity("Psts.Web.Data.PstsProjectDefinition", b =>
+                {
+                    b.Property<Guid>("ProjectId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EmployeePOCId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProjectName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ShortCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ProjectId");
+
+                    b.HasIndex("ClientId")
+                        .IsUnique();
+
+                    b.HasIndex("EmployeePOCId")
+                        .IsUnique();
+
+                    b.ToTable("PstsProjectDefinitions");
+                });
+
+            modelBuilder.Entity("Psts.Web.Data.PstsTaskDefinition", b =>
+                {
+                    b.Property<Guid>("TaskId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.HasKey("TaskId");
+
+                    b.ToTable("PstsTaskDefinitions");
+                });
+
+            modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
+                {
+                    b.Property<Guid>("TransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("TransactionNum")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("TransactionNum"));
+
+                    b.HasKey("TransactionId");
+
+                    b.ToTable("PstsTimeTransactions");
+                });
+
+            modelBuilder.Entity("psts.web.Data.PstsUserProfile", b =>
+                {
+                    b.Property<string>("EmployeeId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ManagerId")
+                        .HasColumnType("text");
+
+                    b.HasKey("EmployeeId");
+
+                    b.HasIndex("ManagerId");
+
+                    b.ToTable("PstsUserProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -275,6 +396,52 @@ namespace psts.web.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Psts.Web.Data.PstsClientProfile", b =>
+                {
+                    b.HasOne("Psts.Web.Data.AppUser", "EmployeePOC")
+                        .WithOne()
+                        .HasForeignKey("Psts.Web.Data.PstsClientProfile", "EmployeePOCId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("EmployeePOC");
+                });
+
+            modelBuilder.Entity("Psts.Web.Data.PstsProjectDefinition", b =>
+                {
+                    b.HasOne("Psts.Web.Data.PstsClientProfile", "Client")
+                        .WithOne()
+                        .HasForeignKey("Psts.Web.Data.PstsProjectDefinition", "ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Psts.Web.Data.AppUser", "EmployeePOC")
+                        .WithOne()
+                        .HasForeignKey("Psts.Web.Data.PstsProjectDefinition", "EmployeePOCId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Client");
+
+                    b.Navigation("EmployeePOC");
+                });
+
+            modelBuilder.Entity("psts.web.Data.PstsUserProfile", b =>
+                {
+                    b.HasOne("Psts.Web.Data.AppUser", "User")
+                        .WithOne()
+                        .HasForeignKey("psts.web.Data.PstsUserProfile", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Psts.Web.Data.AppUser", "Manager")
+                        .WithMany()
+                        .HasForeignKey("ManagerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Manager");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

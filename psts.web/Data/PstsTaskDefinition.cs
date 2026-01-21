@@ -2,5 +2,6 @@
 {
     internal class PstsTaskDefinition
     {
+        public Guid TaskId { get; set; }
     }
 }

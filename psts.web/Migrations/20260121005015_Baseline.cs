@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace psts.web.Migrations
 {
     /// <inheritdoc />
-    public partial class FreshWithIdentity : Migration
+    public partial class Baseline : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,8 +31,8 @@ namespace psts.web.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    fName = table.Column<string>(type: "text", nullable: false),
-                    lName = table.Column<string>(type: "text", nullable: false),
+                    PassswordChangeRequired = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordExpire = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -51,6 +51,30 @@ namespace psts.web.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PstsTaskDefinitions",
+                columns: table => new
+                {
+                    TaskId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PstsTaskDefinitions", x => x.TaskId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PstsTimeTransactions",
+                columns: table => new
+                {
+                    TransactionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TransactionNum = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PstsTimeTransactions", x => x.TransactionId);
                 });
 
             migrationBuilder.CreateTable(
@@ -159,6 +183,83 @@ namespace psts.web.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "PstsClientProfiles",
+                columns: table => new
+                {
+                    ClientId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EmployeePOCId = table.Column<string>(type: "text", nullable: true),
+                    ClientName = table.Column<string>(type: "text", nullable: false),
+                    ClientPOCfName = table.Column<string>(type: "text", nullable: false),
+                    ClientPOClName = table.Column<string>(type: "text", nullable: false),
+                    ClientPOCeMail = table.Column<string>(type: "text", nullable: false),
+                    ClientPOCtPhone = table.Column<string>(type: "text", nullable: false),
+                    ShortCode = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PstsClientProfiles", x => x.ClientId);
+                    table.ForeignKey(
+                        name: "FK_PstsClientProfiles_AspNetUsers_EmployeePOCId",
+                        column: x => x.EmployeePOCId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PstsUserProfiles",
+                columns: table => new
+                {
+                    EmployeeId = table.Column<string>(type: "text", nullable: false),
+                    FName = table.Column<string>(type: "text", nullable: false),
+                    LName = table.Column<string>(type: "text", nullable: false),
+                    ManagerId = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PstsUserProfiles", x => x.EmployeeId);
+                    table.ForeignKey(
+                        name: "FK_PstsUserProfiles_AspNetUsers_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PstsUserProfiles_AspNetUsers_ManagerId",
+                        column: x => x.ManagerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PstsProjectDefinitions",
+                columns: table => new
+                {
+                    ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EmployeePOCId = table.Column<string>(type: "text", nullable: true),
+                    ProjectName = table.Column<string>(type: "text", nullable: false),
+                    ShortCode = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PstsProjectDefinitions", x => x.ProjectId);
+                    table.ForeignKey(
+                        name: "FK_PstsProjectDefinitions_AspNetUsers_EmployeePOCId",
+                        column: x => x.EmployeePOCId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PstsProjectDefinitions_PstsClientProfiles_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "PstsClientProfiles",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -195,6 +296,29 @@ namespace psts.web.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PstsClientProfiles_EmployeePOCId",
+                table: "PstsClientProfiles",
+                column: "EmployeePOCId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PstsProjectDefinitions_ClientId",
+                table: "PstsProjectDefinitions",
+                column: "ClientId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PstsProjectDefinitions_EmployeePOCId",
+                table: "PstsProjectDefinitions",
+                column: "EmployeePOCId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PstsUserProfiles_ManagerId",
+                table: "PstsUserProfiles",
+                column: "ManagerId");
         }
 
         /// <inheritdoc />
@@ -216,7 +340,22 @@ namespace psts.web.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "PstsProjectDefinitions");
+
+            migrationBuilder.DropTable(
+                name: "PstsTaskDefinitions");
+
+            migrationBuilder.DropTable(
+                name: "PstsTimeTransactions");
+
+            migrationBuilder.DropTable(
+                name: "PstsUserProfiles");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "PstsClientProfiles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

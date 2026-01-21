@@ -1,11 +1,15 @@
-﻿namespace psts.web.Data
+﻿using Psts.Web.Data;
+
+namespace psts.web.Data
 {
     public class PstsUserProfile
     {
-        public Guid Id { get; set; } = Guid.Empty;          // Users UUID as assigned in AspNetUsers
+        public string EmployeeId { get; set; } = string.Empty;       // PK/FK  Users UUID as assigned in AspNetUsers, must remain as string type
+        public AppUser? User { get; set; }                           // "Pointer" to AppUser. Fields in this class are related to fields in AppUser
         public string FName { get; set; } = string.Empty;
         public string LName { get; set; } = string.Empty;
-        public string Manager { get; set; } = string.Empty;     // UUID of Manager
+        public AppUser? Manager { get; set; }                        // "Pointer" to AppUser. Fields in this class are related to fields in AppUser
+        public string? ManagerId { get; set; }                       // UUID of Manager, must remain as string type as all ASP.NET userId
 
 
     }
