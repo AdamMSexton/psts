@@ -187,12 +187,6 @@ namespace psts.web.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.Property<bool>("PassswordChangeRequired")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("PasswordExpire")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
@@ -255,14 +249,21 @@ namespace psts.web.Migrations
 
                     b.Property<string>("ShortCode")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)");
 
                     b.HasKey("ClientId");
 
                     b.HasIndex("EmployeePOCId")
                         .IsUnique();
 
-                    b.ToTable("PstsClientProfiles");
+                    b.HasIndex("ShortCode")
+                        .IsUnique();
+
+                    b.ToTable("PstsClientProfiles", t =>
+                        {
+                            t.HasCheckConstraint("CK_Project_ShortCode_Format", "char_length(\"ShortCode\") = 4 AND \"ShortCode\" = upper(\"ShortCode\")");
+                        });
                 });
 
             modelBuilder.Entity("Psts.Web.Data.PstsProjectDefinition", b =>
@@ -277,13 +278,18 @@ namespace psts.web.Migrations
                     b.Property<string>("EmployeePOCId")
                         .HasColumnType("text");
 
+                    b.Property<string>("ProjectDescription")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ShortCode")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)");
 
                     b.HasKey("ProjectId");
 
@@ -293,7 +299,13 @@ namespace psts.web.Migrations
                     b.HasIndex("EmployeePOCId")
                         .IsUnique();
 
-                    b.ToTable("PstsProjectDefinitions");
+                    b.HasIndex("ShortCode")
+                        .IsUnique();
+
+                    b.ToTable("PstsProjectDefinitions", t =>
+                        {
+                            t.HasCheckConstraint("CK_Project_ShortCode_Format", "char_length(\"ShortCode\") = 4 AND \"ShortCode\" = upper(\"ShortCode\")");
+                        });
                 });
 
             modelBuilder.Entity("Psts.Web.Data.PstsTaskDefinition", b =>
@@ -302,9 +314,87 @@ namespace psts.web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ShortCode")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)");
+
+                    b.Property<string>("TaskDescription")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("TaskId");
 
-                    b.ToTable("PstsTaskDefinitions");
+                    b.HasIndex("ProjectId")
+                        .IsUnique();
+
+                    b.HasIndex("ShortCode")
+                        .IsUnique();
+
+                    b.ToTable("PstsTaskDefinitions", t =>
+                        {
+                            t.HasCheckConstraint("CK_Project_ShortCode_Format", "char_length(\"ShortCode\") = 4 AND \"ShortCode\" = upper(\"ShortCode\")");
+                        });
+                });
+
+            modelBuilder.Entity("psts.web.Data.PstsBillingRateResolutionSchedule", b =>
+                {
+                    b.Property<long>("BillingRateNum")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("BillingRateNum"));
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ChangedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ClientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EffectiveAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EmployeeId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("EndAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("HourlyRate")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("TaskId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("BillingRateNum");
+
+                    b.HasIndex("ChangedBy")
+                        .IsUnique();
+
+                    b.HasIndex("ClientId")
+                        .IsUnique();
+
+                    b.HasIndex("ProjectId")
+                        .IsUnique();
+
+                    b.HasIndex("TaskId")
+                        .IsUnique();
+
+                    b.ToTable("PstsBillingRateResolutionSchedule");
                 });
 
             modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
@@ -313,13 +403,52 @@ namespace psts.web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("EnterdTimeStamp")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("EnteredBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("RelatedId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uuid");
+
                     b.Property<long>("TransactionNum")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("TransactionNum"));
 
+                    b.Property<string>("WorkCompletedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly>("WorkCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("WorkCompletedHours")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
                     b.HasKey("TransactionId");
+
+                    b.HasIndex("EnteredBy")
+                        .IsUnique();
+
+                    b.HasIndex("RelatedId");
+
+                    b.HasIndex("TaskId")
+                        .IsUnique();
+
+                    b.HasIndex("WorkCompletedBy")
+                        .IsUnique();
 
                     b.ToTable("PstsTimeTransactions");
                 });
@@ -424,6 +553,83 @@ namespace psts.web.Migrations
                     b.Navigation("Client");
 
                     b.Navigation("EmployeePOC");
+                });
+
+            modelBuilder.Entity("Psts.Web.Data.PstsTaskDefinition", b =>
+                {
+                    b.HasOne("Psts.Web.Data.PstsProjectDefinition", "Project")
+                        .WithOne()
+                        .HasForeignKey("Psts.Web.Data.PstsTaskDefinition", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("psts.web.Data.PstsBillingRateResolutionSchedule", b =>
+                {
+                    b.HasOne("Psts.Web.Data.AppUser", "Employee")
+                        .WithOne()
+                        .HasForeignKey("psts.web.Data.PstsBillingRateResolutionSchedule", "ChangedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Psts.Web.Data.PstsClientProfile", "Client")
+                        .WithOne()
+                        .HasForeignKey("psts.web.Data.PstsBillingRateResolutionSchedule", "ClientId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Psts.Web.Data.PstsProjectDefinition", "Project")
+                        .WithOne()
+                        .HasForeignKey("psts.web.Data.PstsBillingRateResolutionSchedule", "ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Psts.Web.Data.PstsTaskDefinition", "Task")
+                        .WithOne()
+                        .HasForeignKey("psts.web.Data.PstsBillingRateResolutionSchedule", "TaskId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
+                {
+                    b.HasOne("Psts.Web.Data.AppUser", "EnteredEmployee")
+                        .WithOne()
+                        .HasForeignKey("psts.web.Data.PstsTimeTransactions", "EnteredBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("psts.web.Data.PstsTimeTransactions", "RelatedTransaction")
+                        .WithMany()
+                        .HasForeignKey("RelatedId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Psts.Web.Data.PstsTaskDefinition", "Task")
+                        .WithOne()
+                        .HasForeignKey("psts.web.Data.PstsTimeTransactions", "TaskId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Psts.Web.Data.AppUser", "WorkCompletedEmployee")
+                        .WithOne()
+                        .HasForeignKey("psts.web.Data.PstsTimeTransactions", "WorkCompletedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("EnteredEmployee");
+
+                    b.Navigation("RelatedTransaction");
+
+                    b.Navigation("Task");
+
+                    b.Navigation("WorkCompletedEmployee");
                 });
 
             modelBuilder.Entity("psts.web.Data.PstsUserProfile", b =>
