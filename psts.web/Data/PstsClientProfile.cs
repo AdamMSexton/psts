@@ -1,6 +1,6 @@
 ﻿namespace Psts.Web.Data
 {
-    internal class PstsClientProfile
+    public class PstsClientProfile
     {
         public Guid ClientId { get; set; }
         public AppUser? EmployeePOC { get; set; }                           // "Pointer" to AppUser. Fields in this class are related to fields in AppUser
@@ -10,7 +10,6 @@
         public string ClientPOClName { get; set; } = string.Empty;          // Client POC Last Name
         public string ClientPOCeMail { get; set; } = string.Empty;          // Client POC E-Mail
         public string ClientPOCtPhone { get; set; } = string.Empty;         // Client POC Phone
-        public string ShortCode { get; set; } = string.Empty;               // Short code
-
+        public string ShortCode { get; set; } = string.Empty;               // Short code, 4 character limit
     }
 }
