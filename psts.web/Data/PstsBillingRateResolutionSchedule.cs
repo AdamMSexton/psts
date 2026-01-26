@@ -16,6 +16,7 @@ namespace psts.web.Data
         public DateTime EffectiveAt { get; set; } = DateTime.UtcNow;
         public DateTime? EndAt { get; set; }
         public decimal HourlyRate { get; set; }
+        public AppUser? ChangedByEmployee { get; set; }
         public string ChangedBy { get; set; } = string.Empty;
         public DateTime ChangedAt { get; set; } = DateTime.UtcNow;
 

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace psts.web.Migrations
 {
     /// <inheritdoc />
-    public partial class BaselineDB_GTG : Migration
+    public partial class BaselineDBComplete : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -285,6 +285,12 @@ namespace psts.web.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_PstsBillingRateResolutionSchedule_AspNetUsers_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_PstsBillingRateResolutionSchedule_PstsClientProfiles_Client~",
                         column: x => x.ClientId,
                         principalTable: "PstsClientProfiles",
@@ -396,6 +402,12 @@ namespace psts.web.Migrations
                 name: "IX_PstsBillingRateResolutionSchedule_ClientId",
                 table: "PstsBillingRateResolutionSchedule",
                 column: "ClientId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PstsBillingRateResolutionSchedule_EmployeeId",
+                table: "PstsBillingRateResolutionSchedule",
+                column: "EmployeeId",
                 unique: true);
 
             migrationBuilder.CreateIndex(

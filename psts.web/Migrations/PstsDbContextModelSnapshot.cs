@@ -388,6 +388,9 @@ namespace psts.web.Migrations
                     b.HasIndex("ClientId")
                         .IsUnique();
 
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
+
                     b.HasIndex("ProjectId")
                         .IsUnique();
 
@@ -568,7 +571,7 @@ namespace psts.web.Migrations
 
             modelBuilder.Entity("psts.web.Data.PstsBillingRateResolutionSchedule", b =>
                 {
-                    b.HasOne("Psts.Web.Data.AppUser", "Employee")
+                    b.HasOne("Psts.Web.Data.AppUser", "ChangedByEmployee")
                         .WithOne()
                         .HasForeignKey("psts.web.Data.PstsBillingRateResolutionSchedule", "ChangedBy")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -577,6 +580,11 @@ namespace psts.web.Migrations
                     b.HasOne("Psts.Web.Data.PstsClientProfile", "Client")
                         .WithOne()
                         .HasForeignKey("psts.web.Data.PstsBillingRateResolutionSchedule", "ClientId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Psts.Web.Data.AppUser", "Employee")
+                        .WithOne()
+                        .HasForeignKey("psts.web.Data.PstsBillingRateResolutionSchedule", "EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Psts.Web.Data.PstsProjectDefinition", "Project")
@@ -588,6 +596,8 @@ namespace psts.web.Migrations
                         .WithOne()
                         .HasForeignKey("psts.web.Data.PstsBillingRateResolutionSchedule", "TaskId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ChangedByEmployee");
 
                     b.Navigation("Client");
 

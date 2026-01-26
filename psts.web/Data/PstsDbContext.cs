@@ -203,7 +203,7 @@ public class PstsDbContext : IdentityDbContext<AppUser>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<PstsBillingRateResolutionSchedule>()                          // Foreign Key
-            .HasOne(f => f.Employee)
+            .HasOne(f => f.ChangedByEmployee)
             .WithOne()
             .HasForeignKey<PstsBillingRateResolutionSchedule>(f => f.ChangedBy)
             .OnDelete(DeleteBehavior.Restrict);
