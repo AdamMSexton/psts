@@ -22,6 +22,10 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Pages\Admin\" />
+    <Folder Include="Pages\Manage\" />
+    <Folder Include="Pages\Entry\" />
+    <Folder Include="Pages\Reports\" />
   </ItemGroup>
 
 </Project>

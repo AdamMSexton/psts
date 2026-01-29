@@ -13,17 +13,17 @@ public class LoginModel : PageModel
     {
         _signInManager = signInManager;
     }
+    public class LoginInput
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
 
     [BindProperty]
     public LoginInput Input { get; set; } = new();
 
     public bool LoginFailed { get; set; }
 
-    public class LoginInput
-    {
-        public string UserName { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
 
     public async Task<IActionResult> OnPostAsync()
     {

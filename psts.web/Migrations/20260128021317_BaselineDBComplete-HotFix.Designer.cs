@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Psts.Web.Data;
@@ -11,9 +12,11 @@ using Psts.Web.Data;
 namespace psts.web.Migrations
 {
     [DbContext(typeof(PstsDbContext))]
-    partial class PstsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260128021317_BaselineDBComplete-HotFix")]
+    partial class BaselineDBCompleteHotFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -200,9 +203,6 @@ namespace psts.web.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("ResetPassOnLogin")
                         .HasColumnType("boolean");
 
                     b.Property<string>("SecurityStamp")
