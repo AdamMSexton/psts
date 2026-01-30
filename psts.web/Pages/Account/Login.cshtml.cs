@@ -5,7 +5,6 @@ using Psts.Web.Data;
 
 namespace Psts.Web.Pages.Account;
 
-[IgnoreAntiforgeryToken]
 public class LoginModel : PageModel
 {
     private readonly SignInManager<AppUser> _signInManager;

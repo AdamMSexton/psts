@@ -5,6 +5,7 @@
 <h2>Login</h2>
 
 <form method="post">
+    @Html.AntiForgeryToken()
     <div>
         <label>User Name</label>
         <input name="UserName" />
@@ -22,3 +23,8 @@
 {
 <p style="color:red">Login failed</p>
 }
+
+<br />
+<br />
+<a asp-page="./NewUser">Create account</a>
+

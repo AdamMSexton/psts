@@ -1,4 +1,5 @@
 @page
-@model Psts.Web.Pages.HomeModel
+@model Psts.Web.Pages.Account.HomeModel
 
-<h1>Hello</h1>
+<h1>Hello @User.Identity?.Name</h1>
+<h2>@User.Identity?.ToString()</h2>

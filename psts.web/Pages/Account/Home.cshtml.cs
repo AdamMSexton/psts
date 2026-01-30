@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Psts.Web.Pages;
+namespace Psts.Web.Pages.Account;
 
 public class HomeModel : PageModel
 {
