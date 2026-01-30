@@ -182,6 +182,29 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+
+app.MapGet("/_debug-login", async (
+    SignInManager<AppUser> signInManager,
+    UserManager<AppUser> userManager) =>
+{
+    var user = await userManager.FindByNameAsync("admin");
+    if (user == null)
+        return Results.Text("User NOT found");
+
+    var result = await signInManager.PasswordSignInAsync(
+        "admin",
+        "0e9a5b04296baA1!",
+        false,
+        false);
+
+    return Results.Text(
+        $"Succeeded={result.Succeeded}, NotAllowed={result.IsNotAllowed}, LockedOut={result.IsLockedOut}");
+});
+
+
+
+
+
 app.MapControllers();       // For APIs later
 
 app.MapGet("/", context =>
@@ -189,5 +212,7 @@ app.MapGet("/", context =>
     context.Response.Redirect("/Account/Login");
     return Task.CompletedTask;
 });
+
+app.UseDeveloperExceptionPage();
 
 app.Run();

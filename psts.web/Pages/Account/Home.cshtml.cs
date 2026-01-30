@@ -1,14 +1,10 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Psts.Web.Data;
 
-namespace psts.web.Pages.Account
+namespace Psts.Web.Pages;
+
+public class HomeModel : PageModel
 {
-    public class IndexModel : PageModel
+    public void OnGet()
     {
-        public void OnGet()
-        {
-        }
     }
 }
