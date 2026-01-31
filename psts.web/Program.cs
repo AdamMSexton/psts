@@ -153,8 +153,6 @@ using (var scope = app.Services.CreateScope())
         }
 
     }
-    
-
 }
 
 
@@ -175,6 +173,7 @@ using (var scope = app.Services.CreateScope())
 // AMS ***** DELETE ABOVE FOR PRODUCTION, DEV ONLY.                                           Yeah im sure theres a better more professional way to do this but...  How would i leave these jokes.  Also if your reading this i forgot to delete, o jokes on me? you maybe?
 
 
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
