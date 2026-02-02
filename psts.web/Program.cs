@@ -108,6 +108,18 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
+    // AMS - Verify Pending role exists, if not create it
+    if (!await roleManager.RoleExistsAsync("Pending"))
+    {
+        var status = await roleManager.CreateAsync(new IdentityRole("Pending"));
+        if (!status.Succeeded)
+        {
+            rolesCreated = true;
+            foreach (var e in status.Errors)
+                app.Logger.LogError("Role 'Pending' failed: {Error}", e.Description);
+        }
+    }
+
     if (!rolesCreated)
     {
         app.Logger.LogError("Could not create required user roles. APPLICATION MAY NOT FUNCTION CORRECTLY.");

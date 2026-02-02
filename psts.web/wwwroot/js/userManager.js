@@ -128,7 +128,7 @@ async function updateRecord(userID, resetPswd, lockAccount, newRole)
  
     const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-    const result = await fetch('/Admin/Index?handler=UpdateData', {
+    const result = await fetch('/Admin/AdminUserTool?handler=UpdateData', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

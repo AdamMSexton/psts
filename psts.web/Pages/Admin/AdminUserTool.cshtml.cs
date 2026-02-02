@@ -11,12 +11,12 @@ using Psts.Web.Data;
 namespace psts.web.Pages.Admin
 {
         [Authorize(Roles = "Admin")] // Restrict access to only admin users
-        public class IndexModel : PageModel
+        public class AdminUserToolModel : PageModel
         {
             private readonly UserManager<AppUser> _userManager;
             private readonly RoleManager<IdentityRole> _roleManager;
 
-            public IndexModel(
+            public AdminUserToolModel(
                 UserManager<AppUser> userManager,
                 RoleManager<IdentityRole> roleManager)
             {
