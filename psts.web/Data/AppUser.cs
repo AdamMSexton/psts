@@ -5,5 +5,7 @@ namespace Psts.Web.Data;
 public class AppUser : IdentityUser
 {
     // Optional extra fields
-    public enum LoginMode { LocalOnly, OidcOnly, LocalAndOidc};         // Login modes authorized
+    public bool LoginPassAllowed { get; set; }              // Flag to allow/disallow login using Login & Password
+    public bool OIDCAllowed { get; set; }                   // Flag to allow/disallow login using OIDC
+    public bool ResetPassOnLogin { get; set; }              // Flag to require password reset on next login
 }
