@@ -14,6 +14,8 @@ services:
     build: ./Psts.Web
     container_name: psts-web
     restart: always
+    environment:
+      ConnectionStrings__Default: "Host=psts-postgres;Database=psts;Username=psts_user;Password=psts_password"
     networks:
       - backend
     depends_on:
@@ -25,8 +27,8 @@ services:
     container_name: psts-postgres
     restart: always
     environment:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
+        POSTGRES_USER: psts_user
+        POSTGRES_PASSWORD: psts_password
         POSTGRES_DB: psts
     volumes:
         - ./db:/var/lib/postgresql/data
