@@ -1,7 +1,5 @@
-# Ignore appsettings
-appsettings.Development.json
-appsettings.Local.json
-
+# Ignore appsettings  (Passwords for DB)
+appsettings*.json
 
 # Ignore DB data
 db/
