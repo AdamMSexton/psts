@@ -14,3 +14,4 @@ obj/
 
 # Docker stuff
 *.env
+/psts.web/appsettings.Development.json
