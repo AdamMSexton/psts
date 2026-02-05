@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Psts.Web.Data;
+using psts.web.Data;
 using System.ComponentModel.DataAnnotations;
 
 namespace Psts.Web.Pages.Account;
@@ -10,11 +11,13 @@ public class NewUserModel : PageModel
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly PstsDbContext _db;
 
-    public NewUserModel(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+    public NewUserModel(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, PstsDbContext db)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _db = db;
     }
 
     [BindProperty]
@@ -24,17 +27,12 @@ public class NewUserModel : PageModel
     {
         [Required]
         public string FirstName { get; set; } = string.Empty;
-
         [Required]
         public string LastName { get; set; } = string.Empty;
-
         [Phone]
         public string? PhoneNumber { get; set; }
-
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
-
-        public string? ManagerName { get; set; }
     }
 
     public void OnGet() { }
@@ -53,19 +51,48 @@ public class NewUserModel : PageModel
             LoginPassAllowed = true,
             OIDCAllowed = false,
             ResetPassOnLogin = true,
-            LockoutEnabled = true,
+            LockoutEnabled = true
         };
-        
-        // Create user
-        var result = await _userManager.CreateAsync(user);
-        if (!result.Succeeded)
+
+        // Create transaction object to user creation
+        using var userCreationTransaction = await _db.Database.BeginTransactionAsync();
+        try
         {
-            // Problem creating user
+            // Create user
+            var resultU = await _userManager.CreateAsync(user);
+            if (!resultU.Succeeded)
+            {
+                throw new Exception("User creation failed.");
+            }
+
+            // New user assigned pending role while awaiting full onboard.        
+            var resultUR = await _userManager.AddToRoleAsync(user, "Pending");
+            if (!resultUR.Succeeded)
+            {
+                throw new Exception("User role assignment failed.");
+            }
+
+            // Build user profile
+            var userProfile = new PstsUserProfile
+            {
+                FName = Input.FirstName,
+                LName = Input.LastName,
+                EmployeeId = user.Id
+            };
+
+
+            _db.PstsUserProfiles.Add(userProfile);
+            await _db.SaveChangesAsync();
+
+            await userCreationTransaction.CommitAsync();
+        }
+        catch
+        {
+            await userCreationTransaction.RollbackAsync();          // Stop db writes if something failed. Prevent half transactions.
+            throw;
         }
 
-        // New user assigned pending role while awaiting full onboard.        
-        await _userManager.AddToRoleAsync(user, "Pending");
-
+        
         // New user is a user, generate token and forward to user profile page to setup password.
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         return RedirectToPage("/Account/Profile", new {userId = user.Id, token });

@@ -1,5 +1,40 @@
 ﻿@page
-@model psts.web.Pages.Account.profileModel
+@model Psts.Web.Pages.Account.ProfileModel
 @{
     ViewData["Title"] = "User Profile";
 }
+
+<h2>User Profile</h2>
+
+<form method="post">
+    <div>
+        <label asp-for="Input.UserName"></label>
+        <input asp-for="Input.UserName" />
+    </div>
+    <div>
+        <label asp-for="Input.FirstName"></label>
+        <input asp-for="Input.FirstName" />
+    </div>
+
+    <div>
+        <label asp-for="Input.LastName"></label>
+        <input asp-for="Input.LastName" />
+    </div>
+
+    <div>
+        <label asp-for="Input.Email"></label>
+        <input asp-for="Input.Email" />
+    </div>
+
+    <div>
+        <label asp-for="Input.PhoneNumber"></label>
+        <input asp-for="Input.PhoneNumber" />
+    </div>
+
+    <div>
+        <label asp-for="Input.ManagerName"></label>
+        <input asp-for="Input.ManagerName" />
+    </div>
+
+    <button type="submit">Save</button>
+</form>
