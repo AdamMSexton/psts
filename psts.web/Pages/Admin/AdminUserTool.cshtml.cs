@@ -9,6 +9,7 @@ using System.Text.Json;
 using Psts.Web.Data;
 
 namespace psts.web.Pages.Admin
+
 {
         [Authorize(Roles = "Admin")] // Restrict access to only admin users
         public class AdminUserToolModel : PageModel
@@ -16,9 +17,7 @@ namespace psts.web.Pages.Admin
             private readonly UserManager<AppUser> _userManager;
             private readonly RoleManager<IdentityRole> _roleManager;
 
-            public AdminUserToolModel(
-                UserManager<AppUser> userManager,
-                RoleManager<IdentityRole> roleManager)
+            public AdminUserToolModel(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
             {
                 _userManager = userManager;
                 _roleManager = roleManager;
@@ -104,7 +103,7 @@ namespace psts.web.Pages.Admin
             }
             else  // 1 or 0 roles currently assigned
             {
-                if ((userToModifyRole == null) && (data.NewRole == "nonUser"))
+                if ((userToModifyRole == null) && (data.NewRole == "Pending"))
                 {
                     changeRole = false;
                 }
@@ -119,7 +118,7 @@ namespace psts.web.Pages.Admin
                 // Remove all roles found
                 await _userManager.RemoveFromRolesAsync(userToModify, userToModifyRole);
                 // Add new role received
-                if (data.NewRole != "nonUser")
+                if (data.NewRole != "Pending")
                 {
                     await _userManager.AddToRoleAsync(userToModify, data.NewRole);
                     changedRole = true;
@@ -138,7 +137,7 @@ namespace psts.web.Pages.Admin
                 public string UserID { get; set; } = string.Empty;
                 public bool ResetPswd { get; set; }
                 public bool LockAccount { get; set; }
-                public string NewRole { get; set; } = string.Empty;
+            public string NewRole { get; set; } = string.Empty;
         }
 
         public List<AppUser> Users { get; set; }
