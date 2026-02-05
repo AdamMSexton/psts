@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function ()
         userIDs.push(inputItems[i].getAttribute("id").slice(4));
     }
     
-    //console.log(userIDs);
+    console.log(userIDs);
 
     // Add listeners & set initial visibility
 
@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function ()
     for (let i = 0; i < userIDs.length; i++)
     {
         // Add Listeners to user access controls
+        document.getElementById("role-" + userIDs[i] + "-P").addEventListener('click', function () { rowChange(userIDs[i]) });
         document.getElementById("role-" + userIDs[i] + "-C").addEventListener('click', function () { rowChange(userIDs[i]) });
         document.getElementById("role-" + userIDs[i] + "-E").addEventListener('click', function () { rowChange(userIDs[i]) });
         document.getElementById("role-" + userIDs[i] + "-M").addEventListener('click', function () { rowChange(userIDs[i]) });
@@ -52,6 +53,7 @@ function updateVisibility()
 // Visibility will be update row by row based on checkbox values.
 {
     // Get filtermask
+    pending = document.getElementById("filter-Pending").checked;
     clerk = document.getElementById("filter-Clerk").checked;
     employee = document.getElementById("filter-Employee").checked;
     manager = document.getElementById("filter-Manager").checked;
@@ -62,6 +64,11 @@ function updateVisibility()
     for (let i = 0; i < userIDs.length; i++) {
         switch (document.querySelector('input[name="role-' + userIDs[i] + '"]:checked').value)
         {   
+            case "Pending":
+                {
+                    document.getElementById("row-" + userIDs[i]).style.visibility = pending ? "visible" : "collapse";
+                    break;
+                }
             case "Clerk":
                 {
                     document.getElementById("row-" + userIDs[i]).style.visibility = clerk ? "visible" : "collapse";
@@ -128,7 +135,7 @@ async function updateRecord(userID, resetPswd, lockAccount, newRole)
  
     const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-    const result = await fetch('/Admin/AdminUserTool?handler=UpdateData', {
+    const result = await fetch('/AdminTools/Index?handler=UpdateData', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
