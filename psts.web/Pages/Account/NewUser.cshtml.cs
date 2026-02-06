@@ -42,10 +42,15 @@ public class NewUserModel : PageModel
         if (!ModelState.IsValid)
             return Page();
 
+        string newUserName = Input.FirstName + "." + Input.LastName;
+
+        // ***************** Code to prevent duplicate users, i.e. john.smith  next should be john.smith1
+
+
         // Build new user from form inputs
         var user = new AppUser
         {
-            UserName = Input.FirstName + "." + Input.LastName,
+            UserName = newUserName,
             Email = Input.Email,
             PhoneNumber = Input.PhoneNumber,
             LoginPassAllowed = true,
