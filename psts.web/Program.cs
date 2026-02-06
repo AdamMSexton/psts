@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using psts.web.Data;
 using Psts.Web.Data;
 using System.Data;
 
@@ -42,136 +43,25 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddControllers();      // For APIs later
 
+builder.Services.AddScoped<PstsDbSeeder>();
+
 var app = builder.Build();
 
-// AMS - Apply migrations (for DB init and validation)
+
+
+// AMS - Apply migrations (for DB init and validation) & Seed
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PstsDbContext>();
     db.Database.Migrate();
+    
+    // AMS - Seed Database
+    var seeder = scope.ServiceProvider.GetRequiredService<PstsDbSeeder>();
+    await seeder.SeedDbAsync();
 }
 
 
-// AMS ***** This section verify roles and at least 1 admin exists.  ensure bare minimum setup in the case of a fresh install or DB
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
-
-    bool rolesCreated = true;
-
-    // AMS - Verify Admin role exists, if not create it
-    if (!await roleManager.RoleExistsAsync("Admin"))
-    {
-        var status = await roleManager.CreateAsync(new IdentityRole("Admin"));
-        if (!status.Succeeded)
-        {
-            rolesCreated = true;
-            foreach (var e in status.Errors)
-                app.Logger.LogError("Role 'Admin' failed: {Error}", e.Description);
-        }
-    }
-
-    // AMS - Verify Manager role exists, if not create it
-    if (!await roleManager.RoleExistsAsync("Manager"))
-    {
-        var status = await roleManager.CreateAsync(new IdentityRole("Manager"));
-        if (!status.Succeeded)
-        {
-            rolesCreated = true;
-            foreach (var e in status.Errors)
-                app.Logger.LogError("Role 'Manager' failed: {Error}", e.Description);
-        }
-    }
-
-    // AMS - Verify Employee role exists, if not create it
-    if (!await roleManager.RoleExistsAsync("Employee"))
-    {
-        var status = await roleManager.CreateAsync(new IdentityRole("Employee"));
-        if (!status.Succeeded)
-        {
-            rolesCreated = true;
-            foreach (var e in status.Errors)
-                app.Logger.LogError("Role 'Employee' failed: {Error}", e.Description);
-        }
-    }
-
-    // AMS - Verify Clerk role exists, if not create it
-    if (!await roleManager.RoleExistsAsync("Clerk"))
-    {
-        var status = await roleManager.CreateAsync(new IdentityRole("Clerk"));
-        if (!status.Succeeded)
-        {
-            rolesCreated = true;
-            foreach (var e in status.Errors)
-                app.Logger.LogError("Role 'Clerk' failed: {Error}", e.Description);
-        }
-    }
-
-    // AMS - Verify Pending role exists, if not create it
-    if (!await roleManager.RoleExistsAsync("Pending"))
-    {
-        var status = await roleManager.CreateAsync(new IdentityRole("Pending"));
-        if (!status.Succeeded)
-        {
-            rolesCreated = true;
-            foreach (var e in status.Errors)
-                app.Logger.LogError("Role 'Pending' failed: {Error}", e.Description);
-        }
-    }
-
-    if (!rolesCreated)
-    {
-        app.Logger.LogError("Could not create required user roles. APPLICATION MAY NOT FUNCTION CORRECTLY.");
-    }
-
-    // AMS if no admins exist create the default and set to require password change at next login.
-    var admins = await userManager.GetUsersInRoleAsync("Admin");
-    if (!admins.Any())
-    {
-        // AMS - Setup new admin user settings
-        var initialAdmin = new AppUser 
-        { 
-            UserName = "admin",
-            Email = "admin@psts.local",
-            EmailConfirmed = true,
-            ResetPassOnLogin = true,
-            LoginPassAllowed = true,
-            OIDCAllowed = false
-        };
-        
-        // AMS - Verify admin username is not in use
-        if (await userManager.FindByNameAsync(initialAdmin.UserName) == null)
-        {
-            // AMS - Create new admin user
-            string randPassword = $"{Guid.NewGuid():N}".Substring(0, 12) + "aA1!";
-            var result = await userManager.CreateAsync(initialAdmin, randPassword);
-            // AMS - Take success/fail of Admin user creation, assign admin role, and log an appropriate output.
-            if (!result.Succeeded)
-            {
-                throw new Exception($"Failed to create initial admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            }
-            else
-            {
-                await userManager.AddToRoleAsync(initialAdmin, "Admin");
-                app.Logger.LogCritical(@"
-                    ==================================================
-                     INITIAL ADMIN ACCOUNT CREATED
-                     USERNAME: admin
-                     PASSWORD: {Password}
-                    ==================================================
-                    ", randPassword);
-            }
-        }
-
-    }
-}
-
-
-
-
-
-// AMS ***** Create a dev user. Delete for production
+// AMS ***** Create a dev user. DELETE FOR PRODUCTION
 using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
@@ -192,29 +82,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
-
-app.MapGet("/_debug-login", async (
-    SignInManager<AppUser> signInManager,
-    UserManager<AppUser> userManager) =>
-{
-    var user = await userManager.FindByNameAsync("admin");
-    if (user == null)
-        return Results.Text("User NOT found");
-
-    var result = await signInManager.PasswordSignInAsync(
-        "admin",
-        "0e9a5b04296baA1!",
-        false,
-        false);
-
-    return Results.Text(
-        $"Succeeded={result.Succeeded}, NotAllowed={result.IsNotAllowed}, LockedOut={result.IsLockedOut}");
-});
-
-
-
-
 
 app.MapControllers();       // For APIs later
 

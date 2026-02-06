@@ -12,6 +12,7 @@ public class PstsDbContext : IdentityDbContext<AppUser>
     }
 
     // Data tables
+    public DbSet<AppSettings> AppSettingss { get; set; } = default!;
     public DbSet<PstsUserProfile> PstsUserProfiles { get; set; } = default!;
     public DbSet<PstsClientProfile> PstsClientProfiles { get; set; } = default!;
     public DbSet<PstsProjectDefinition> PstsProjectDefinitions {  get; set; } = default!;
