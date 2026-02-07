@@ -12,11 +12,13 @@ public class PstsDbContext : IdentityDbContext<AppUser>
     }
 
     // Data tables
-    DbSet<PstsUserProfile> PstsUserProfiles { get; set; }
-    DbSet<PstsClientProfile> PstsClientProfiles { get; set; }
-    DbSet<PstsProjectDefinition> PstsProjectDefinitions {  get; set; }
-    DbSet<PstsTaskDefinition> PstsTaskDefinitions { get; set; }
-    DbSet<PstsTimeTransactions> PstsTimeTransactions { get; set; }
+    public DbSet<AppSettings> AppSettingss { get; set; } = default!;
+    public DbSet<PstsUserProfile> PstsUserProfiles { get; set; } = default!;
+    public DbSet<PstsClientProfile> PstsClientProfiles { get; set; } = default!;
+    public DbSet<PstsProjectDefinition> PstsProjectDefinitions {  get; set; } = default!;
+    public DbSet<PstsTaskDefinition> PstsTaskDefinitions { get; set; } = default!;
+    public DbSet<PstsTimeTransactions> PstsTimeTransactionss { get; set; } = default!;
+    public DbSet<PstsBillingRateResolutionSchedule> pstsBillingRateResolutionSchedules { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder builder)       
     {
