@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Psts.Web.Data;
+using System.Linq.Expressions;
 
 namespace psts.web.Data
 {
@@ -93,38 +94,62 @@ namespace psts.web.Data
             if (!admins.Any())
             {
                 // AMS - Setup new admin user settings
-                var initialAdmin = new AppUser 
+                
+                using var userCreationTransaction = await _db.Database.BeginTransactionAsync();
+                try 
                 { 
-                    UserName = "admin",
-                    Email = "admin@psts.local",
-                    EmailConfirmed = true,
-                    ResetPassOnLogin = true,
-                    LoginPassAllowed = true,
-                    OIDCAllowed = false
-                };
+                    var initialAdmin = new AppUser 
+                    { 
+                        UserName = "admin",
+                        Email = "admin@psts.local",
+                        EmailConfirmed = true,
+                        ResetPassOnLogin = true,
+                        LoginPassAllowed = true,
+                        OIDCAllowed = false
+                    };
         
-                // AMS - Verify admin username is not in use
-                if (await _userManager.FindByNameAsync(initialAdmin.UserName) == null)
-                {
                     // AMS - Create new admin user
                     string randPassword = $"{Guid.NewGuid():N}".Substring(0, 12) + "aA1!";
-                    var result = await _userManager.CreateAsync(initialAdmin, randPassword);
+                    var resultU = await _userManager.CreateAsync(initialAdmin, randPassword);
                     // AMS - Take success/fail of Admin user creation, assign admin role, and log an appropriate output.
-                    if (!result.Succeeded)
+                    if (!resultU.Succeeded)
                     {
-                        throw new Exception($"Failed to create initial admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                        throw new Exception($"Failed to create initial admin user: {string.Join(", ", resultU.Errors.Select(e => e.Description))}");
                     }
-                    else
+
+                    var resultUR = await _userManager.AddToRoleAsync(initialAdmin, "Admin");
+                    if (!resultUR.Succeeded)
                     {
-                        await _userManager.AddToRoleAsync(initialAdmin, "Admin");
-                        _logger.LogCritical(@"
-                            ==================================================
-                             INITIAL ADMIN ACCOUNT CREATED
-                             USERNAME: admin
-                             PASSWORD: {Password}
-                            ==================================================
-                            ", randPassword);
+                        throw new Exception($"Failed to add 'admin' role to admin user: {string.Join(", ", resultUR.Errors.Select(e => e.Description))}");
                     }
+
+
+                    // Create Profile
+                    var initialAdminProfile = new PstsUserProfile
+                    {
+                        FName = "Default",
+                        LName = "Administrator",
+                        EmployeeId = initialAdmin.Id,
+                        ManagerId = null
+                    };
+
+                    _db.PstsUserProfiles.Add(initialAdminProfile);
+                    await _db.SaveChangesAsync();
+
+                    _logger.LogCritical(@"
+                        ==================================================
+                            INITIAL ADMIN ACCOUNT CREATED
+                            USERNAME: admin
+                            PASSWORD: {Password}
+                        ==================================================
+                        ", randPassword);
+                    
+                    await userCreationTransaction.CommitAsync();
+                }
+                catch
+                {
+                    await userCreationTransaction.RollbackAsync();          // Stop db writes if something failed. Prevent half transactions.
+                    throw;
                 }
             }
         }

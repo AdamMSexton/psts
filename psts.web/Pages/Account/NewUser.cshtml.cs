@@ -82,7 +82,8 @@ public class NewUserModel : PageModel
             {
                 FName = Input.FirstName,
                 LName = Input.LastName,
-                EmployeeId = user.Id
+                EmployeeId = user.Id,
+                ManagerId = null
             };
 
 

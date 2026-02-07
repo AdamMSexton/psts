@@ -15,6 +15,8 @@ namespace Psts.Web.Pages.Account
         private readonly PstsDbContext _db;
         private readonly SignInManager<AppUser> _signInManager;
 
+        public enum PasswordChangeReason { Undetermined, Voluntary, ForcedOnLogin, NewUser }
+
         public ProfileModel(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, PstsDbContext db, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
@@ -141,7 +143,9 @@ namespace Psts.Web.Pages.Account
         {
             ModelState.Clear();
             if (!TryValidateModel(PasswordInput, nameof(PasswordInput)))
+            {
                 return Page();
+            }
 
             // Verify current user exists
             var user = await _userManager.FindByIdAsync(userId);
@@ -150,6 +154,34 @@ namespace Psts.Web.Pages.Account
                 return NotFound();
             }
 
+            PasswordChangeReason changeReason = PasswordChangeReason.Undetermined;
+
+            // Is this an existing user executing a voluntary change
+            if ((!user.ResetPassOnLogin) && (!string.IsNullOrEmpty(user.PasswordHash)))
+            {
+                changeReason = PasswordChangeReason.Voluntary;
+            }
+
+            // This was existing user that was forced to change password
+            if ((user.ResetPassOnLogin) && (!string.IsNullOrEmpty(user.PasswordHash)))
+            {
+                changeReason = PasswordChangeReason.ForcedOnLogin;
+            }
+
+            // This is a new user who is setting their password first time in
+            if ((user.ResetPassOnLogin) && (string.IsNullOrEmpty(user.PasswordHash)))
+            {
+                changeReason = PasswordChangeReason.NewUser;
+            }
+
+
+            // For some reason we can not determine what teh circumstance is, so terminate.
+            if (changeReason == PasswordChangeReason.Undetermined)
+            {
+                return Forbid();
+            }
+
+
             // Verify both new passowrds entered match
             if (PasswordInput.NewPassword != PasswordInput.VerifyPassword)          // Ensure New and Verify passwords match
             {
@@ -157,8 +189,9 @@ namespace Psts.Web.Pages.Account
                 return Page();
             }
 
+           
             // If not a new account, verify password is not a rerun 
-            if ((!user.ResetPassOnLogin) || (!string.IsNullOrEmpty(user.PasswordHash)))
+            if ((changeReason==PasswordChangeReason.Voluntary) || (changeReason == PasswordChangeReason.ForcedOnLogin))
             {
                 // Test if new password is same as old
                 var recycledPassword = await _userManager.CheckPasswordAsync(user, PasswordInput.NewPassword);
@@ -169,17 +202,22 @@ namespace Psts.Web.Pages.Account
                 }
             }
             
-            bool forceSignout = true;       // Voluntary Password changes can remain logged in, set flag to force signout until otherwise determined
-            
-            if ((!user.ResetPassOnLogin) && (string.IsNullOrEmpty(token)))      // Voluntary password change
+            // Ensure password meets system requirements
+            foreach (var validator in _userManager.PasswordValidators)
             {
-                forceSignout = false;
+                var result = await validator.ValidateAsync(_userManager, user, PasswordInput.NewPassword);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(nameof(PasswordInput.NewPassword), error.Description);
+                    }
+                    return Page();
+                }
             }
 
-
-                // All password tests passed and no clear to be set/changed
-                // Validate received token is valid, not expired, and for user.  Only for forced password changes
-            if ((user.ResetPassOnLogin) && (!string.IsNullOrEmpty(token)))
+            // For forced changes, validate received token is valid, not expired, and for user.
+            if ((changeReason == PasswordChangeReason.ForcedOnLogin) || (changeReason == PasswordChangeReason.NewUser))
             {
                 var isValid = await _userManager.VerifyUserTokenAsync(user, _userManager.Options.Tokens.PasswordResetTokenProvider, "ResetPassword", token);
                 if (!isValid)
@@ -188,10 +226,8 @@ namespace Psts.Web.Pages.Account
                 }
             }
 
-            
-
-            // If user existed before current session and used valid credentials this branch
-            if ((!user.ResetPassOnLogin) || (!string.IsNullOrEmpty(user.PasswordHash)))
+            // If voluntary change then use change password
+            if (changeReason == PasswordChangeReason.Voluntary)
             {
                 var result = await _userManager.ChangePasswordAsync(user, PasswordInput.CurrentPassword, PasswordInput.NewPassword);
                 if (!result.Succeeded)
@@ -203,7 +239,9 @@ namespace Psts.Web.Pages.Account
                     return Page();
                 }
             }
-            else    // Not logged in with valid credentials, most likely new user.
+
+            // If new user (NULL password) or forced (credentials verified with login and token) then reset password
+            if ((changeReason == PasswordChangeReason.NewUser) || (changeReason == PasswordChangeReason.ForcedOnLogin))
             {
                 var passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var result = await _userManager.ResetPasswordAsync(user, passwordResetToken, PasswordInput.NewPassword);
@@ -217,15 +255,23 @@ namespace Psts.Web.Pages.Account
                 }
             }
 
-            // Password changed, release locks
-            var updateResult = await _userManager.SetLockoutEnabledAsync(user, false);
+            // Password changed, reset failed login count
+            var updateResult = await _userManager.ResetAccessFailedCountAsync(user);
             if (!updateResult.Succeeded)
             {
                 foreach (var error in updateResult.Errors)
                     ModelState.AddModelError("", error.Description);
             }
 
-            
+            // Password changed, remove lockout end date
+            updateResult = await _userManager.SetLockoutEndDateAsync(user, null);
+            if (!updateResult.Succeeded)
+            {
+                foreach (var error in updateResult.Errors)
+                    ModelState.AddModelError("", error.Description);
+            }
+
+            // Password changed, clear the reset on login flag
             user.ResetPassOnLogin = false;
             updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded) 
@@ -234,15 +280,20 @@ namespace Psts.Web.Pages.Account
                 ModelState.AddModelError("", error.Description);
             }
 
-            if (forceSignout)       // Flagged for signout, should be anybody but voluntary changes.
+            // Force signout, should be anybody but voluntary changes.
+            if ((changeReason == PasswordChangeReason.ForcedOnLogin) || (changeReason == PasswordChangeReason.NewUser))
             {
                 await _signInManager.SignOutAsync();
                 return RedirectToPage("/Account/Login");
             }
-            else
+            
+            // Voluntary change was authenticate with a good password earlier.  continue without logout.
+            if (changeReason == PasswordChangeReason.Voluntary)
             { 
                 return RedirectToPage("/Account/Profile");
             }
+
+            return Page();
         }
 
     }

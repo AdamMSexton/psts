@@ -9,13 +9,13 @@ public class LoginModel : PageModel
 {
     private readonly SignInManager<AppUser> _signInManager;
     private readonly ILogger<LoginModel> _logger;
+    private readonly UserManager<AppUser> _userManager;
 
-    public LoginModel(
-        SignInManager<AppUser> signInManager,
-        ILogger<LoginModel> logger)
+    public LoginModel(SignInManager<AppUser> signInManager, ILogger<LoginModel> logger, UserManager<AppUser> userManager)
     {
         _signInManager = signInManager;
         _logger = logger;
+        _userManager = userManager;
     }
 
     public class LoginInput
@@ -47,10 +47,54 @@ public class LoginModel : PageModel
             lockoutOnFailure: false
         );
 
-        if (result.Succeeded)
-            return RedirectToPage("/Account/Home");
+        
 
-        LoginFailed = true;
+        if (result.Succeeded)
+        {
+            var user = await _userManager.FindByNameAsync( userName );
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (user.LoginPassAllowed)      // Account can use login and password
+            {
+                // Check if user needs to change password
+                if (user.ResetPassOnLogin == true)
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    return RedirectToPage("/Account/Profile", new { userId = user.Id, token });
+                }
+                else
+                {
+                    return RedirectToPage("/Account/Home");
+                }
+            }
+            else    // Account not authorized for login and password, logout and kick back to login.
+            {
+                await _signInManager.SignOutAsync();
+                return RedirectToPage("/Account/Login");
+            }
+        }
+
+        if (result.IsLockedOut)
+        {
+            ModelState.AddModelError("", "Account is locked.");
+            return Page();
+        }
+
+        if (result.IsNotAllowed)
+        {
+            ModelState.AddModelError("", "Sign-in not allowed.");
+            return Page();
+        }
+
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError("", "Invalid login attempt.");
+            return Page();
+        }
+
         return Page();
     }
 }
