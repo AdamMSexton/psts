@@ -1,6 +1,9 @@
 @page
 @model Psts.Web.Pages.Account.LoginModel
-
+@{
+    ViewData["Title"] = "Login - PSTS Solutions";
+    ViewData["HideNavbar"] = true;
+}
 
 <h2>Login</h2>
 
@@ -28,3 +31,6 @@
 <br />
 <a asp-page="./NewUser">Create account</a>
 
+<h1>PSTS SOLUTIONS</h1>
+<p>Providing efficient hour tracking, and keeping you focused on your business.</p>
+<img src="@Url.Content("~/Images/BCO.eb2e4f5c-29cf-4e37-9a8c-8dd773714c58.png")" alt="PSTS Solutions Logo" title="PSTS Solutions Logo" />

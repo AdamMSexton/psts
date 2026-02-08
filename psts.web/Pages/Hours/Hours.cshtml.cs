@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace psts.web.Pages.Account
+namespace psts.web.Pages.Hours
 {
-    public class profileModel : PageModel
+    public class HoursModel : PageModel
     {
         public void OnGet()
         {
-
         }
     }
 }
