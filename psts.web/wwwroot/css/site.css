@@ -1,2 +1,37 @@
 ﻿body {
+    font-family: 'Lato', sans-serif;
 }
+
+/*Navbar styling*/
+#navBar {
+    display: flex;
+    justify-content: center; /* centers horizontally */
+}
+
+    #navBar ul {
+        display: flex;
+        gap: 9%; /* spacing between items */
+        list-style: none;
+        padding-right: 10%;
+        padding-left: -0.25%;
+        padding-top: 0.25%;
+       
+        padding-bottom: 0.25%;
+        margin-top: 1%;
+        font-weight: bold;
+        background-color: lightgrey;
+    }
+
+    #navBar li a:hover{
+        text-decoration: blink;
+        color:black;
+    }
+    #navBar li a:visited {
+        text-decoration: none;
+        color: mediumpurple;
+    }
+
+    #navBar li a:link {
+        text-decoration: none;
+        color: white;
+    }
