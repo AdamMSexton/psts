@@ -1,30 +1,63 @@
 @page
 @model Psts.Web.Pages.Account.LoginModel
 
+<div style="max-width: 400px; margin: 50px auto; font-family: Arial, sans-serif;">
+    <h2>Login</h2>
 
-<h2>Login</h2>
+    <!-- Traditional username/password login -->
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <div style="margin-bottom: 15px;">
+            <label>User Name</label>
+            <input name="UserName" style="width: 100%; padding: 8px;" />
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label>Password</label>
+            <input name="Password" type="password" style="width: 100%; padding: 8px;" />
+        </div>
+        <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Login</button>
+    </form>
 
-<form method="post">
-    @Html.AntiForgeryToken()
-    <div>
-        <label>User Name</label>
-        <input name="UserName" />
+    @if (Model.LoginFailed)
+    {
+        <p style="color:red; margin-top: 10px;">Login failed</p>
+    }
+
+    <div style="margin: 20px 0;">
+        <a asp-page="./NewUser">Create account</a>
     </div>
 
-    <div>
-        <label>Password</label>
-        <input name="Password" type="password" />
+    <!-- Divider -->
+    <div style="text-align: center; margin: 30px 0;">
+        <span style="color: #666;">- OR -</span>
     </div>
 
-    <button type="submit">Login</button>
-</form>
+    <!-- External login providers -->
+    <h3 style="margin-bottom: 15px;">Sign in with:</h3>
 
-@if (Model.LoginFailed)
-{
-<p style="color:red">Login failed</p>
-}
+    @if (Model.ExternalLogins?.Count > 0)
+    {
+        <form method="post" asp-page-handler="ExternalLogin">
+            @Html.AntiForgeryToken()
+            @foreach (var provider in Model.ExternalLogins)
+            {
+                var buttonStyle = "width: 100%; padding: 12px; margin: 10px 0; font-size: 16px; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; color: white;";
+                var backgroundColor = provider.Name switch
+                {
+                    "Google" => "#4285f4",
+                    "Microsoft" => "#00a4ef",
+                    "Auth0" => "#eb5424",
+                    "Okta" => "#007dc1",
+                    _ => "#666"
+                };
 
-<br />
-<br />
-<a asp-page="./NewUser">Create account</a>
-
+                <button type="submit"
+                        name="provider"
+                        value="@provider.Name"
+                        style="@buttonStyle background-color: @backgroundColor;">
+                    Sign in with @provider.Name
+                </button>
+            }
+        </form>
+    }
+</div>

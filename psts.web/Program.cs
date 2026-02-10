@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using psts.web.Data;
 using Psts.Web.Data;
 using System.Data;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +40,84 @@ builder.Logging.AddSimpleConsole(options =>
     options.TimestampFormat = "HH:mm:ss ";
 });
 
-builder.Services.AddAuthentication();
+// Configure external authentication
+var authBuilder = builder.Services.AddAuthentication();
+
+// Google Authentication - only enabled if ClientId is configured
+if (!string.IsNullOrEmpty(builder.Configuration["Authentication:Google:ClientId"]))
+{
+    authBuilder.AddGoogle("Google", options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+        options.CallbackPath = "/signin-google";
+    });
+}
+
+// Microsoft Authentication - only enabled if ClientId is configured
+if (!string.IsNullOrEmpty(builder.Configuration["Authentication:Microsoft:ClientId"]))
+{
+    authBuilder.AddOpenIdConnect("Microsoft", options =>
+    {
+        options.Authority = $"https://login.microsoftonline.com/{builder.Configuration["Authentication:Microsoft:TenantId"]}/v2.0";
+        options.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]!;
+        options.CallbackPath = "/signin-microsoft";
+        options.ResponseType = Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectResponseType.Code;
+        options.SaveTokens = true;
+
+        options.Scope.Clear();
+        options.Scope.Add("openid");
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+    });
+}
+
+// Auth0 Authentication - only enabled if ClientId is configured
+if (!string.IsNullOrEmpty(builder.Configuration["Authentication:Auth0:ClientId"]))
+{
+    authBuilder.AddOpenIdConnect("Auth0", options =>
+    {
+        options.Authority = builder.Configuration["Authentication:Auth0:Authority"]!;
+        options.ClientId = builder.Configuration["Authentication:Auth0:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:Auth0:ClientSecret"]!;
+        options.CallbackPath = "/signin-auth0";
+        options.ResponseType = Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectResponseType.Code;
+        options.SaveTokens = true;
+
+        options.Scope.Clear();
+        options.Scope.Add("openid");
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+    });
+}
+
+// Okta Authentication - only enabled if ClientId is configured
+if (!string.IsNullOrEmpty(builder.Configuration["Authentication:Okta:ClientId"]))
+{
+    authBuilder.AddOpenIdConnect("Okta", options =>
+    {
+        options.Authority = builder.Configuration["Authentication:Okta:Authority"]!;
+        options.ClientId = builder.Configuration["Authentication:Okta:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:Okta:ClientSecret"]!;
+        options.CallbackPath = "/signin-okta";
+        options.ResponseType = Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectResponseType.Code;
+        options.SaveTokens = true;
+
+        options.Scope.Clear();
+        options.Scope.Add("openid");
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+
+        options.TokenValidationParameters.NameClaimType = "name";
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+    });
+}
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddRazorPages();
