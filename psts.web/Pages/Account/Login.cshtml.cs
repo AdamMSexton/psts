@@ -10,13 +10,11 @@ public class LoginModel : PageModel
 {
     private readonly SignInManager<AppUser> _signInManager;
     private readonly ILogger<LoginModel> _logger;
-    private readonly UserManager<AppUser> _userManager;
 
     public LoginModel(SignInManager<AppUser> signInManager, ILogger<LoginModel> logger, UserManager<AppUser> userManager)
     {
         _signInManager = signInManager;
         _logger = logger;
-        _userManager = userManager;
     }
 
     public class LoginInput
