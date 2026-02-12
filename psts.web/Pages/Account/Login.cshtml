@@ -5,70 +5,92 @@
     ViewData["HideNavbar"] = true;
 }
 
-<div style="max-width: 400px; margin: 50px auto; font-family: Arial, sans-serif;">
-    <h2>Login</h2>
 
-    <!-- Traditional username/password login -->
-    <form method="post" id="local-login-form">
-        @Html.AntiForgeryToken()
-        <div style="margin-bottom: 15px;">
-            <label>User Name</label>
-            <input name="UserName" type="text" placeholder="Enter your username..." autocomplete="username" style="width: 100%; padding: 8px;" />
+
+
+
+<div class="login-container">
+
+    <div class="grid-item welcome-box">
+        <div class="welcome-inner">
+            <h1>Greetings, User.</h1>
+            <h2>Please sign in or create an account.</h2>
         </div>
-        <div style="margin-bottom: 15px;">
-            <label>Password</label>
-            <input name="Password" type="password" placeholder="Enter your password..." autocomplete="current-password" style="width: 100%; padding: 8px;" />
-        </div>
-        <button type="submit" id="local-login-submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Login</button>
-    </form>
-
-    @if (Model.LoginFailed)
-    {
-        <p style="color:red; margin-top: 10px;">Login failed</p>
-    }
-
-    <br />
-
-    <!-- Divider -->
-    <div style="text-align: center; margin: 30px 0;">
-        <span style="color: #666;">- OR -</span>
     </div>
 
-    <!-- External login providers -->
-    <h3 style="margin-bottom: 15px;">Sign in with:</h3>
+    <!-- LOGIN -->
+    <div id="login" class="grid-item" style="grid-column: 1; grid-row: 2;">
+        <h2>Login</h2>
 
-    @if (Model.ExternalLogins?.Count > 0)
-    {
-        <form method="post" asp-page-handler="ExternalLogin">
+        <form method="post" id="local-login-form">
             @Html.AntiForgeryToken()
-            @foreach (var provider in Model.ExternalLogins)
-            {
-                var buttonStyle = "width: 100%; padding: 12px; margin: 10px 0; font-size: 16px; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; color: white;";
-                var backgroundColor = provider.Name switch
-                {
-                    "Google" => "#4285f4",
-                    "Microsoft" => "#00a4ef",
-                    "Auth0" => "#eb5424",
-                    "Okta" => "#007dc1",
-                    _ => "#666"
-                };
 
-                <button type="submit"
-                        name="provider"
-                        value="@provider.Name"
-                        style="@buttonStyle background-color: @backgroundColor;">
-                    Sign in with @provider.Name
-                </button>
-            }
+            <div class="form-group">
+                <label>User Name</label>
+                <input name="UserName" type="text" placeholder="Enter your username..." autocomplete="username" />
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input name="Password" type="password" placeholder="Enter your password..." autocomplete="current-password" />
+            </div>
+
+            <button type="submit" id="local-login-submit" class="btn-primary">
+                Login
+            </button>
         </form>
-    }
 
-<a asp-page="./NewUser">Create account</a>
+        @if (Model.LoginFailed)
+        {
+            <p class="error-text">Login failed</p>
+        }
 
-<h1>PSTS SOLUTIONS</h1>
-<p>Providing efficient hour tracking, and keeping you focused on your business.</p>
-<img src="@Url.Content("~/Images/BCO.eb2e4f5c-29cf-4e37-9a8c-8dd773714c58.png")" alt="PSTS Solutions Logo" title="PSTS Solutions Logo" />
+        <a asp-page="./NewUser">Create account</a>
+    </div>
+
+    <!-- EXTERNAL LOGIN -->
+    <div id="loginExternal" class="grid-item" style="grid-column: 2; grid-row: 2;">
+        <h3>Sign in with:</h3>
+
+        @if (Model.ExternalLogins?.Count > 0)
+        {
+            <form method="post" asp-page-handler="ExternalLogin">
+                @Html.AntiForgeryToken()
+
+                @foreach (var provider in Model.ExternalLogins)
+                {
+                    var backgroundColor = provider.Name switch
+                    {
+                                    "Google" => "google",
+                                    "Microsoft" => "microsoft",
+                                    "Auth0" => "auth0",
+                                    "Okta" => "okta",
+                        _ => "default"
+                    };
+
+                    <button type="submit"
+                            name="provider"
+                            value="@provider.Name"
+                            class="external-btn @backgroundColor">
+                        Sign in with @provider.Name
+                    </button>
+                }
+            </form>
+        }
+    </div>
+
+    <!-- COMPANY CONTENT -->
+    <div id="companyContent" class="grid-item" style="grid-column: 3; grid-row: 2;">
+        <h1>PSTS SOLUTIONS</h1>
+        <p>Providing efficient hour tracking, and keeping you focused on your business.</p>
+
+        <img src="@Url.Content("~/Images/BCO.eb2e4f5c-29cf-4e37-9a8c-8dd773714c58.png")"
+             alt="PSTS Solutions Logo"
+             title="PSTS Solutions Logo" />
+    </div>
+
 </div>
+
 @section Scripts {
     <script src="~/js/Login.js" asp-append-version="true"></script>
 }
