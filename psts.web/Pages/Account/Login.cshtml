@@ -9,17 +9,17 @@
     <h2>Login</h2>
 
     <!-- Traditional username/password login -->
-    <form method="post">
+    <form method="post" id="local-login-form">
         @Html.AntiForgeryToken()
         <div style="margin-bottom: 15px;">
             <label>User Name</label>
-            <input name="UserName" style="width: 100%; padding: 8px;" />
+            <input name="UserName" type="text" placeholder="Enter your username..." autocomplete="username" style="width: 100%; padding: 8px;" />
         </div>
         <div style="margin-bottom: 15px;">
             <label>Password</label>
-            <input name="Password" type="password" style="width: 100%; padding: 8px;" />
+            <input name="Password" type="password" placeholder="Enter your password..." autocomplete="current-password" style="width: 100%; padding: 8px;" />
         </div>
-        <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Login</button>
+        <button type="submit" id="local-login-submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Login</button>
     </form>
 
     @if (Model.LoginFailed)
@@ -75,3 +75,7 @@
 <h1>PSTS SOLUTIONS</h1>
 <p>Providing efficient hour tracking, and keeping you focused on your business.</p>
 <img src="@Url.Content("~/Images/BCO.eb2e4f5c-29cf-4e37-9a8c-8dd773714c58.png")" alt="PSTS Solutions Logo" title="PSTS Solutions Logo" />
+
+@section Scripts {
+    <script src="~/js/Login.js" asp-append-version="true"></script>
+}
