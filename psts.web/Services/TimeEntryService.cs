@@ -72,5 +72,10 @@ namespace psts.web.Services
             }
             
         }
+    
+        public async Task<ServiceResult<bool>> ChangeShortCode(string _employeeId, string _employeeRole, ShortCodeType type, Guid entityId, string? newShortCode)
+        {
+
+        }
     }
 }
