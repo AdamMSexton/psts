@@ -6,6 +6,12 @@
 
 <h2>User Profile</h2>
 
+@*Status message for OIDC operations*@
+@if (TempData["StatusMessage"] != null)
+{
+    <p>@TempData["StatusMessage"]</p>
+}
+
 <form method="post" asp-page-handler="UpdateProfile">
     <div>
         <label asp-for="ProfileInput.UserName"></label>
@@ -64,3 +70,45 @@
 
     <button type="submit">Update</button>
 </form>
+
+@*OIDC stuff below all new*@
+<br /><br />
+
+<h3>External Login Options</h3>
+@if (Model.CurrentLogins?.Count > 0)
+{
+    <h4>Linked Accounts</h4>
+    @foreach (var login in Model.CurrentLogins)
+    {
+        <form method="post" asp-page-handler="RemoveLogin">
+            <div>
+                <label>@login.LoginProvider</label>
+                <input type="hidden" name="loginProvider" value="@login.LoginProvider" />
+                <input type="hidden" name="providerKey" value="@login.ProviderKey" />
+                <button type="submit">Remove</button>
+            </div>
+        </form>
+    }
+}
+else
+{
+    <p>You have no linked external accounts.</p>
+}
+<br/>
+
+@if (Model.ExternalLogins?.Count > 0)
+
+{
+    <h4> Add External Login</h4>
+    @foreach(var provider in Model.ExternalLogins)
+    {
+        @* Only show provider if not already linked *@
+        @if(!Model.CurrentLogins.Any(l=>l.LoginProvider==provider.Name))
+        {
+            <form method="post" asp-page-handler="LinkLogin">
+                <input type="hidden" name="provider" value="@provider.Name"/>
+                <button type="submit">Link @provider.Name</button>
+            </form>
+        }
+    }
+}

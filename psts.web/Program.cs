@@ -6,6 +6,7 @@ using System.Data;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,7 +60,10 @@ if (!string.IsNullOrEmpty(builder.Configuration["Authentication:Microsoft:Client
 {
     authBuilder.AddOpenIdConnect("Microsoft", options =>
     {
-        options.Authority = $"https://login.microsoftonline.com/{builder.Configuration["Authentication:Microsoft:TenantId"]}/v2.0";
+        var tenantId = builder.Configuration["Authentication:Microsoft:TenantId"];
+
+        // TenantId "common" allows any Microsoft account
+        options.Authority = $"https://login.microsoftonline.com/{tenantId}/v2.0";
         options.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"]!;
         options.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]!;
         options.CallbackPath = "/signin-microsoft";
@@ -72,6 +76,22 @@ if (!string.IsNullOrEmpty(builder.Configuration["Authentication:Microsoft:Client
         options.Scope.Add("email");
 
         options.SignInScheme = IdentityConstants.ExternalScheme;
+
+        // Fix issuer validation for multi-tenant scenarios
+        options.TokenValidationParameters.IssuerValidator = (issuer, token, parameters) =>
+        {
+            // Accept tokens from any tenant when using "common"
+            if (tenantId == "common" || tenantId == "organizations" || tenantId == "consumers")
+            {
+                return issuer;
+            }
+            // For specific tenant, validate normally
+            if (issuer.Contains(tenantId))
+            {
+                return issuer;
+            }
+            throw new Microsoft.IdentityModel.Tokens.SecurityTokenInvalidIssuerException($"Issuer '{issuer}' is invalid.");
+        };
     });
 }
 

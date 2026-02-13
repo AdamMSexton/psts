@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Psts.Web.Data;
 using psts.web.Data;
+using Psts.Web.Data;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -58,6 +61,12 @@ namespace Psts.Web.Pages.Account
         }
 
         public bool RequireCurrentPassword { get; set; } = true;
+
+        //List of available external authentication providers(Google, Microsoft, Auth0, Okta)
+        public IList<AuthenticationScheme>? ExternalLogins { get; set; }
+
+        //List of OIDC providers currently linked to this user's account
+        public IList<UserLoginInfo>? CurrentLogins { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string userId, string token)
         {
@@ -124,8 +133,88 @@ namespace Psts.Web.Pages.Account
                 ProfileInput.ManagerName = managerProfile.LName + ", " + managerProfile.FName;
             }
 
+
+            //Load available OIDC providers (Google, Microsoft, Auth0, Okta)
+            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            //Load which OIDC providers are currently linked to this user
+            CurrentLogins = await _userManager.GetLoginsAsync(user);
+
             return Page();
         }
+
+
+
+        //Initiates OIDC provider linking process
+        public IActionResult OnPostLinkLogin(string provider)
+        {
+            // Redirect to the external provider (Google, Microsoft, etc.) for authentication
+            // After authentication, provider redirects back to OnGetLinkLoginCallbackAsync
+            var redirectUrl = Url.Page("./Profile", pageHandler: "LinkLoginCallback");
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _userManager.GetUserId(User));
+            return new ChallengeResult(provider, properties);
+        }
+
+        //Handles callback after user authenticates with OIDC provider
+        //runs after Google/Microsoft/Auth0/Okta redirects back
+        public async Task<IActionResult> OnGetLinkLoginCallbackAsync()
+        {
+            // Get the currently logged-in user
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            // Get the external login info from the provider 
+            var info = await _signInManager.GetExternalLoginInfoAsync(user.Id);
+            if (info == null)
+            {
+                TempData["StatusMessage"] = "Error: Could not load external login information.";
+                return RedirectToPage();
+            }
+
+            // Link the external login to the current user's account
+            var result = await _userManager.AddLoginAsync(user, info);
+            if (!result.Succeeded)
+            {
+                // This error typically means the OIDC account is already linked to another user
+                TempData["StatusMessage"] = "Error: The external login was not added. The login may already be associated with another account.";
+                return RedirectToPage();
+            }
+
+            // Clear the external authentication cookie
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+            TempData["StatusMessage"] = $"The external login {info.LoginProvider} was added successfully.";
+            return RedirectToPage();
+        }
+
+
+        //Removes a linked OIDC provider from user's account
+        //runs when user clicks "Remove" next to a linked provider on the profile page
+        public async Task<IActionResult> OnPostRemoveLoginAsync(string loginProvider, string providerKey)
+        {
+            // Get the currently logged-in user
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            // Remove the external login from the user's account
+            var result = await _userManager.RemoveLoginAsync(user, loginProvider, providerKey);
+            if (!result.Succeeded)
+            {
+                TempData["StatusMessage"] = "Error: The external login was not removed.";
+                return RedirectToPage();
+            }
+
+            // Refresh the user's authentication session
+            await _signInManager.RefreshSignInAsync(user);
+            TempData["StatusMessage"] = $"The external login {loginProvider} was removed successfully.";
+            return RedirectToPage();
+        }
+
 
 
 
