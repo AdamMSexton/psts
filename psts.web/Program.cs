@@ -127,7 +127,8 @@ builder.Services.AddControllers();      // For APIs later
 
 builder.Services.AddScoped<PstsDbSeeder>();
 
-builder.Services.AddScoped<ITimeEntryService, TimeEntryService>();
+builder.Services.AddScoped<IShortCodeService, ShortCodeService>();
+builder.Services.AddScoped<IManagementService, ManagementService>();
 
 var app = builder.Build();
 

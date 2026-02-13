@@ -7,11 +7,11 @@ namespace Psts.Web.Pages.Account;
 
 public class HomeModel : PageModel
 {
-    private readonly ITimeEntryService _timeEntryService;
+    private readonly IShortCodeService _timeEntryService;
 
     public ShortCodeDecodeResultDto? testResult { get; private set; }
 
-    public HomeModel (ITimeEntryService timeEntryService)
+    public HomeModel (IShortCodeService timeEntryService)
     {
         _timeEntryService = timeEntryService;
     }
