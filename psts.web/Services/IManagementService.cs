@@ -11,8 +11,6 @@ namespace psts.web.Services
         Task<ServiceResult<bool>> UpdateProject(string _requestorId, RoleTypes _requestorRole, UpdateProjectDto _newClientData);
         Task<ServiceResult<Guid>> AddNewTask(string _requestorId, RoleTypes _requestorRole, CreateTaskDto _newClient);
         Task<ServiceResult<bool>> UpdateTask(string _requestorId, RoleTypes _requestorRole, UpdateTaskDto _newClientData);
-        Task<ServiceResult<bool>> ChangeUserRole(string _requestorId, RoleTypes _requestionRole, string _targetEmployee _targetEmployee, RoleTypes _newRole);
-
-
+        Task<ServiceResult<bool>> ChangeUserRole(string _requestorId, RoleTypes _requestorRole, string _targetEmployee, RoleTypes _newRole);
     }
 }

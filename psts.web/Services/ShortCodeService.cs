@@ -78,7 +78,12 @@ namespace psts.web.Services
         {
             try
             {
-                // Validate inputs
+                // Validate requestor inputs
+                if (_requestorId == null)
+                {
+                    return ServiceResult<bool>.Fail("Invalid Requestor Id.");
+                }
+
                 if (!Enum.IsDefined(typeof(RoleTypes), _requestorRole))
                 {
                     return ServiceResult<bool>.Fail("Invalid Role.");
