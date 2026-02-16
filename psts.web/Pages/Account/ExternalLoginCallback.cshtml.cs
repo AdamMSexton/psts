@@ -75,6 +75,8 @@ public class ExternalLoginCallbackModel : PageModel
         //    }
         //}
 
+
+
         // If we get here, something went wrong
         _logger.LogError("Unable to load external login information or create user.");
         return RedirectToPage("./Login");
