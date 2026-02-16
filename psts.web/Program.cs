@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using psts.web.Data;
-using Psts.Web.Data;
-using System.Data;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using psts.web.Data;
+using psts.web.Services;
+using Psts.Web.Data;
+using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -125,6 +126,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddControllers();      // For APIs later
 
 builder.Services.AddScoped<PstsDbSeeder>();
+
+builder.Services.AddScoped<IShortCodeService, ShortCodeService>();
+builder.Services.AddScoped<IManagementService, ManagementService>();
 
 var app = builder.Build();
 

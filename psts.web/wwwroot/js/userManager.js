@@ -132,10 +132,15 @@ async function updateRecord(userID, resetPswd, lockAccount, newRole)
 
 {
     //  window.alert("Update Record for User: " + userID)
- 
+
+    console.log(userID);
+    console.log(resetPswd);
+    console.log(lockAccount);
+    console.log(newRole);
+
     const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-    const result = await fetch('/AdminTools/Index?handler=UpdateData', {
+    const result = await fetch('/Admin/AdminUserTool?handler=UpdateData', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -148,6 +153,8 @@ async function updateRecord(userID, resetPswd, lockAccount, newRole)
             NewRole : newRole
         })
     });
+
+    console.log(result);
 
   
         const text = await result.text();       // Read once
