@@ -45,35 +45,35 @@ public class ExternalLoginCallbackModel : PageModel
             return RedirectToPage("/Account/Home");
         }
 
-        // If the user does not have an account, create one
-        var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-        var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email;
+        //// If the user does not have an account, create one
+        //var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+        //var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email;
 
-        if (email != null)
-        {
-            var user = new AppUser
-            {
-                UserName = email,
-                Email = email
-            };
+        //if (email != null)
+        //{
+        //    var user = new AppUser
+        //    {
+        //        UserName = email,
+        //        Email = email
+        //    };
 
-            var createResult = await _userManager.CreateAsync(user);
-            if (createResult.Succeeded)
-            {
-                createResult = await _userManager.AddLoginAsync(user, info);
-                if (createResult.Succeeded)
-                {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-                    return RedirectToPage("/Account/Home");
-                }
-            }
+        //    var createResult = await _userManager.CreateAsync(user);
+        //    if (createResult.Succeeded)
+        //    {
+        //        createResult = await _userManager.AddLoginAsync(user, info);
+        //        if (createResult.Succeeded)
+        //        {
+        //            await _signInManager.SignInAsync(user, isPersistent: false);
+        //            _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+        //            return RedirectToPage("/Account/Home");
+        //        }
+        //    }
 
-            foreach (var error in createResult.Errors)
-            {
-                _logger.LogError("Error creating user: {Error}", error.Description);
-            }
-        }
+        //    foreach (var error in createResult.Errors)
+        //    {
+        //        _logger.LogError("Error creating user: {Error}", error.Description);
+        //    }
+        //}
 
         // If we get here, something went wrong
         _logger.LogError("Unable to load external login information or create user.");
