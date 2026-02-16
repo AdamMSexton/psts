@@ -1,32 +1,57 @@
 ﻿@page
 @model Psts.Web.Pages.Account.NewUserModel
 @{
-    ViewData["Title"] = "Signup - PSTS Solutions";
+    ViewData["Title"] = "Create Account - PSTS Solutions";
     ViewData["HideNavbar"] = true;
 }
 
-<h2>New User Information</h2>
+<div id="app-container">
+    <div class="login-container">
 
-<form method="post">
-    <div>
-        <label asp-for="Input.FirstName"></label>
-        <input asp-for="Input.FirstName" />
+        <!-- HEADER -->
+        <div class="grid-item welcome-box">
+            <div class="welcome-inner">
+                <h1>Create Your Account</h1>
+                <h3>Please enter your information below.</h3>
+            </div>
+        </div>
+
+        <!-- NEW USER FORM -->
+        <div id="newUser" class="grid-item">
+            <h2>New User Information</h2>
+
+            <form method="post" id="new-user-form">
+
+                <div class="form-group">
+                 
+                    <p>First Name:</p>
+                    <input asp-for="Input.FirstName" type="text" placeholder="Enter your first name..." />
+                </div>
+
+                <div class="form-group">
+                    
+                    <p>Last Name:</p>
+                    <input asp-for="Input.LastName" type="text" placeholder="Enter your last name..." />
+                </div>
+
+                <div class="form-group">
+                   
+                    <p>Phone Number:</p>
+                    <input asp-for="Input.PhoneNumber" type="text" placeholder="Enter your phone number..." />
+                </div>
+
+                <div class="form-group">
+              
+                    <p>Email:</p>
+                    <input asp-for="Input.Email" type="email" placeholder="Enter your email..." />
+                </div>
+
+                <button type="submit" class="btn-primary submit-btn">
+                    Submit
+                </button>
+
+            </form>
+        </div>
+
     </div>
-
-    <div>
-        <label asp-for="Input.LastName"></label>
-        <input asp-for="Input.LastName" />
-    </div>
-
-    <div>
-        <label asp-for="Input.PhoneNumber"></label>
-        <input asp-for="Input.PhoneNumber" />
-    </div>
-
-    <div>
-        <label asp-for="Input.Email"></label>
-        <input asp-for="Input.Email" />
-    </div>
-
-    <button type="submit">Submit</button>
-</form>
+</div>
