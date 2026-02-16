@@ -11,9 +11,9 @@ namespace psts.web.Services
 
         private readonly PstsDbContext _db;
         private readonly IShortCodeService _scs;
-        private readonly UserManager<IdentityRole> _userManager;
+        private readonly UserManager<AppUser> _userManager;
 
-        public ManagementService(PstsDbContext db, IShortCodeService scs, UserManager<IdentityRole> userManager)
+        public ManagementService(PstsDbContext db, IShortCodeService scs, UserManager<AppUser> userManager)
         {
             _db = db;
             _scs = scs;
