@@ -1,0 +1,62 @@
+﻿@page
+@model psts.web.Pages.Manage.ManageRolesModel
+@{
+    ViewData["Title"] = "Role Management";
+}
+
+<h2>Role Management</h2>
+
+<div style="display:flex; gap:24px; align-items:flex-start;">
+
+    <form method="get" style="display:flex; gap:8px; margin:6px 0 10px;">
+        <input type="text" name="q" value="@Model.Query" placeholder="First and/or Last Name" style="flex:1;" />
+        <button type="submit">Search</button>
+    </form>
+    <form method="post">
+        <!-- Search Result Box -->
+        <div style="width: 420px;">
+            <label><b>Find User</b></label>
+            <select name="SelectedSearchUserId" size="8" style="width:100%;">
+                @foreach (var user in Model.SearchResults)
+                {
+                    <option value="@user.EmployeeId">@(user.LName + ", " + user.FName)</option>
+                }
+            </select>
+        </div>
+        <div style="width: 400px;">
+            <!-- Pending Users Box -->
+            <label>Pending Users</label>
+            <select name="SelectedPendingUserId" size="10" style="width: 100%;">
+                @foreach (var user in Model.PendingUsersProfiles)
+                {
+                    <option value="@user.EmployeeId">
+                        @(user.LName + ", " + user.FName)
+                    </option>
+                }
+            </select>
+        </div>
+        <div style="width: 260px;">
+            <label><b>Set Role</b></label>
+
+            <div>
+                <label>
+                    <input type="radio" name="TargetRole" value="Clerk" />
+                    Clerk
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    <input type="radio" name="TargetRole" value="Employee" />
+                    Employee
+                </label>
+            </div>
+
+            <div style="margin-top:12px;">
+                <button type="submit">Change Role</button>
+            </div>
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+        </div>
+    </form>
+</div>

@@ -450,11 +450,20 @@ namespace psts.web.Services
                 // Remove all roles if any
                 if (roles.Any())
                 {
-                    await _userManager.RemoveFromRolesAsync(targetUser, roles);
+                    var roleResult = await _userManager.RemoveFromRolesAsync(targetUser, roles);
+                    if (!roleResult.Succeeded)
+                    {
+                        return ServiceResult<bool>.Fail("Unable to remove existing role(s).");
+                    }
                 }
 
                 // Set new role as provided
                 var result = await _userManager.AddToRoleAsync(targetUser, _newRole.ToString());
+                if (!result.Succeeded)
+                {
+                    return ServiceResult<bool>.Fail("Failed to add role.");
+                }
+
 
                 return ServiceResult<bool>.Ok(true);
             }
