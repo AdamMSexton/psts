@@ -31,36 +31,36 @@ body {
     font-size: 2rem;
 }
 
-.navBar ul {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
+    .navBar ul {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
 
-.navBar li a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    transition: color 0.15s ease, background 0.15s ease;
-}
+    .navBar li a {
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        transition: color 0.15s ease, background 0.15s ease;
+    }
 
-.navBar li a:hover {
-    color: #222;
-    background: #ffffff;
-    border-radius: 0.25rem;
-}
+        .navBar li a:hover {
+            color: #222;
+            background: #ffffff;
+            border-radius: 0.25rem;
+        }
 
-.navBar li a:visited {
-    color: #d0cfff;
-}
+        .navBar li a:visited {
+            color: #d0cfff;
+        }
 
-.navBar li a:active {
-    background: #cccccc;
-    color: #000000;
-}
+        .navBar li a:active {
+            background: #cccccc;
+            color: #000000;
+        }
 /*END NAV BAR STYLING*/
 
 /*Login Page Styling*/
@@ -77,64 +77,58 @@ body {
     gap: 1.25rem; /* 20px -> 1.25rem */
     max-width: 75rem; /* 1200px -> 75rem */
     margin: 3.125rem auto; /* 50px -> 3.125rem */
-    
 }
 
 /* GENERAL GRID ITEM */
 .grid-item {
-    padding: 1.25rem; /* 20px -> 1.25rem */
-    border: 0.0625rem solid #ddd; /* 1px -> 0.0625rem */
-    border-radius: 0.375rem; /* 6px -> 0.375rem */
+    padding: 1.25rem;
+    border: 0.0625rem solid #ddd;
+    border-radius: 0.375rem;
     background-color: var(--secondary-bg-color);
     border-color: var(--border-bg);
 }
 
-/* WELCOME BOX — spans all columns but centers content */
+/* WELCOME BOX */
 .welcome-box {
-    grid-column: 1 / 4; /* spans columns 1, 2, 3 */
+    grid-column: 1 / 4;
     grid-row: 1;
     display: flex;
-    justify-content: center; /* centers content horizontally */
+    justify-content: center;
     text-align: center;
     background: none;
     border: none;
-    padding: 0.625rem; /* 10px -> 0.625rem */
+    padding: 0.625rem;
 }
 
-/* Optional: limit width of welcome content */
-.welcome-box .welcome-inner {
-    max-width: 31.25rem; /* 500px -> 31.25rem */
-}
+    .welcome-box .welcome-inner {
+        max-width: 31.25rem;
+    }
 
 /* FORM ELEMENTS */
 .form-group {
-    margin-bottom: 0.9375rem; /* 15px -> 0.9375rem */
+    margin-bottom: 0.9375rem;
 }
 
-/* Make inputs and primary button visually identical in outer size and box-model.
-   Inputs match the button padding, border, font-size and box-sizing so they line up. */
 input[type="text"],
 input[type="password"] {
     display: block;
     width: 100%;
     box-sizing: border-box;
-    padding: 0.625rem; /* match .btn-primary padding */
+    padding: 0.625rem;
     font-size: 1rem;
     line-height: 1.2;
-    border: 0.0625rem solid var(--border-bg); /* same border color as buttons */
+    border: 0.0625rem solid var(--border-bg);
     border-radius: 0.25rem;
-    background-color: var(--primary-bg-color); /* changed: inputs use primary-bg-color */
+    background-color: var(--primary-bg-color);
     color: inherit;
 }
 
-/* Improve placeholder contrast when inputs use dark background */
-input[type="text"]::placeholder,
-input[type="password"]::placeholder {
-    color: rgba(255,255,255,0.7);
-}
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
 
 /* BUTTONS */
-/* Secondary button (styled anchor) */
 .btn-secondary {
     display: inline-block;
     padding: 0.5rem 0.75rem;
@@ -145,61 +139,50 @@ input[type="password"]::placeholder {
     border-radius: 0.25rem;
     text-decoration: none;
     box-sizing: border-box;
-
-    /* spacing: right and bottom so that horizontal/vertical gaps match primary/external buttons */
-    margin: 0  var(--button-gap) var(--button-gap) 0;
-
+    margin: 0 var(--button-gap) var(--button-gap) 0;
     transition: background-color 150ms ease, color 150ms ease, transform 120ms ease, box-shadow 150ms ease;
 }
 
-/* Hover / focus for secondary buttons */
-.btn-secondary:hover,
-.btn-secondary:focus {
-    background-color: rgba(0,168,255,0.12); /* subtle highlight using --main-button tone */
-    color: white; /* invert text color for clearer contrast */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-    transform: translateY(-1px);
-    outline: none;
-}
+    .btn-secondary:hover,
+    .btn-secondary:focus {
+        background-color: rgba(0,168,255,0.12);
+        color: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+        transform: translateY(-1px);
+        outline: none;
+    }
 
-/* Provide an accessible focus-visible style */
-.btn-secondary:focus-visible {
-    box-shadow: 0 0 0 3px rgba(0,168,255,0.18);
-}
+    .btn-secondary:focus-visible {
+        box-shadow: 0 0 0 3px rgba(0,168,255,0.18);
+    }
 
-/* Primary (submit) button */
 .btn-primary {
     display: block;
     width: 35%;
     box-sizing: border-box;
-    padding: 0.625rem; /* same as inputs */
-    background-color: var(--main-button); /* use --main-button */
+    padding: 0.625rem;
+    background-color: var(--main-button);
     color: white;
-    border: 0.0625rem solid var(--border-bg); /* consistent border color */
+    border: 0.0625rem solid var(--border-bg);
     border-radius: 0.25rem;
     cursor: pointer;
-    font-size: 2rem; /* matches h1 (kept from previous change) */
+    font-size: 2rem;
     line-height: 1.1;
-
-    /* vertical spacing consistent with other buttons */
     margin: var(--button-gap) 0 var(--button-gap) 0;
-
     transition: transform 120ms ease, box-shadow 150ms ease, filter 120ms ease;
 }
 
-/* Apply hover/focus effects to primary button similar to secondary */
-.btn-primary:hover,
-.btn-primary:focus {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.28);
-    filter: brightness(1.03); /* slight brighten on hover */
-    outline: none;
-}
+    .btn-primary:hover,
+    .btn-primary:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+        filter: brightness(1.03);
+        outline: none;
+    }
 
-/* Accessible focus-visible ring for primary button */
-.btn-primary:focus-visible {
-    box-shadow: 0 0 0 3px rgba(0,168,255,0.18);
-}
+    .btn-primary:focus-visible {
+        box-shadow: 0 0 0 3px rgba(0,168,255,0.18);
+    }
 
 /* EXTERNAL LOGIN BUTTONS */
 .external-btn {
@@ -207,7 +190,7 @@ input[type="password"]::placeholder {
     width: 100%;
     box-sizing: border-box;
     padding: 0.75rem;
-    margin: 0 0 var(--button-gap) 0; /* bottom spacing consistent with others */
+    margin: 0 0 var(--button-gap) 0;
     font-size: 1rem;
     cursor: pointer;
     border: 0.0625rem solid var(--border-bg);
@@ -215,60 +198,132 @@ input[type="password"]::placeholder {
     color: white;
 }
 
-/* External button hover to match style family */
-.external-btn:hover,
-.external-btn:focus {
-    filter: brightness(0.95);
-    transform: translateY(-1px);
+    .external-btn:hover,
+    .external-btn:focus {
+        filter: brightness(0.95);
+        transform: translateY(-1px);
+    }
+
+    .external-btn.google {
+        background-color: #4285F4;
+    }
+
+    .external-btn.microsoft {
+        background-color: #00A4EF;
+    }
+
+    .external-btn.auth0 {
+        background-color: #EB5424;
+    }
+
+    .external-btn.okta {
+        background-color: #007DC1;
+    }
+
+    .external-btn.default {
+        background-color: #666;
+    }
+
+    .external-btn .provider-logo {
+        width: 1.5rem;
+        height: 1.5rem;
+        object-fit: contain;
+        vertical-align: middle;
+        margin-right: 0.75rem;
+        display: inline-block;
+    }
+
+    .external-btn span {
+        vertical-align: middle;
+        display: inline-block;
+    }
+
+/* External login grid */
+.external-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    align-items: stretch;
 }
 
-/* Provider-specific colors */
-.external-btn.google {
-    background-color: #4285f4;
+.external-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    gap: 0.5rem;
+    min-height: 4.5rem;
 }
 
-.external-btn.microsoft {
-    background-color: #00a4ef;
-}
+    .external-btn .external-btn-top {
+        font-size: 0.95rem;
+        opacity: 0.95;
+    }
 
-.external-btn.auth0 {
-    background-color: #eb5424;
-}
+    .external-btn .external-btn-bottom {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+    }
 
-.external-btn.okta {
-    background-color: #007dc1;
-}
+    .external-btn .provider-name {
+        display: inline-block;
+        white-space: nowrap;
+    }
 
-.external-btn.default {
-    background-color: #666;
-}
+@media (max-width: 640px) {
+    .external-grid {
+        grid-template-columns: 1fr;
+    }
 
-/* COMPANY CONTENT */
-#companyContent img {
-    max-width: 100%;
-    margin-top: 0.9375rem; /* 15px -> 0.9375rem */
-}
-
-/* position the 3 column items of the login page */
-#login {
-    grid-column: 1;
-    grid-row: 2;
-}
-
-#loginExternal {
-    grid-column: 2;
-    grid-row: 2;
+    .external-btn {
+        padding: 0.75rem;
+    }
 }
 
 #companyContent {
-    grid-column: 3;
-    grid-row: 2;
+    text-align: center;
 }
 
-/* make the login page container full viewport */
-#app-container {
-    width: 100vw;
-    height: 100vh;
+/* Company logo */
+.company-logo {
+    width: 90%;
+    max-width: 16rem;
+    height: auto;
+    display: block;
+    margin: 0.9375rem auto 0 auto;
+    border-radius: 0.375rem;
+    object-fit: contain;
 }
 
-/* End Login Page Styling */
+@media (max-width: 640px) {
+    .company-logo {
+        width: 40%;
+        max-width: 20rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* --- FINAL FIX: Keep Forgot + Create on one line, Login on its own line --- */
+.action-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+    .action-row .btn-secondary {
+        display: inline-block;
+        margin-right: 0.75rem;
+    }
+
+    .action-row .btn-primary {
+        display: block;
+        width: 35%;
+        margin: 0;
+    }

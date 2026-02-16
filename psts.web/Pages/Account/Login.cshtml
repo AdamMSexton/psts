@@ -5,10 +5,6 @@
     ViewData["HideNavbar"] = true;
 }
 
-
-
-
-
 <div id="app-container">
     <div class="login-container">
 
@@ -36,22 +32,24 @@
                     <input name="Password" type="password" placeholder="Enter your password..." autocomplete="current-password" />
                 </div>
 
-
-                <a asp-page="" class="btn-secondary">Forgot Login?</a>
-
                 <button type="submit" id="local-login-submit" class="btn-primary">
                     Login
                 </button>
+
+                <div class="action-row">
+                    <a asp-page="" class="btn-secondary">Forgot Login?</a>
+                    <a asp-page="./NewUser" class="btn-secondary">Create an account</a>
+                   
+                 
+                </div>
             </form>
 
-            <a asp-page="./NewUser" class="btn-secondary">New User? Create an account</a>
+            
 
             @if (Model.LoginFailed)
             {
                 <p class="error-text">Login failed</p>
             }
-
-
         </div>
 
         <!-- EXTERNAL LOGIN -->
@@ -63,36 +61,46 @@
                 <form method="post" asp-page-handler="ExternalLogin">
                     @Html.AntiForgeryToken()
 
-                    @foreach (var provider in Model.ExternalLogins)
-                    {
-                        var backgroundColor = provider.Name switch
+                    <div class="external-grid">
+                        @foreach (var provider in Model.ExternalLogins)
                         {
-                                        "Google" => "google",
-                                        "Microsoft" => "microsoft",
-                                        "Auth0" => "auth0",
-                                        "Okta" => "okta",
-                            _ => "default"
-                        };
+                            var backgroundColor = provider.Name switch
+                            {
+                                "Google" => "google",
+                                "Microsoft" => "microsoft",
+                                "Auth0" => "auth0",
+                                "Okta" => "okta",
+                                _ => "default"
+                            };
 
-                        <button type="submit"
-                                name="provider"
-                                value="@provider.Name"
-                                class="external-btn @backgroundColor">
-                            Sign in with @provider.Name
-                        </button>
-                    }
+                            // Build the image path under wwwroot/Images/ExternalLoginLogos
+                            var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{provider.Name}.png");
+
+                            <button type="submit"
+                                    name="provider"
+                                    value="@provider.Name"
+                                    class="external-btn @backgroundColor">
+                                <div class="external-btn-top">Sign in with</div>
+                                <div class="external-btn-bottom">
+                                    <span class="provider-name">@provider.Name</span>
+                                    <img src="@logoPath" alt="@provider.Name logo" class="provider-logo" />
+                                </div>
+                            </button>
+                        }
+                    </div>
                 </form>
             }
         </div>
 
         <!-- COMPANY CONTENT -->
         <div id="companyContent" class="grid-item">
-            <h1>PSTS SOLUTIONS</h1>
-            <p>Providing efficient hour tracking, and keeping you focused on your business.</p>
+            <h2>PSTS SOLUTIONS</h2>
+            <p>Providing efficient consultant hour tracking, and keeping you focused on your business.</p>
 
             <img src="@Url.Content("~/Images/BCO.eb2e4f5c-29cf-4e37-9a8c-8dd773714c58.png")"
                  alt="PSTS Solutions Logo"
-                 title="PSTS Solutions Logo" />
+                 title="PSTS Solutions Logo"
+                 class="company-logo" />
         </div>
 
     </div>
