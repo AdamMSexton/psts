@@ -13,25 +13,32 @@
         <button type="submit">Search</button>
     </form>
     <form method="post">
-        <!-- Search Result Box -->
+        <!-- User List Box -->
         <div style="width: 420px;">
             <label><b>Find User</b></label>
-            <select name="SelectedSearchUserId" size="8" style="width:100%;">
-                @foreach (var user in Model.SearchResults)
+            <select name="SelectedUserId" size="8" style="width:100%;">
+                @if (Model.SearchResults.Count > 0)
                 {
-                    <option value="@user.EmployeeId">@(user.LName + ", " + user.FName)</option>
+                    @foreach (var user in Model.SearchResults)
+                    {
+                        <option value="@user.EmployeeId">@(user.LName + ", " + user.FName)</option>
+                    }
                 }
-            </select>
-        </div>
-        <div style="width: 400px;">
-            <!-- Pending Users Box -->
-            <label>Pending Users</label>
-            <select name="SelectedPendingUserId" size="10" style="width: 100%;">
-                @foreach (var user in Model.PendingUsersProfiles)
+
+                @if ((Model.SearchResults.Count > 0) && (Model.PendingUsersProfiles.Count > 0))
                 {
-                    <option value="@user.EmployeeId">
-                        @(user.LName + ", " + user.FName)
-                    </option>
+                    <option value=""></option>
+                }
+
+
+                @if (Model.PendingUsersProfiles.Count > 0)
+                {
+                    <option value="">Pending Users...</option>
+
+                    @foreach (var user in Model.PendingUsersProfiles)
+                    {
+                        <option value="@user.EmployeeId">@(user.LName + ", " + user.FName)</option>
+                    }
                 }
             </select>
         </div>

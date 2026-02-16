@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Psts.Web.Pages.Account;
 using System.Threading.Tasks;
 using psts.web.Services;
+using Microsoft.IdentityModel.Tokens;
 
 namespace psts.web.Pages.Manage
 {
@@ -28,8 +29,7 @@ namespace psts.web.Pages.Manage
         public IList<PstsUserProfile>? PendingUsersProfiles { get; set; }
 
         // bind posted form fields
-        [BindProperty] public string? SelectedPendingUserId { get; set; }
-        [BindProperty] public string? SelectedSearchUserId { get; set; }
+        [BindProperty] public string? SelectedUserId { get; set; }
         [BindProperty] public string? TargetRole { get; set; } // "Client" or "Employee"
 
 
@@ -75,13 +75,11 @@ namespace psts.web.Pages.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // validate selection: exactly one user selected
-            var pendingSelected = !string.IsNullOrWhiteSpace(SelectedPendingUserId);
-            var searchSelected = !string.IsNullOrWhiteSpace(SelectedSearchUserId);
+            // validate a user was selected
 
-            if (pendingSelected == searchSelected) // both true OR both false
+            if (string.IsNullOrWhiteSpace(SelectedUserId))
             {
-                ModelState.AddModelError(string.Empty, "Select exactly one user (Pending OR Search Results).");
+                ModelState.AddModelError(string.Empty, "No user selected.");
                 await OnGetAsync(null); // repopulate lists
                 return Page();
             }
@@ -93,18 +91,18 @@ namespace psts.web.Pages.Manage
                 return Page();
             }
 
-            var selectedUserId = pendingSelected ? SelectedPendingUserId! : SelectedSearchUserId!;
-
             var user = await _userManager.GetUserAsync(User);
             var roles = await _userManager.GetRolesAsync(user);
 
-
-            var result = await _management.ChangeUserRole(User.FindFirstValue(ClaimTypes.NameIdentifier), Enum.Parse<RoleTypes>(roles[0]), selectedUserId, Enum.Parse<RoleTypes>(TargetRole));
-            if (!result.Success)
+            if ((!string.IsNullOrEmpty(user.Id)) && (!roles.IsNullOrEmpty()))
             {
-                ModelState.AddModelError(string.Empty, "Unable to change role. " + result.Error);
-                await OnGetAsync(null);
-                return Page();
+                var result = await _management.ChangeUserRole(user.Id.ToString(), Enum.Parse<RoleTypes>(roles[0]), SelectedUserId, Enum.Parse<RoleTypes>(TargetRole));
+                if (!result.Success)
+                {
+                    ModelState.AddModelError(string.Empty, "Unable to change role. " + result.Error);
+                    await OnGetAsync(null);
+                    return Page();
+                }
             }
 
 
