@@ -20,7 +20,12 @@
         <header>
             <nav class="navBar">
                 <ul>
-                    <li><a asp-page="/Account/Home">Home</a></li>
+                    <li>
+                        <a asp-page="/Account/Home">
+                            <img src="@Url.Content("~/Images/navBarIcons/home.png")" alt="Home" />
+                        </a>
+                    </li>
+
                     <li><a asp-page="/Hours/Hours">Hours</a></li>
                     <li><a asp-page="/Reports/Index">Reports</a></li>
 
@@ -34,9 +39,12 @@
                     <li>
                         <form method="post" asp-page="/Account/Logout" class="logout-form" style="display:inline">
                             @Html.AntiForgeryToken()
-                            <button type="submit">Logout</button>
+                            <button type="submit" style="background:none;border:none;padding:0;">
+                                <img src="@Url.Content("~/Images/navBarIcons/log-out.png")" alt="Logout" />
+                            </button>
                         </form>
                     </li>
+
                 </ul>
             </nav>
         </header>
