@@ -4,111 +4,194 @@
     ViewData["Title"] = "User Profile - PSTS Solutions";
 }
 
-<h2>User Profile</h2>
+<h2 style="text-align:center; margin-top:1rem;">User Profile</h2>
 
-@*Status message for OIDC operations*@
 @if (TempData["StatusMessage"] != null)
 {
-    <p>@TempData["StatusMessage"]</p>
+    <p style="text-align:center; margin-bottom:1.5rem;">@TempData["StatusMessage"]</p>
 }
 
-<form method="post" asp-page-handler="UpdateProfile">
-    <div>
-        <label asp-for="ProfileInput.UserName"></label>
-        <input asp-for="ProfileInput.UserName" />
+<div class="profile-grid">
+
+    <!-- -------------------------------------------------- -->
+    <!-- USER PROFILE BOX -->
+    <!-- -------------------------------------------------- -->
+    <div id="profileBox" class="profile-box grid-item">
+
+        <h2>User Profile</h2>
+
+        <form method="post" asp-page-handler="UpdateProfile">
+
+            <div>
+                
+                <p>User Name:</p>
+                <input asp-for="ProfileInput.UserName" placeholder="Username..."/>
+            </div>
+
+            <div>
+                
+                <p>First Name:</p>
+                <input asp-for="ProfileInput.FirstName" placeholder="First Name..."/>
+            </div>
+
+            <div>
+               
+                <p>Last Name:</p>
+                <input asp-for="ProfileInput.LastName" placeholder="Last Name..."/>
+            </div>
+
+            <div>
+                <p>Email Address:</p>
+                <input asp-for="ProfileInput.Email" placeholder="Your email..."/>
+            </div>
+
+            <div>
+                <p>Phone Number:</p>
+                <input asp-for="ProfileInput.PhoneNumber" placeholder="Your phone number...">
+            </div>
+
+            <div>
+                <p>Manager Name:</p>
+                <input asp-for="ProfileInput.ManagerName" placeholder="Your manager's name..."/>
+            </div>
+
+            <button type="submit">Update</button>
+        </form>
+
     </div>
-    <div>
-        <label asp-for="ProfileInput.FirstName"></label>
-        <input asp-for="ProfileInput.FirstName" />
+
+
+    <!-- -------------------------------------------------- -->
+    <!-- PASSWORD BOX -->
+    <!-- -------------------------------------------------- -->
+    <div id="passwordBox" class="password-box grid-item">
+
+        <h2>Change Password</h2>
+
+        <form method="post"
+              asp-page-handler="ChangePassword"
+              asp-route-userId="@Model.PasswordInput.UserId"
+              asp-route-token="@Model.PasswordInput.SecurityTokenStash">
+
+            <div>
+               
+                <p>Current Password:</p>
+                @if (Model.RequireCurrentPassword)
+                {
+                    <input type="password" asp-for="PasswordInput.CurrentPassword" placeholder="Your current password..."/>
+                }
+                else
+                {
+                    <input asp-for="PasswordInput.CurrentPassword" disabled />
+                }
+            </div>
+
+            <div>
+                
+                <p>New Password:</p>
+                <input type="password" asp-for="PasswordInput.NewPassword" placeholder="Enter your new password..." />
+            </div>
+
+            <div>
+               
+                <p>Password Verification:</p>
+                <input type="password" asp-for="PasswordInput.VerifyPassword" placeholder="Please enter new password again..."/>
+            </div>
+
+            <button type="submit">Update</button>
+        </form>
+
     </div>
 
-    <div>
-        <label asp-for="ProfileInput.LastName"></label>
-        <input asp-for="ProfileInput.LastName" />
-    </div>
 
-    <div>
-        <label asp-for="ProfileInput.Email"></label>
-        <input asp-for="ProfileInput.Email" />
-    </div>
+    <!-- -------------------------------------------------- -->
+    <!-- EXTERNAL LOGIN BOX -->
+    <!-- -------------------------------------------------- -->
+    <div id="externalBox" class="external-box grid-item">
 
-    <div>
-        <label asp-for="ProfileInput.PhoneNumber"></label>
-        <input asp-for="ProfileInput.PhoneNumber" />
-    </div>
+        <h3>External Login Options</h3>
 
-    <div>
-        <label asp-for="ProfileInput.ManagerName"></label>
-        <input asp-for="ProfileInput.ManagerName" />
-    </div>
-
-    <button type="submit">Update</button>
-</form>
-
-<br /><br />
-
-<form method="post" asp-page-handler="ChangePassword" asp-route-userId="@Model.PasswordInput.UserId" asp-route-token="@Model.PasswordInput.SecurityTokenStash">
-    <div>
-        <label asp-for="PasswordInput.CurrentPassword"></label>
-        @if (Model.RequireCurrentPassword)
+        <!-- Linked Accounts -->
+        @if (Model.CurrentLogins?.Count > 0)
         {
-            <input type="password" asp-for="PasswordInput.CurrentPassword" />
+            <h4>Linked Accounts:</h4>
+
+            @foreach (var login in Model.CurrentLogins)
+            {
+                var providerClass = login.LoginProvider switch
+                {
+                                "Google" => "google",
+                                "Microsoft" => "microsoft",
+                                "Auth0" => "auth0",
+                                "Okta" => "okta",
+                    _ => "default"
+                };
+
+                var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{login.LoginProvider}.png");
+
+                <form method="post" asp-page-handler="RemoveLogin">
+                    <div class="external-provider external-btn @providerClass">
+
+                        <div class="external-btn-bottom">
+                            <span class="provider-name">@login.LoginProvider</span>
+                            <img src="@logoPath" alt="@login.LoginProvider logo" class="provider-logo" />
+                        </div>
+
+                        <input type="hidden" name="loginProvider" value="@login.LoginProvider" />
+                        <input type="hidden" name="providerKey" value="@login.ProviderKey" />
+
+                        <button type="submit" class="btn-secondary">Remove</button>
+                    </div>
+                </form>
+            }
         }
         else
         {
-            <input asp-for="PasswordInput.CurrentPassword" disabled/>
+            <p>You have no linked external accounts.</p>
         }
-    </div>
-    <div>
-        <label asp-for="PasswordInput.NewPassword"></label>
-        <input type="password" asp-for="PasswordInput.NewPassword" />
-    </div>
-    <div>
-        <label asp-for="PasswordInput.VerifyPassword"></label>
-        <input type="password" asp-for="PasswordInput.VerifyPassword" />
-    </div>
 
-    <button type="submit">Update</button>
-</form>
+        <br />
 
-@*OIDC stuff below all new*@
-<br /><br />
-
-<h3>External Login Options</h3>
-@if (Model.CurrentLogins?.Count > 0)
-{
-    <h4>Linked Accounts</h4>
-    @foreach (var login in Model.CurrentLogins)
-    {
-        <form method="post" asp-page-handler="RemoveLogin">
-            <div>
-                <label>@login.LoginProvider</label>
-                <input type="hidden" name="loginProvider" value="@login.LoginProvider" />
-                <input type="hidden" name="providerKey" value="@login.ProviderKey" />
-                <button type="submit">Remove</button>
-            </div>
-        </form>
-    }
-}
-else
-{
-    <p>You have no linked external accounts.</p>
-}
-<br/>
-
-@if (Model.ExternalLogins?.Count > 0)
-
-{
-    <h4> Add External Login</h4>
-    @foreach(var provider in Model.ExternalLogins)
-    {
-        @* Only show provider if not already linked *@
-        @if(!Model.CurrentLogins.Any(l=>l.LoginProvider==provider.Name))
+        <!-- Add External Login -->
+        @if (Model.ExternalLogins?.Count > 0)
         {
-            <form method="post" asp-page-handler="LinkLogin">
-                <input type="hidden" name="provider" value="@provider.Name"/>
-                <button type="submit">Link @provider.Name</button>
-            </form>
+            <h4>Add External Login:</h4>
+
+            @foreach (var provider in Model.ExternalLogins)
+            {
+                if (!Model.CurrentLogins.Any(l => l.LoginProvider == provider.Name))
+                {
+                    var providerClass = provider.Name switch
+                    {
+                                        "Google" => "google",
+                                        "Microsoft" => "microsoft",
+                                        "Auth0" => "auth0",
+                                        "Okta" => "okta",
+                        _ => "default"
+                    };
+
+                    var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{provider.Name}.png");
+
+                    <form method="post" asp-page-handler="LinkLogin">
+                        <input type="hidden" name="provider" value="@provider.Name" />
+
+                        <button type="submit"
+                                class="external-btn @providerClass"
+                                style="width:100%;">
+
+                            <div class="external-btn-top">Link account:</div>
+
+                            <div class="external-btn-bottom">
+                                <span class="provider-name">@provider.Name</span>
+                                <img src="@logoPath" alt="@provider.Name logo" class="provider-logo" />
+                            </div>
+
+                        </button>
+                    </form>
+                }
+            }
         }
-    }
-}
+
+    </div>
+
+</div>
