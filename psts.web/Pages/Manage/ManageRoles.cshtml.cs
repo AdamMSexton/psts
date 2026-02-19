@@ -31,6 +31,7 @@ namespace psts.web.Pages.Manage
         // bind posted form fields
         [BindProperty] public string? SelectedUserId { get; set; }
         [BindProperty] public string? TargetRole { get; set; } // "Client" or "Employee"
+        public string? CurrentRole { get; set; }
 
 
 
@@ -65,11 +66,18 @@ namespace psts.web.Pages.Manage
                         p.LName.ToLower().StartsWith(term));
                 }
 
-                var results = await query
+                var searchRresults = await query
                     .Take(50)
                     .ToListAsync();
 
-                SearchResults = results;
+                //SearchResults = results;
+
+                var roleRows = await (
+                    from ur in _db.UserRoles
+                    join r in _db.Roles on ur.RoleId equals r.Id
+                    where SearchResults.Contains(ur.UserId)
+                    select new { ur.UserId, RoleName = r.Name }
+                ).ToListAsync();
             }
         }
 
@@ -90,6 +98,15 @@ namespace psts.web.Pages.Manage
                 await OnGetAsync(null);
                 return Page();
             }
+
+            var SelectedUser = await _userManager.FindByIdAsync(SelectedUserId);
+            if (SelectedUser == null)
+            {
+                ModelState.AddModelError(string.Empty, "Unable to find selected user.");
+                await OnGetAsync(null);
+                return Page();
+            }
+
 
             var user = await _userManager.GetUserAsync(User);
             var roles = await _userManager.GetRolesAsync(user);
