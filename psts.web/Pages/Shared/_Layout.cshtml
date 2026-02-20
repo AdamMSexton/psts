@@ -24,7 +24,7 @@
                     <!--Slot 1-->
                     <li>
                         <a asp-page="/Account/Home">
-                            <img src="@Url.Content("~/Images/navBarIcons/home.png")" alt="Home" />
+                            <img src="@Url.Content("~/Images/navBarIcons/home.svg")" alt="Home" />
                         </a>
                     </li>
 
@@ -36,9 +36,10 @@
 
                     @if (User.IsInRole("Manager"))
                     {
-                        <li><a asp-page="/Manage/changeBillingRate">Billing Rate</a></li>
+                        <li class="has-dropdown"> <a asp-page="/Hours/Hours">Hours</a> <ul class="dropdown"> <li><a asp-page="/Manage/changeBillingRate">Billing Rate</a></li> </ul> </li>
                     }
 
+                   
                     @if (User.IsInRole("Clerk") || User.IsInRole("Manager") || User.IsInRole("Employee"))
                     {
                         <li><a asp-page="/Reports/Index">Reports</a></li>
@@ -51,12 +52,7 @@
 
                     @if (User.IsInRole("Manager"))
                     {
-                        <li><a asp-page="/Manage/manageGeneral">General</a></li>
-                    }
-
-                    @if (User.IsInRole("Manager"))
-                    {
-                        <li><a asp-page="/Manage/manageRoles">Manage Roles</a></li>
+                        <li class="has-dropdown"> <a asp-page="/Manage/Index">Manage</a> <ul class="dropdown"> <li><a asp-page="/Manage/manageGeneral">General</a></li> <li><a asp-page="/Manage/manageRoles">Manage Roles</a></li> </ul> </li>
                     }
 
                     @if (User.IsInRole("Admin"))
@@ -75,7 +71,7 @@
                         <form method="post" asp-page="/Account/Logout" class="logout-form" style="display:inline">
                             @Html.AntiForgeryToken()
                             <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;">
-                                <img src="@Url.Content("~/Images/navBarIcons/log-out.png")" alt="Logout" />
+                                <img src="@Url.Content("~/Images/navBarIcons/log-out.svg")" alt="Logout" />
                             </button>
                         </form>
                     </li>

@@ -20,56 +20,170 @@ body {
 */
 
 
-/*===========================================================================*/
-/* Navbar Styling */
-/*===========================================================================*/
+/* ============================================================
+   NAVBAR — PSTS THEME (FULL STYLING WITH DROPDOWNS)
+   ============================================================ */
 
 .navBar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    background: #222;
+    background: linear-gradient( to bottom, var(--secondary-bg-color), var(--primary-bg-color) );
+    padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
-    text-transform: capitalize;
-    font-size: 2rem;
+    border: 0.0625rem solid var(--border-bg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    margin: 1rem auto 2rem auto;
+    max-width: 90rem;
+    position: relative;
+    z-index: 10;
 }
 
     .navBar ul {
         display: flex;
-        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+        gap: 2.25rem;
         list-style: none;
         margin: 0;
         padding: 0;
     }
 
+    /* ------------------------------
+   NAV LINKS (TEXT)
+   ------------------------------ */
+
     .navBar li a {
-        color: #ffffff;
+        color: white;
         text-decoration: none;
         font-weight: 600;
-        padding: 0.5rem 1rem;
-        transition: color 0.15s ease, background 0.15s ease;
+        font-size: 1.15rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.35rem;
+        transition: color 150ms ease, background-color 150ms ease, transform 120ms ease, box-shadow 150ms ease;
     }
 
         .navBar li a:hover {
-            color: #222;
-            background: #ffffff;
-            border-radius: 0.25rem;
+            background-color: rgba(0,168,255,0.15);
+            color: var(--main-button);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
         }
 
-        .navBar li a:visited {
-            color: #d0cfff;
+    /* ------------------------------
+   ICON LINKS (HOME + LOGOUT)
+   ------------------------------ */
+
+    .navBar img {
+        width: 2rem;
+        height: 2rem;
+        object-fit: contain;
+        filter: brightness(0.9);
+        transition: filter 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+    }
+
+    .navBar a img:hover,
+    .logout-form button:hover img {
+        filter: brightness(1.25);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+
+.logout-form button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+/* ============================================================
+   DROPDOWN MENUS
+   ============================================================ */
+
+.has-dropdown {
+    position: relative;
+}
+
+    /* Hidden by default */
+    .has-dropdown .dropdown {
+        position: absolute;
+        top: 2.75rem;
+        left: 0;
+        background: var(--secondary-bg-color);
+        border: 0.0625rem solid var(--border-bg);
+        border-radius: 0.5rem;
+        padding: 0.5rem 0;
+        list-style: none;
+        min-width: 12rem;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(6px);
+        transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+        z-index: 50;
+    }
+
+    /* Show on hover */
+    .has-dropdown:hover .dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+/* Dropdown items */
+.dropdown li {
+    width: 100%;
+}
+
+    .dropdown li a {
+        display: block;
+        padding: 0.6rem 1rem;
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background-color 150ms ease, color 150ms ease, transform 120ms ease;
+    }
+
+        .dropdown li a:hover {
+            background-color: rgba(0,168,255,0.15);
+            color: var(--main-button);
+            transform: translateX(3px);
         }
 
-        .navBar li a:active {
-            background: #cccccc;
-            color: #000000;
-        }
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 720px) {
+    .navBar ul {
+        gap: 1.25rem;
+    }
+
+    .navBar img {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
+    .navBar li a {
+        font-size: 1rem;
+    }
+
+    .has-dropdown .dropdown {
+        min-width: 10rem;
+    }
+}
+
+.navBar img {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: filter 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+}
+
+.navBar a img:hover,
+.logout-form button:hover img {
+    filter: brightness(0) invert(1) brightness(1.25);
+}
 
 
-/*===========================================================================*/
-/*END NAV BAR STYLING*/
-/*===========================================================================*/
 
 
 
@@ -350,16 +464,16 @@ input[type="password"] {
 @media (max-width: 640px) {
     .company-logo {
         width: 40%;
-        max-width: 20rem; /* doubled from 10rem */
-        margin-left: auto; /* keep centered on mobile */
+        max-width: 20rem; 
+        margin-left: auto; 
         margin-right: auto;
     }
 }
 
 
-/* --- FINAL FIX: Keep Forgot + Create on one line, Login on its own line --- */
 
-/* Put the two links on the same row */
+
+
 .action-row {
     display: flex;
     flex-direction: column; /* stack rows */
