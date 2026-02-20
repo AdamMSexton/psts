@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Psts.Web.Pages.Account;
 using System.Threading.Tasks;
 using psts.web.Services;
+using psts.web.Dto;
 using Microsoft.IdentityModel.Tokens;
 
 namespace psts.web.Pages.Manage
@@ -25,7 +26,7 @@ namespace psts.web.Pages.Manage
         private readonly IManagementService _management;
 
         public string? Query { get; set; }
-        public IList<PstsUserProfile>? SearchResults { get; set; } = new List<PstsUserProfile>();
+        public IList<UserDisplayDto>? SearchResults { get; set; } = new List<UserDisplayDto>();
         public IList<PstsUserProfile>? PendingUsersProfiles { get; set; }
 
         // bind posted form fields
@@ -66,18 +67,30 @@ namespace psts.web.Pages.Manage
                         p.LName.ToLower().StartsWith(term));
                 }
 
-                var searchRresults = await query
+                // Find user profiles that meet query (First or Last name, first characters)
+                var searchResults = await query
                     .Take(50)
                     .ToListAsync();
 
-                //SearchResults = results;
+                // Extract ids from searchResults
+                var searchIds = searchResults.Select(p => p.EmployeeId).ToList();
 
-                var roleRows = await (
+                // Get roles for those Ids
+                var roleByUserId = await (
                     from ur in _db.UserRoles
                     join r in _db.Roles on ur.RoleId equals r.Id
-                    where SearchResults.Contains(ur.UserId)
+                    where searchIds.Contains(ur.UserId)
                     select new { ur.UserId, RoleName = r.Name }
-                ).ToListAsync();
+                ).ToDictionaryAsync(x => x.UserId, x => x.RoleName);
+
+
+                SearchResults = searchResults.Select(p => new UserDisplayDto
+                {
+                    EmployeeId = p.EmployeeId,
+                    FName = p.FName,
+                    LName = p.LName,
+                    Role = roleByUserId.TryGetValue(p.EmployeeId, out var role) ? role : null
+                }).ToList();
             }
         }
 

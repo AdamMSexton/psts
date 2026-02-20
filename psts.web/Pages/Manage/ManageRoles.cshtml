@@ -21,7 +21,7 @@
                 {
                     @foreach (var user in Model.SearchResults)
                     {
-                        <option title="Temp Role" value="@user.EmployeeId">@(user.LName + ", " + user.FName) </option>
+                        <option title="@user.Role" value="@user.EmployeeId">@(user.LName + ", " + user.FName) </option>
                     }
                 }
 
