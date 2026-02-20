@@ -21,7 +21,6 @@
             <nav class="navBar">
                 <ul>
 
-                   
                     <!--Slot 1-->
                     <li>
                         <a asp-page="/Account/Home">
@@ -35,19 +34,29 @@
                         <li><a asp-page="/Hours/Hours">Hours</a></li>
                     }
 
-
-
+                    @if (User.IsInRole("Manager"))
+                    {
+                        <li><a asp-page="/Manage/changeBillingRate">Billing Rate</a></li>
+                    }
 
                     @if (User.IsInRole("Clerk") || User.IsInRole("Manager") || User.IsInRole("Employee"))
                     {
                         <li><a asp-page="/Reports/Index">Reports</a></li>
                     }
 
-
+                    @if (User.IsInRole("Manager"))
+                    {
+                        <li><a asp-page="/Manage/Index">Manage</a></li>
+                    }
 
                     @if (User.IsInRole("Manager"))
                     {
-                        <li><a asp-page="/Manage/manageGeneral">Manage</a></li>
+                        <li><a asp-page="/Manage/manageGeneral">General</a></li>
+                    }
+
+                    @if (User.IsInRole("Manager"))
+                    {
+                        <li><a asp-page="/Manage/manageRoles">Manage Roles</a></li>
                     }
 
                     @if (User.IsInRole("Admin"))
@@ -55,24 +64,17 @@
                         <li><a asp-page="/Admin/AdminUserTool">Tools</a></li>
                     }
 
-
                     @if (User.IsInRole("Admin"))
                     {
                         <li><a asp-page="/appSettings/appSettings">App Settings</a></li>
                     }
 
-
-                    <li><a asp-page="/Account/profile">Profile</a></li>
-
-
-
-                 
+                    <li><a asp-page="/Account/Profile">Profile</a></li>
 
                     <li>
                         <form method="post" asp-page="/Account/Logout" class="logout-form" style="display:inline">
                             @Html.AntiForgeryToken()
-                           
-                            <button type="submit" style="background:none;border:none;padding:0;">
+                            <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;">
                                 <img src="@Url.Content("~/Images/navBarIcons/log-out.png")" alt="Logout" />
                             </button>
                         </form>
@@ -90,4 +92,3 @@
     @RenderSection("Scripts", required: false)
 </body>
 </html>
-
