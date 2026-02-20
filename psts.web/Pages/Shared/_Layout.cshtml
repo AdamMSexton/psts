@@ -21,30 +21,40 @@
             <nav class="navBar">
                 <ul>
 
-                    <!--Slot 1-->
+                    <!-- Home -->
                     <li>
-                        <a asp-page="/Account/Home">
-                            <img src="@Url.Content("~/Images/navBarIcons/home.svg")" alt="Home" />
+                        <a asp-page="/Account/Home" class="icon-button">
+                            <img src="~/Images/navBarIcons/home.svg" alt="Home" />
                         </a>
                     </li>
 
-                    <!--Slot 2-->
-                    @if (User.IsInRole("Employee") || User.IsInRole("Manager"))
+                    <!-- Fix this -->
+                    @if (User.IsInRole("Employee"))
                     {
                         <li><a asp-page="/Hours/Hours">Hours</a></li>
                     }
 
+
                     @if (User.IsInRole("Manager"))
                     {
-                        <li class="has-dropdown"> <a asp-page="/Hours/Hours">Hours</a> <ul class="dropdown"> <li><a asp-page="/Manage/changeBillingRate">Billing Rate</a></li> </ul> </li>
+                        <li class="has-dropdown">
+                            <a asp-page="/Hours/Hours">Hours</a>
+                            <ul class="dropdown">
+                                <li><a asp-page="/Manage/changeBillingRate">Billing Rate</a></li>
+                            </ul>
+                        </li>
                     }
+                
 
-                   
+
+
+                    <!-- Reports -->
                     @if (User.IsInRole("Clerk") || User.IsInRole("Manager") || User.IsInRole("Employee"))
                     {
                         <li><a asp-page="/Reports/Index">Reports</a></li>
                     }
 
+                    <!-- Manage -->
                     @if (User.IsInRole("Manager"))
                     {
                         <li><a asp-page="/Manage/Index">Manage</a></li>
@@ -52,31 +62,37 @@
 
                     @if (User.IsInRole("Manager"))
                     {
-                        <li class="has-dropdown"> <a asp-page="/Manage/Index">Manage</a> <ul class="dropdown"> <li><a asp-page="/Manage/manageGeneral">General</a></li> <li><a asp-page="/Manage/manageRoles">Manage Roles</a></li> </ul> </li>
+                        <li class="has-dropdown">
+                            <a asp-page="/Manage/Index">Manage</a>
+                            <ul class="dropdown">
+                                <li><a asp-page="/Manage/manageGeneral">General</a></li>
+                                <li><a asp-page="/Manage/manageRoles">Manage Roles</a></li>
+                            </ul>
+                        </li>
                     }
 
+                    <!-- Admin -->
                     @if (User.IsInRole("Admin"))
                     {
                         <li><a asp-page="/Admin/AdminUserTool">Tools</a></li>
-                    }
-
-                    @if (User.IsInRole("Admin"))
-                    {
                         <li><a asp-page="/appSettings/appSettings">App Settings</a></li>
                     }
 
+                    <!-- Profile -->
                     <li><a asp-page="/Account/Profile">Profile</a></li>
 
+                    <!-- Logout -->
                     <li>
-                        <form method="post" asp-page="/Account/Logout" class="logout-form" style="display:inline">
+                        <form method="post" asp-page="/Account/Logout" class="logout-form">
                             @Html.AntiForgeryToken()
-                            <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;">
-                                <img src="@Url.Content("~/Images/navBarIcons/log-out.svg")" alt="Logout" />
+                            <button type="submit" class="icon-button">
+                                <img src="~/Images/navBarIcons/log-out.svg" alt="Logout" />
                             </button>
                         </form>
                     </li>
 
                 </ul>
+
             </nav>
         </header>
     }

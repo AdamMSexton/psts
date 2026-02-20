@@ -25,13 +25,15 @@ body {
    ============================================================ */
 
 .navBar {
-    background: linear-gradient( to bottom, var(--secondary-bg-color), var(--primary-bg-color) );
+    background: linear-gradient(to bottom, var(--secondary-bg-color), var(--primary-bg-color));
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
     border: 0.0625rem solid var(--border-bg);
     box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    /* dynamic width */
+    width: fit-content;
+    /* keep centered */
     margin: 1rem auto 2rem auto;
-    max-width: 90rem;
     position: relative;
     z-index: 10;
 }
@@ -60,38 +62,48 @@ body {
         transition: color 150ms ease, background-color 150ms ease, transform 120ms ease, box-shadow 150ms ease;
     }
 
-        .navBar li a:hover {
-            background-color: rgba(0,168,255,0.15);
-            color: var(--main-button);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-        }
+      
 
-    /* ------------------------------
+/* ------------------------------
    ICON LINKS (HOME + LOGOUT)
    ------------------------------ */
 
-    .navBar img {
+/* Shared wrapper for both <a> and <button> */
+.icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+    /* Shared icon styling */
+    .icon-button img {
         width: 2rem;
         height: 2rem;
         object-fit: contain;
-        filter: brightness(0.9);
+        filter: brightness(0) invert(1);
         transition: filter 150ms ease, transform 120ms ease, box-shadow 150ms ease;
     }
 
-    .navBar a img:hover,
-    .logout-form button:hover img {
-        filter: brightness(1.25);
+    /* Shared hover behavior */
+    .icon-button:hover img {
+        filter: brightness(0) invert(1) brightness(1.25);
         transform: translateY(-2px);
         box-shadow: 0 4px 10px rgba(0,0,0,0.25);
     }
 
+/* Remove default button styling */
 .logout-form button {
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
 }
+
 
 /* ============================================================
    DROPDOWN MENUS
@@ -170,18 +182,14 @@ body {
     }
 }
 
-.navBar img {
-    width: 2rem;
-    height: 2rem;
-    object-fit: contain;
-    filter: brightness(0) invert(1);
-    transition: filter 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+.navBar li a:hover {
+    color: var(--main-button);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    filter: brightness(1.25);
 }
 
-.navBar a img:hover,
-.logout-form button:hover img {
-    filter: brightness(0) invert(1) brightness(1.25);
-}
+
 
 
 
