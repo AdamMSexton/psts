@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Psts.Web.Pages.Account;
 using System.Threading.Tasks;
 using psts.web.Services;
+using psts.web.Dto;
 using Microsoft.IdentityModel.Tokens;
 
 namespace psts.web.Pages.Manage
@@ -25,12 +26,13 @@ namespace psts.web.Pages.Manage
         private readonly IManagementService _management;
 
         public string? Query { get; set; }
-        public IList<PstsUserProfile>? SearchResults { get; set; } = new List<PstsUserProfile>();
+        public IList<UserDisplayDto>? SearchResults { get; set; } = new List<UserDisplayDto>();
         public IList<PstsUserProfile>? PendingUsersProfiles { get; set; }
 
         // bind posted form fields
         [BindProperty] public string? SelectedUserId { get; set; }
         [BindProperty] public string? TargetRole { get; set; } // "Client" or "Employee"
+        public string? CurrentRole { get; set; }
 
 
 
@@ -65,11 +67,30 @@ namespace psts.web.Pages.Manage
                         p.LName.ToLower().StartsWith(term));
                 }
 
-                var results = await query
+                // Find user profiles that meet query (First or Last name, first characters)
+                var searchResults = await query
                     .Take(50)
                     .ToListAsync();
 
-                SearchResults = results;
+                // Extract ids from searchResults
+                var searchIds = searchResults.Select(p => p.EmployeeId).ToList();
+
+                // Get roles for those Ids
+                var roleByUserId = await (
+                    from ur in _db.UserRoles
+                    join r in _db.Roles on ur.RoleId equals r.Id
+                    where searchIds.Contains(ur.UserId)
+                    select new { ur.UserId, RoleName = r.Name }
+                ).ToDictionaryAsync(x => x.UserId, x => x.RoleName);
+
+
+                SearchResults = searchResults.Select(p => new UserDisplayDto
+                {
+                    EmployeeId = p.EmployeeId,
+                    FName = p.FName,
+                    LName = p.LName,
+                    Role = roleByUserId.TryGetValue(p.EmployeeId, out var role) ? role : null
+                }).ToList();
             }
         }
 
@@ -90,6 +111,15 @@ namespace psts.web.Pages.Manage
                 await OnGetAsync(null);
                 return Page();
             }
+
+            var SelectedUser = await _userManager.FindByIdAsync(SelectedUserId);
+            if (SelectedUser == null)
+            {
+                ModelState.AddModelError(string.Empty, "Unable to find selected user.");
+                await OnGetAsync(null);
+                return Page();
+            }
+
 
             var user = await _userManager.GetUserAsync(User);
             var roles = await _userManager.GetRolesAsync(user);

@@ -21,7 +21,7 @@
                 {
                     @foreach (var user in Model.SearchResults)
                     {
-                        <option value="@user.EmployeeId">@(user.LName + ", " + user.FName)</option>
+                        <option title="@user.Role" value="@user.EmployeeId">@(user.LName + ", " + user.FName) </option>
                     }
                 }
 
@@ -37,7 +37,7 @@
 
                     @foreach (var user in Model.PendingUsersProfiles)
                     {
-                        <option value="@user.EmployeeId">@(user.LName + ", " + user.FName)</option>
+                        <option title="Pending" value="@user.EmployeeId">@(user.LName + ", " + user.FName)</option>
                     }
                 }
             </select>
