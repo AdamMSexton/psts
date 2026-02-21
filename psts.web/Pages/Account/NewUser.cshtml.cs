@@ -42,10 +42,22 @@ public class NewUserModel : PageModel
         if (!ModelState.IsValid)
             return Page();
 
+        bool availableUserNameFound = false;
+        int increment = 0;
         string newUserName = Input.FirstName + "." + Input.LastName;
-
-        // ***************** Code to prevent duplicate users, i.e. john.smith  next should be john.smith1
-
+        do
+        {
+            var validRequestor = await _userManager.FindByNameAsync(newUserName);
+            if (validRequestor != null)
+            {
+                increment++;
+                newUserName = Input.FirstName + "." + Input.LastName + increment.ToString();
+            }
+            else
+            {
+                availableUserNameFound = true;
+            }
+        } while(!availableUserNameFound);
 
         // Build new user from form inputs
         var user = new AppUser
@@ -85,7 +97,6 @@ public class NewUserModel : PageModel
                 EmployeeId = user.Id,
                 ManagerId = null
             };
-
 
             _db.PstsUserProfiles.Add(userProfile);
             await _db.SaveChangesAsync();
