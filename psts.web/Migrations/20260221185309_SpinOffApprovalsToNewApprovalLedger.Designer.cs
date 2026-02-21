@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Psts.Web.Data;
@@ -11,9 +12,11 @@ using Psts.Web.Data;
 namespace psts.web.Migrations
 {
     [DbContext(typeof(PstsDbContext))]
-    partial class PstsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260221185309_SpinOffApprovalsToNewApprovalLedger")]
+    partial class SpinOffApprovalsToNewApprovalLedger
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -431,24 +434,24 @@ namespace psts.web.Migrations
 
             modelBuilder.Entity("psts.web.Data.PstsTimeAdjustmentApprovalLedger", b =>
                 {
-                    b.Property<Guid>("SubjectTransactionId")
+                    b.Property<Guid>("ApprovedTransactionId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("ApprovalAuthority")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("ApprovalTimeStamp")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<bool>("Approved")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("ApprovingUserId")
                         .HasColumnType("text");
 
-                    b.Property<short>("Decision")
-                        .HasColumnType("smallint");
-
-                    b.Property<DateTime>("DecisionTimeStamp")
-                        .HasColumnType("timestamptz");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("text");
+                    b.Property<bool>("Disapproved")
+                        .HasColumnType("boolean");
 
                     b.Property<long>("TransactionNum")
                         .ValueGeneratedOnAdd()
@@ -456,11 +459,11 @@ namespace psts.web.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("TransactionNum"));
 
-                    b.HasKey("SubjectTransactionId");
+                    b.HasKey("ApprovedTransactionId");
 
                     b.HasIndex("ApprovingUserId");
 
-                    b.ToTable("pstsTimeAdjustmentApprovalLedgers");
+                    b.ToTable("PstsTimeAdjustmentApprovalLedger");
                 });
 
             modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
@@ -676,15 +679,15 @@ namespace psts.web.Migrations
 
             modelBuilder.Entity("psts.web.Data.PstsTimeAdjustmentApprovalLedger", b =>
                 {
+                    b.HasOne("psts.web.Data.PstsTimeTransactions", "SubjectTransaction")
+                        .WithOne("RelatedApproval")
+                        .HasForeignKey("psts.web.Data.PstsTimeAdjustmentApprovalLedger", "ApprovedTransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Psts.Web.Data.AppUser", "ApprovingUser")
                         .WithMany()
                         .HasForeignKey("ApprovingUserId");
-
-                    b.HasOne("psts.web.Data.PstsTimeTransactions", "SubjectTransaction")
-                        .WithOne("RelatedApproval")
-                        .HasForeignKey("psts.web.Data.PstsTimeAdjustmentApprovalLedger", "SubjectTransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("ApprovingUser");
 

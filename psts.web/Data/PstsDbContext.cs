@@ -18,6 +18,7 @@ public class PstsDbContext : IdentityDbContext<AppUser>
     public DbSet<PstsProjectDefinition> PstsProjectDefinitions {  get; set; } = default!;
     public DbSet<PstsTaskDefinition> PstsTaskDefinitions { get; set; } = default!;
     public DbSet<PstsTimeTransactions> PstsTimeTransactionss { get; set; } = default!;
+    public DbSet<PstsTimeAdjustmentApprovalLedger> pstsTimeAdjustmentApprovalLedgers { get; set; } = default!;
     public DbSet<PstsBillingRateResolutionSchedule> pstsBillingRateResolutionSchedules { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder builder)       
@@ -172,14 +173,31 @@ public class PstsDbContext : IdentityDbContext<AppUser>
             .Property(t => t.WorkCompletedDate)
             .HasColumnType("date");
 
-        builder.Entity<PstsTimeTransactions>()              // Explicitly tell DB its a date and time
-            .Property(e => e.ApprovalTimeStamp)
-            .HasColumnType("timestamptz");
-
-
         builder.Entity<PstsTimeTransactions>()              // Set Precision to 5 digits, 2 decimal.  max is 999.99
             .Property(e => e.WorkCompletedHours)
             .HasPrecision(5, 2);
+
+        // **** PstsTimeAdjustmentApproval
+        builder.Entity<PstsTimeAdjustmentApprovalLedger>(entity =>              // Primary Key & Foreign Key with relationship... Inception Voodoo
+        {
+            entity.HasKey(a => a.SubjectTransactionId);                        // Define Primary Key
+
+            entity.HasOne(a => a.SubjectTransaction)                            // Pointer from ApprovalLedger -> TimeTransaction
+                  .WithOne(t => t.RelatedApproval)                              // Pointer from TimeTransaction -> ApprovalLedger
+                  .HasForeignKey<PstsTimeAdjustmentApprovalLedger>(a => a.SubjectTransactionId);   // Define Foreign Key
+        });
+
+        builder.Entity<PstsTimeAdjustmentApprovalLedger>()              // Ensure TransactionNum is incrementing.
+            .Property(e => e.TransactionNum)
+            .UseIdentityColumn();
+
+        builder.Entity<PstsTimeAdjustmentApprovalLedger>()              // Convert Decision enum to short. Approved = 1, Disapproved = 2
+            .Property(x => x.Decision)
+            .HasConversion<short>();
+
+        builder.Entity<PstsTimeAdjustmentApprovalLedger>()              // Explicitly tell DB its a date and time
+            .Property(e => e.DecisionTimeStamp)
+            .HasColumnType("timestamptz");
 
         // **** PstsBillingRateResolutionSchedule ***
 

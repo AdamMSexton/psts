@@ -114,7 +114,7 @@ namespace psts.web.Services
             }
         }
 
-        public async Task<ServiceResult<bool>> ApproveTransactionAdjustment(string _requestorId, RoleTypes _requestorRole, Guid _transactionIdToApprove)
+        public async Task<ServiceResult<bool>> AdjudicateTransactionAdjustment(string _requestorId, RoleTypes _requestorRole, ApprovalDecisionDto _decision)
         {
             try
             {
@@ -149,7 +149,7 @@ namespace psts.web.Services
                 }
 
                 // Validate transaction to approve
-                var transactionToApprove = await _db.PstsTimeTransactionss.FindAsync(_transactionIdToApprove);
+                var transactionToApprove = await _db.PstsTimeTransactionss.FindAsync(_decision.SubjectTransactionId);
                 if (transactionToApprove == null)
                 {
                     return ServiceResult<bool>.Fail("Transaction Id to approve not found.");
@@ -160,14 +160,23 @@ namespace psts.web.Services
                     return ServiceResult<bool>.Fail("Transaction to approve is not an adjustment.");
                 }
 
-                transactionToApprove.ApprovalAuthority = _requestorId;
+                var verifyNoCurrentApproval = await _db.pstsTimeAdjustmentApprovalLedgers.FindAsync(_decision.SubjectTransactionId);
+                if (verifyNoCurrentApproval != null)
+                {
+                    return ServiceResult<bool>.Fail("Transaction already " + verifyNoCurrentApproval.Decision.ToString());
+                }
 
+                var newApprovalAction = new PstsTimeAdjustmentApprovalLedger();
+                newApprovalAction.SubjectTransactionId = _decision.SubjectTransactionId;
+                newApprovalAction.ApprovalAuthority = _requestorId;
+                newApprovalAction.Decision = _decision.Decision;
+                newApprovalAction.Notes = _decision.Notes;
+                newApprovalAction.DecisionTimeStamp = DateTime.UtcNow;
 
+                await _db.pstsTimeAdjustmentApprovalLedgers.AddAsync(newApprovalAction);
+                await _db.SaveChangesAsync();
 
-                //await _db.PstsTimeTransactionss.AddAsync(newTimeTransaction);
-                //await _db.SaveChangesAsync();
-
-                return ServiceResult<bool>.Ok(false);
+                return ServiceResult<bool>.Ok(true);
             }
             catch (Exception ex)
             {

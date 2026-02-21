@@ -21,20 +21,7 @@ namespace psts.web.Data
         // ***** Adjustment related variables *****
         public bool IsAdjustment { get; set; } = false;                 // Entry is an adjustment to another transaction
         public PstsTimeTransactions? RelatedTransaction { get; set; }
+        public PstsTimeAdjustmentApprovalLedger? RelatedApproval { get; set; } // null = unapproved
         public Guid? RelatedId { get; set; }
-
-
-
-        public string? ApprovalAuthority { get; set; }
-        public bool? Approved { get; set; } = false;
-        public bool? Disapproved { get; set; } = false;
-        public DateTime? ApprovalTimeStamp {  get; set; } = DateTime.UtcNow;
-        public AppUser? ApprovingUser { get; set; }
-
-
-
-
-
-
     }
 }
