@@ -150,8 +150,10 @@ builder.Services.AddControllers();      // For APIs later
 
 builder.Services.AddScoped<PstsDbSeeder>();
 
+builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IShortCodeService, ShortCodeService>();
 builder.Services.AddScoped<IManagementService, ManagementService>();
+builder.Services.AddScoped<ITimeServices, TimeServices>();
 
 var app = builder.Build();
 

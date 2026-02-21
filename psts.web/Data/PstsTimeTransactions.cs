@@ -13,13 +13,23 @@ namespace psts.web.Data
         public string EnteredBy { get; set; } = string.Empty;
         public AppUser? WorkCompletedEmployee { get; set; }
         public string WorkCompletedBy { get; set; } = string.Empty;
-        public DateTime EnterdTimeStamp { get; set; } = DateTime.UtcNow;
+        public DateTime EnteredTimeStamp { get; set; } = DateTime.UtcNow;
         public DateOnly WorkCompletedDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
-        public enum TransactionType { NewEntry,Adjustment };         // Entry type
-        public PstsTimeTransactions? RelatedTransaction { get; set; }
-        public Guid? RelatedId { get; set; }
         public decimal WorkCompletedHours { get; set; } = 0;
         public string Notes {  get; set; } = string.Empty;
+        
+        // ***** Adjustment related variables *****
+        public bool IsAdjustment { get; set; } = false;                 // Entry is an adjustment to another transaction
+        public PstsTimeTransactions? RelatedTransaction { get; set; }
+        public Guid? RelatedId { get; set; }
+
+
+
+        public string? ApprovalAuthority { get; set; }
+        public bool? Approved { get; set; } = false;
+        public bool? Disapproved { get; set; } = false;
+        public DateTime? ApprovalTimeStamp {  get; set; } = DateTime.UtcNow;
+        public AppUser? ApprovingUser { get; set; }
 
 
 

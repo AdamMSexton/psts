@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Psts.Web.Data;
@@ -11,9 +12,11 @@ using Psts.Web.Data;
 namespace psts.web.Migrations
 {
     [DbContext(typeof(PstsDbContext))]
-    partial class PstsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260221004418_RestructureSettingsToKeyValuePair")]
+    partial class RestructureSettingsToKeyValuePair
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -435,12 +438,6 @@ namespace psts.web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ApprovalAuthority")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApprovingUserId")
-                        .HasColumnType("text");
-
                     b.Property<string>("EnteredBy")
                         .IsRequired()
                         .HasColumnType("text");
@@ -479,8 +476,6 @@ namespace psts.web.Migrations
                         .HasColumnType("numeric(5,2)");
 
                     b.HasKey("TransactionId");
-
-                    b.HasIndex("ApprovingUserId");
 
                     b.HasIndex("EnteredBy")
                         .IsUnique();
@@ -650,10 +645,6 @@ namespace psts.web.Migrations
 
             modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
                 {
-                    b.HasOne("Psts.Web.Data.AppUser", "ApprovingUser")
-                        .WithMany()
-                        .HasForeignKey("ApprovingUserId");
-
                     b.HasOne("Psts.Web.Data.AppUser", "EnteredEmployee")
                         .WithOne()
                         .HasForeignKey("psts.web.Data.PstsTimeTransactions", "EnteredBy")
@@ -676,8 +667,6 @@ namespace psts.web.Migrations
                         .HasForeignKey("psts.web.Data.PstsTimeTransactions", "WorkCompletedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("ApprovingUser");
 
                     b.Navigation("EnteredEmployee");
 

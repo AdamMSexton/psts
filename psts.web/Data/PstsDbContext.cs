@@ -25,6 +25,11 @@ public class PstsDbContext : IdentityDbContext<AppUser>
         base.OnModelCreating(builder);
 
 
+        // **** AppSettings ****
+        builder.Entity<AppSettings>()
+            .HasKey(z => z.Setting);                        // Primary Key
+
+
         // **** PstsUserProfile ***
         builder.Entity<PstsUserProfile>()                   // Primary Key
             .HasKey(a => a.EmployeeId);
@@ -160,12 +165,17 @@ public class PstsDbContext : IdentityDbContext<AppUser>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<PstsTimeTransactions>()              // Explicitly tell DB its a date and time
-            .Property(e => e.EnterdTimeStamp)
+            .Property(e => e.EnteredTimeStamp)
             .HasColumnType("timestamptz");
 
         builder.Entity<PstsTimeTransactions>()              // Explicity tell DB its date only
             .Property(t => t.WorkCompletedDate)
             .HasColumnType("date");
+
+        builder.Entity<PstsTimeTransactions>()              // Explicitly tell DB its a date and time
+            .Property(e => e.ApprovalTimeStamp)
+            .HasColumnType("timestamptz");
+
 
         builder.Entity<PstsTimeTransactions>()              // Set Precision to 5 digits, 2 decimal.  max is 999.99
             .Property(e => e.WorkCompletedHours)

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using psts.web.Domain.Enums;
 using Psts.Web.Data;
 using System.Linq.Expressions;
 
@@ -20,8 +22,23 @@ namespace psts.web.Data
             _logger = logger;
         }
 
+        private static readonly Dictionary<SystemSettings, string> DefaultSettings = new()
+        {
+            {SystemSettings.MakeOIDCAvailable, "true" },
+            {SystemSettings.OIDCEnabledByDefault, "false" },
+            {SystemSettings.DisableAccountAfterXDaysStale, "0" },
+            {SystemSettings.ManagerApprovalForAdjustments, "false" },
+            {SystemSettings.MaxDaysInPastForEntry, "14" },
+            {SystemSettings.MaxDaysInFutureForEntry, "0" },
+            {SystemSettings.MaxHoursByEmployeePerDay, "8" }
+        };
+
+
         public async Task SeedDbAsync()
         {
+            
+            // ********** CREATE ROLES **********
+            
             bool rolesCreated = true;
 
             // AMS - Verify Admin role exists, if not create it
@@ -89,6 +106,9 @@ namespace psts.web.Data
                 _logger.LogError("Could not create required user roles. APPLICATION MAY NOT FUNCTION CORRECTLY.");
             }
 
+            
+            // ********** CREATE DEFAULT ADMIN IF NEEDED **********
+            
             // AMS if no admins exist create the default and set to require password change at next login.
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
             if (!admins.Any())
@@ -152,6 +172,35 @@ namespace psts.web.Data
                     throw;
                 }
             }
+
+
+            // ********** Populate Application settings **********
+
+            foreach (var setting in DefaultSettings)
+            {
+                var key = setting.Key;
+                var defaultVale = setting.Value;
+
+                bool settingExists = await _db.AppSettingss.AnyAsync(u => u.Setting == key.ToString());
+                if (!settingExists)
+                {
+                    var newSettingRecord = new AppSettings();
+                    newSettingRecord.Setting = key.ToString();
+                    newSettingRecord.Value = defaultVale;
+                    try
+                    {
+                        _db.AppSettingss.Add(newSettingRecord);
+                        await _db.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Error writing default " + key.ToString() + " Setting to AppSettings DB. => " + ex.Message);
+                    }
+                }
+            }
+
         }
     }
+
+
 }
