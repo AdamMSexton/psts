@@ -54,11 +54,6 @@
                         <li><a asp-page="/Reports/Index">Reports</a></li>
                     }
 
-                    <!-- Manage -->
-                    @if (User.IsInRole("Manager"))
-                    {
-                        <li><a asp-page="/Manage/Index">Manage</a></li>
-                    }
 
                     @if (User.IsInRole("Manager"))
                     {
