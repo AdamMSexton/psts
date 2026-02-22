@@ -8,7 +8,7 @@
 
 @if (TempData["StatusMessage"] != null)
 {
-    <p style="text-align:center; margin-bottom:1.5rem;">@TempData["StatusMessage"]</p>
+    <p class="error-text">@TempData["StatusMessage"]</p>
 }
 
 <div class="profile-grid">
@@ -23,26 +23,23 @@
         <form method="post" asp-page-handler="UpdateProfile">
 
             <div>
-                
                 <p>User Name:</p>
-                <input asp-for="ProfileInput.UserName" placeholder="Username..."/>
+                <input asp-for="ProfileInput.UserName" placeholder="Username..." />
             </div>
 
             <div>
-                
                 <p>First Name:</p>
-                <input asp-for="ProfileInput.FirstName" placeholder="First Name..."/>
+                <input asp-for="ProfileInput.FirstName" placeholder="First Name..." />
             </div>
 
             <div>
-               
                 <p>Last Name:</p>
-                <input asp-for="ProfileInput.LastName" placeholder="Last Name..."/>
+                <input asp-for="ProfileInput.LastName" placeholder="Last Name..." />
             </div>
 
             <div>
                 <p>Email Address:</p>
-                <input asp-for="ProfileInput.Email" placeholder="Your email..."/>
+                <input asp-for="ProfileInput.Email" placeholder="Your email..." />
             </div>
 
             <div>
@@ -52,7 +49,7 @@
 
             <div>
                 <p>Manager Name:</p>
-                <input asp-for="ProfileInput.ManagerName" placeholder="Your manager's name..."/>
+                <input asp-for="ProfileInput.ManagerName" placeholder="Your manager's name..." />
             </div>
 
             <button type="submit">Update</button>
@@ -74,15 +71,15 @@
               asp-route-token="@Model.PasswordInput.SecurityTokenStash">
 
             <div>
-                @if(!string.IsNullOrEmpty(Model.PasswordChangeMessage))
+                @if (!string.IsNullOrEmpty(Model.PasswordChangeMessage))
                 {
-                    @Model.PasswordChangeMessage
-                    <br />
+                    <p class="error-text">@Model.PasswordChangeMessage</p>
                 }
+
                 <p>Current Password:</p>
                 @if (Model.RequireCurrentPassword)
                 {
-                    <input type="password" asp-for="PasswordInput.CurrentPassword" placeholder="Your current password..."/>
+                    <input type="password" asp-for="PasswordInput.CurrentPassword" placeholder="Your current password..." />
                 }
                 else
                 {
@@ -91,15 +88,13 @@
             </div>
 
             <div>
-                
                 <p>New Password:</p>
                 <input type="password" asp-for="PasswordInput.NewPassword" placeholder="Enter your new password..." />
             </div>
 
             <div>
-               
                 <p>Password Verification:</p>
-                <input type="password" asp-for="PasswordInput.VerifyPassword" placeholder="Please enter new password again..."/>
+                <input type="password" asp-for="PasswordInput.VerifyPassword" placeholder="Please enter new password again..." />
             </div>
 
             <button type="submit">Update</button>
@@ -126,10 +121,10 @@
                 {
                     var providerClass = login.LoginProvider switch
                     {
-                                    "Google" => "google",
-                                    "Microsoft" => "microsoft",
-                                    "Auth0" => "auth0",
-                                    "Okta" => "okta",
+                                        "Google" => "google",
+                                        "Microsoft" => "microsoft",
+                                        "Auth0" => "auth0",
+                                        "Okta" => "okta",
                         _ => "default"
                     };
 
@@ -169,10 +164,10 @@
                     {
                         var providerClass = provider.Name switch
                         {
-                                            "Google" => "google",
-                                            "Microsoft" => "microsoft",
-                                            "Auth0" => "auth0",
-                                            "Okta" => "okta",
+                                                "Google" => "google",
+                                                "Microsoft" => "microsoft",
+                                                "Auth0" => "auth0",
+                                                "Okta" => "okta",
                             _ => "default"
                         };
 

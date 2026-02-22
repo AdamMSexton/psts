@@ -835,3 +835,34 @@ input[type="password"] {
         grid-template-columns: 1fr;
     }
 }
+/* ============================================================
+   FORM VALIDATION — PSTS THEME
+   ============================================================ */
+
+.error-text {
+    color: #FF6B6B;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 1rem auto;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(255, 80, 80, 0.12);
+    border: 0.0625rem solid rgba(255, 80, 80, 0.35);
+    border-radius: 0.25rem;
+    display: block;
+    width: fit-content;
+    text-align: center;
+    text-shadow: 0 0 4px rgba(0,0,0,0.4);
+    animation: fadeError 0.35s ease-out forwards;
+}
+
+@keyframes fadeError {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -93,8 +93,9 @@
                     </form>
                     @if (!string.IsNullOrEmpty(Model.LoginErrorText))
                     {
-                        @Model.LoginErrorText
+                        <p class="error-text">@Model.LoginErrorText</p>
                     }
+
                 }
             </div>
         }
