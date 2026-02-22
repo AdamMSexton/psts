@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Psts.Web.Data;
@@ -11,9 +12,11 @@ using Psts.Web.Data;
 namespace psts.web.Migrations
 {
     [DbContext(typeof(PstsDbContext))]
-    partial class PstsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260221005642_AddApprovalAuthorityFieldsToTimeTransactionRegister")]
+    partial class AddApprovalAuthorityFieldsToTimeTransactionRegister
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -429,45 +432,17 @@ namespace psts.web.Migrations
                     b.ToTable("pstsBillingRateResolutionSchedules");
                 });
 
-            modelBuilder.Entity("psts.web.Data.PstsTimeAdjustmentApprovalLedger", b =>
-                {
-                    b.Property<Guid>("SubjectTransactionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ApprovalAuthority")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApprovingUserId")
-                        .HasColumnType("text");
-
-                    b.Property<short>("Decision")
-                        .HasColumnType("smallint");
-
-                    b.Property<DateTime>("DecisionTimeStamp")
-                        .HasColumnType("timestamptz");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("text");
-
-                    b.Property<long>("TransactionNum")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("TransactionNum"));
-
-                    b.HasKey("SubjectTransactionId");
-
-                    b.HasIndex("ApprovingUserId");
-
-                    b.ToTable("pstsTimeAdjustmentApprovalLedgers");
-                });
-
             modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
                 {
                     b.Property<Guid>("TransactionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("ApprovalAuthority")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ApprovingUserId")
+                        .HasColumnType("text");
 
                     b.Property<string>("EnteredBy")
                         .IsRequired()
@@ -507,6 +482,8 @@ namespace psts.web.Migrations
                         .HasColumnType("numeric(5,2)");
 
                     b.HasKey("TransactionId");
+
+                    b.HasIndex("ApprovingUserId");
 
                     b.HasIndex("EnteredBy")
                         .IsUnique();
@@ -674,25 +651,12 @@ namespace psts.web.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("psts.web.Data.PstsTimeAdjustmentApprovalLedger", b =>
+            modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
                 {
                     b.HasOne("Psts.Web.Data.AppUser", "ApprovingUser")
                         .WithMany()
                         .HasForeignKey("ApprovingUserId");
 
-                    b.HasOne("psts.web.Data.PstsTimeTransactions", "SubjectTransaction")
-                        .WithOne("RelatedApproval")
-                        .HasForeignKey("psts.web.Data.PstsTimeAdjustmentApprovalLedger", "SubjectTransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApprovingUser");
-
-                    b.Navigation("SubjectTransaction");
-                });
-
-            modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
-                {
                     b.HasOne("Psts.Web.Data.AppUser", "EnteredEmployee")
                         .WithOne()
                         .HasForeignKey("psts.web.Data.PstsTimeTransactions", "EnteredBy")
@@ -715,6 +679,8 @@ namespace psts.web.Migrations
                         .HasForeignKey("psts.web.Data.PstsTimeTransactions", "WorkCompletedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ApprovingUser");
 
                     b.Navigation("EnteredEmployee");
 
@@ -741,11 +707,6 @@ namespace psts.web.Migrations
                     b.Navigation("Manager");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
-                {
-                    b.Navigation("RelatedApproval");
                 });
 #pragma warning restore 612, 618
         }

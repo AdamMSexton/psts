@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Psts.Web.Data;
@@ -11,9 +12,11 @@ using Psts.Web.Data;
 namespace psts.web.Migrations
 {
     [DbContext(typeof(PstsDbContext))]
-    partial class PstsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260220225246_RemoveEnumFromTimeTransactionRegister")]
+    partial class RemoveEnumFromTimeTransactionRegister
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -361,14 +364,25 @@ namespace psts.web.Migrations
 
             modelBuilder.Entity("psts.web.Data.AppSettings", b =>
                 {
-                    b.Property<string>("Setting")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.HasKey("Setting");
+                    b.Property<int>("DisableAccountAfterXDaysStale")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("MakeOIDCAvailable")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ManagerApprovalForAdjustments")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("OIDCEnabledByDefault")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
 
                     b.ToTable("AppSettingss");
                 });
@@ -429,52 +443,18 @@ namespace psts.web.Migrations
                     b.ToTable("pstsBillingRateResolutionSchedules");
                 });
 
-            modelBuilder.Entity("psts.web.Data.PstsTimeAdjustmentApprovalLedger", b =>
-                {
-                    b.Property<Guid>("SubjectTransactionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ApprovalAuthority")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApprovingUserId")
-                        .HasColumnType("text");
-
-                    b.Property<short>("Decision")
-                        .HasColumnType("smallint");
-
-                    b.Property<DateTime>("DecisionTimeStamp")
-                        .HasColumnType("timestamptz");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("text");
-
-                    b.Property<long>("TransactionNum")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("TransactionNum"));
-
-                    b.HasKey("SubjectTransactionId");
-
-                    b.HasIndex("ApprovingUserId");
-
-                    b.ToTable("pstsTimeAdjustmentApprovalLedgers");
-                });
-
             modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
                 {
                     b.Property<Guid>("TransactionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("EnterdTimeStamp")
+                        .HasColumnType("timestamptz");
+
                     b.Property<string>("EnteredBy")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("EnteredTimeStamp")
-                        .HasColumnType("timestamptz");
 
                     b.Property<bool>("IsAdjustment")
                         .HasColumnType("boolean");
@@ -674,23 +654,6 @@ namespace psts.web.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("psts.web.Data.PstsTimeAdjustmentApprovalLedger", b =>
-                {
-                    b.HasOne("Psts.Web.Data.AppUser", "ApprovingUser")
-                        .WithMany()
-                        .HasForeignKey("ApprovingUserId");
-
-                    b.HasOne("psts.web.Data.PstsTimeTransactions", "SubjectTransaction")
-                        .WithOne("RelatedApproval")
-                        .HasForeignKey("psts.web.Data.PstsTimeAdjustmentApprovalLedger", "SubjectTransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApprovingUser");
-
-                    b.Navigation("SubjectTransaction");
-                });
-
             modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
                 {
                     b.HasOne("Psts.Web.Data.AppUser", "EnteredEmployee")
@@ -741,11 +704,6 @@ namespace psts.web.Migrations
                     b.Navigation("Manager");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("psts.web.Data.PstsTimeTransactions", b =>
-                {
-                    b.Navigation("RelatedApproval");
                 });
 #pragma warning restore 612, 618
         }
