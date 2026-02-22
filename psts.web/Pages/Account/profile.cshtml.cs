@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using psts.web.Data;
+using psts.web.Services;
 using Psts.Web.Data;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime;
 
 
 namespace Psts.Web.Pages.Account
@@ -17,15 +19,17 @@ namespace Psts.Web.Pages.Account
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly PstsDbContext _db;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly ISettingsService _settings;
 
         public enum PasswordChangeReason { Undetermined, Voluntary, ForcedOnLogin, NewUser }
 
-        public ProfileModel(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, PstsDbContext db, SignInManager<AppUser> signInManager)
+        public ProfileModel(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, PstsDbContext db, SignInManager<AppUser> signInManager, ISettingsService settingsService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _db = db;
             _signInManager = signInManager;
+            _settings = settingsService;
         }
 
         [BindProperty]
@@ -61,6 +65,7 @@ namespace Psts.Web.Pages.Account
         }
 
         public bool RequireCurrentPassword { get; set; } = true;
+        public bool OIDCEnabled { get; set; }
 
         //List of available external authentication providers(Google, Microsoft, Auth0, Okta)
         public IList<AuthenticationScheme>? ExternalLogins { get; set; }
@@ -133,7 +138,10 @@ namespace Psts.Web.Pages.Account
                 ProfileInput.ManagerName = managerProfile.LName + ", " + managerProfile.FName;
             }
 
-
+            // OIDC system setting and user setting and setup for most restrictive            
+            OIDCEnabled = await _settings.GetSetting<bool>(psts.web.Domain.Enums.SystemSettings.MakeOIDCAvailable);
+            OIDCEnabled = !((!OIDCEnabled) || (!user.OIDCAllowed));         // If either OIDC setting is false, the OR is true and inverted to false. Cheaper than an 'if'.
+            
             //Load available OIDC providers (Google, Microsoft, Auth0, Okta)
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             //Load which OIDC providers are currently linked to this user

@@ -53,45 +53,51 @@
         </div>
 
         <!-- EXTERNAL LOGIN -->
-        <div id="loginExternal" class="grid-item">
-            <h3>Sign in with:</h3>
+       @if (Model.OIDCEnabled)
+       {
+            <div id="loginExternal" class="grid-item">
+                <h3>Sign in with:</h3>
 
-            @if (Model.ExternalLogins?.Count > 0)
-            {
-                <form method="post" asp-page-handler="ExternalLogin">
-                    @Html.AntiForgeryToken()
+                @if (Model.ExternalLogins?.Count > 0)
+                {
+                    <form method="post" asp-page-handler="ExternalLogin">
+                        @Html.AntiForgeryToken()
 
-                    <div class="external-grid">
-                        @foreach (var provider in Model.ExternalLogins)
-                        {
-                            var backgroundColor = provider.Name switch
+                        <div class="external-grid">
+                            @foreach (var provider in Model.ExternalLogins)
                             {
-                                "Google" => "google",
-                                "Microsoft" => "microsoft",
-                                "Auth0" => "auth0",
-                                "Okta" => "okta",
-                                _ => "default"
-                            };
+                                var backgroundColor = provider.Name switch
+                                {
+                                    "Google" => "google",
+                                    "Microsoft" => "microsoft",
+                                    "Auth0" => "auth0",
+                                    "Okta" => "okta",
+                                    _ => "default"
+                                };
 
-                            // Build the image path under wwwroot/Images/ExternalLoginLogos
-                            var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{provider.Name}.png");
+                                // Build the image path under wwwroot/Images/ExternalLoginLogos
+                                var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{provider.Name}.png");
 
-                            <button type="submit"
-                                    name="provider"
-                                    value="@provider.Name"
-                                    class="external-btn @backgroundColor">
-                                <div class="external-btn-top">Sign in with:</div>
-                                <div class="external-btn-bottom">
-                                    <span class="provider-name">@provider.Name</span>
-                                    <img src="@logoPath" alt="@provider.Name logo" class="provider-logo" />
-                                </div>
-                            </button>
-                        }
-                    </div>
-                </form>
-            }
-        </div>
-
+                                <button type="submit"
+                                        name="provider"
+                                        value="@provider.Name"
+                                        class="external-btn @backgroundColor">
+                                    <div class="external-btn-top">Sign in with:</div>
+                                    <div class="external-btn-bottom">
+                                        <span class="provider-name">@provider.Name</span>
+                                        <img src="@logoPath" alt="@provider.Name logo" class="provider-logo" />
+                                    </div>
+                                </button>
+                            }
+                        </div>
+                    </form>
+                    @if (!string.IsNullOrEmpty(Model.LoginErrorText))
+                    {
+                        @Model.LoginErrorText
+                    }
+                }
+            </div>
+        }
         <!-- COMPANY CONTENT -->
         <div id="companyContent" class="grid-item">
             <h2>PSTS SOLUTIONS</h2>

@@ -16,7 +16,7 @@ namespace psts.web.Services
         public async Task<T> GetSetting<T>(SystemSettings key)
         {
             // Get row from settings table based on provided key
-            var row = await _db.AppSettingss.FindAsync(key);
+            var row = await _db.AppSettingss.FindAsync(key.ToString());
             if (row == null)
             {
                 //Setting not found

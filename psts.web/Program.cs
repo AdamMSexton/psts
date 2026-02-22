@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using psts.web.Data;
 using psts.web.Services;
 using Psts.Web.Data;
 using System.Data;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -171,18 +170,16 @@ using (var scope = app.Services.CreateScope())
 }
 
 
-// AMS ***** Create a dev user. DELETE FOR PRODUCTION
-using (var scope = app.Services.CreateScope())
+// AMS - Need this to accept forwarded headers from external proxies.  GPT says so, and it fixed https/OIDC running in DOcker live on internet.
+var fhOptions = new ForwardedHeadersOptions
 {
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+fhOptions.KnownNetworks.Clear();
+fhOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(fhOptions);
 
-    var devUser = new AppUser { UserName = "dev", Email = "dev@psts.local" };
-    if (await userManager.FindByNameAsync(devUser.UserName) == null)
-    {
-        await userManager.CreateAsync(devUser, "devdev");
-    }
-}
-// AMS ***** DELETE ABOVE FOR PRODUCTION, DEV ONLY.                                           Yeah im sure theres a better more professional way to do this but...  How would i leave these jokes.  Also if your reading this i forgot to delete, o jokes on me? you maybe?
+
 
 
 app.UseStaticFiles();

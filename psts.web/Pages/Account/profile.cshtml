@@ -107,91 +107,93 @@
     <!-- -------------------------------------------------- -->
     <!-- EXTERNAL LOGIN BOX -->
     <!-- -------------------------------------------------- -->
-    <div id="externalBox" class="external-box grid-item">
+    @if (Model.OIDCEnabled)
+    {
+        <div id="externalBox" class="external-box grid-item">
 
-        <h3>External Login Options</h3>
+            <h3>External Login Options</h3>
 
-        <!-- Linked Accounts -->
-        @if (Model.CurrentLogins?.Count > 0)
-        {
-            <h4>Linked Accounts:</h4>
-
-            @foreach (var login in Model.CurrentLogins)
+            <!-- Linked Accounts -->
+            @if (Model.CurrentLogins?.Count > 0)
             {
-                var providerClass = login.LoginProvider switch
+                <h4>Linked Accounts:</h4>
+
+                @foreach (var login in Model.CurrentLogins)
                 {
-                                "Google" => "google",
-                                "Microsoft" => "microsoft",
-                                "Auth0" => "auth0",
-                                "Okta" => "okta",
-                    _ => "default"
-                };
-
-                var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{login.LoginProvider}.png");
-
-                <form method="post" asp-page-handler="RemoveLogin">
-                    <div class="external-provider external-btn @providerClass">
-
-                        <div class="external-btn-bottom">
-                            <span class="provider-name">@login.LoginProvider</span>
-                            <img src="@logoPath" alt="@login.LoginProvider logo" class="provider-logo" />
-                        </div>
-
-                        <input type="hidden" name="loginProvider" value="@login.LoginProvider" />
-                        <input type="hidden" name="providerKey" value="@login.ProviderKey" />
-
-                        <button type="submit" class="btn-secondary">Remove</button>
-                    </div>
-                </form>
-            }
-        }
-        else
-        {
-            <p>You have no linked external accounts.</p>
-        }
-
-        <br />
-
-        <!-- Add External Login -->
-        @if (Model.ExternalLogins?.Count > 0)
-        {
-            <h4>Add External Login:</h4>
-
-            @foreach (var provider in Model.ExternalLogins)
-            {
-                if (!Model.CurrentLogins.Any(l => l.LoginProvider == provider.Name))
-                {
-                    var providerClass = provider.Name switch
+                    var providerClass = login.LoginProvider switch
                     {
-                                        "Google" => "google",
-                                        "Microsoft" => "microsoft",
-                                        "Auth0" => "auth0",
-                                        "Okta" => "okta",
+                                    "Google" => "google",
+                                    "Microsoft" => "microsoft",
+                                    "Auth0" => "auth0",
+                                    "Okta" => "okta",
                         _ => "default"
                     };
 
-                    var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{provider.Name}.png");
+                    var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{login.LoginProvider}.png");
 
-                    <form method="post" asp-page-handler="LinkLogin">
-                        <input type="hidden" name="provider" value="@provider.Name" />
-
-                        <button type="submit"
-                                class="external-btn @providerClass"
-                                style="width:100%;">
-
-                            <div class="external-btn-top">Link account:</div>
+                    <form method="post" asp-page-handler="RemoveLogin">
+                        <div class="external-provider external-btn @providerClass">
 
                             <div class="external-btn-bottom">
-                                <span class="provider-name">@provider.Name</span>
-                                <img src="@logoPath" alt="@provider.Name logo" class="provider-logo" />
+                                <span class="provider-name">@login.LoginProvider</span>
+                                <img src="@logoPath" alt="@login.LoginProvider logo" class="provider-logo" />
                             </div>
 
-                        </button>
+                            <input type="hidden" name="loginProvider" value="@login.LoginProvider" />
+                            <input type="hidden" name="providerKey" value="@login.ProviderKey" />
+
+                            <button type="submit" class="btn-secondary">Remove</button>
+                        </div>
                     </form>
                 }
             }
-        }
+            else
+            {
+                <p>You have no linked external accounts.</p>
+            }
 
-    </div>
+            <br />
 
+            <!-- Add External Login -->
+            @if (Model.ExternalLogins?.Count > 0)
+            {
+                <h4>Add External Login:</h4>
+
+                @foreach (var provider in Model.ExternalLogins)
+                {
+                    if (!Model.CurrentLogins.Any(l => l.LoginProvider == provider.Name))
+                    {
+                        var providerClass = provider.Name switch
+                        {
+                                            "Google" => "google",
+                                            "Microsoft" => "microsoft",
+                                            "Auth0" => "auth0",
+                                            "Okta" => "okta",
+                            _ => "default"
+                        };
+
+                        var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{provider.Name}.png");
+
+                        <form method="post" asp-page-handler="LinkLogin">
+                            <input type="hidden" name="provider" value="@provider.Name" />
+
+                            <button type="submit"
+                                    class="external-btn @providerClass"
+                                    style="width:100%;">
+
+                                <div class="external-btn-top">Link account:</div>
+
+                                <div class="external-btn-bottom">
+                                    <span class="provider-name">@provider.Name</span>
+                                    <img src="@logoPath" alt="@provider.Name logo" class="provider-logo" />
+                                </div>
+
+                            </button>
+                        </form>
+                    }
+                }
+            }
+
+        </div>
+    }
 </div>

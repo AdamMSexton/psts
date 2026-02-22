@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using psts.web.Services;
 using Psts.Web.Data;
+using Psts.Web.Pages.appSettings;
 
 namespace Psts.Web.Pages.Account;
 
@@ -11,12 +13,14 @@ public class LoginModel : PageModel
     private readonly SignInManager<AppUser> _signInManager;
     private readonly ILogger<LoginModel> _logger;
     private readonly UserManager<AppUser> _userManager;
+    private readonly ISettingsService _settings;
 
-    public LoginModel(SignInManager<AppUser> signInManager, ILogger<LoginModel> logger, UserManager<AppUser> userManager)
+    public LoginModel(SignInManager<AppUser> signInManager, ILogger<LoginModel> logger, UserManager<AppUser> userManager, ISettingsService settings)
     {
         _signInManager = signInManager;
         _logger = logger;
         _userManager = userManager;
+        _settings = settings;
     }
 
     public class LoginInput
@@ -26,12 +30,20 @@ public class LoginModel : PageModel
     }
 
     public bool LoginFailed { get; set; }
+    public bool OIDCEnabled { get; set; }
+    public string LoginErrorText { get; set; } = string.Empty;
 
     // List of external authentication providers
     public IList<AuthenticationScheme>? ExternalLogins { get; set; }
 
     public async Task OnGetAsync()
     {
+        LoginErrorText = TempData["LoginError"] as string;
+
+        // Check system setting for OIDC enablement
+        OIDCEnabled = await _settings.GetSetting<bool>(psts.web.Domain.Enums.SystemSettings.MakeOIDCAvailable);
+     
+        
         // Load available external login providers
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
     }
@@ -43,12 +55,6 @@ public class LoginModel : PageModel
     {
         // Reload external logins for display if login fails
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
-        _logger.LogCritical(
-            "POST user={User} passLen={Len}",
-            userName,
-            password?.Length ?? -1
-        );
 
         var result = await _signInManager.PasswordSignInAsync(
             userName,

@@ -32,53 +32,64 @@ public class ExternalLoginCallbackModel : PageModel
             return RedirectToPage("./Login");
         }
 
-        // Sign in the user with this external login provider if the user already has a login
-        var result = await _signInManager.ExternalLoginSignInAsync(
-            info.LoginProvider,
-            info.ProviderKey,
-            isPersistent: false,
-            bypassTwoFactor: true);
+        // Pull user profile to check for OIDC authorization
+        var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
 
-        if (result.Succeeded)
+        if (user.OIDCAllowed)
         {
-            _logger.LogInformation("User logged in with {Name} provider.", info.LoginProvider);
-            return RedirectToPage("/Account/Home");
+            // Sign in the user with this external login provider if the user already has a login
+            var result = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                isPersistent: false,
+                bypassTwoFactor: true);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User logged in with {Name} provider.", info.LoginProvider);
+                return RedirectToPage("/Account/Home");
+            }
+        }
+        else
+        {
+            TempData["LoginError"] = "User account not authorized for OIDC login.";
+            return RedirectToPage("./Login");
         }
 
-        //// If the user does not have an account, create one
-        //var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-        //var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email;
+            //// If the user does not have an account, create one
+            //var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            //var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email;
 
-        //if (email != null)
-        //{
-        //    var user = new AppUser
-        //    {
-        //        UserName = email,
-        //        Email = email
-        //    };
+            //if (email != null)
+            //{
+            //    var user = new AppUser
+            //    {
+            //        UserName = email,
+            //        Email = email
+            //    };
 
-        //    var createResult = await _userManager.CreateAsync(user);
-        //    if (createResult.Succeeded)
-        //    {
-        //        createResult = await _userManager.AddLoginAsync(user, info);
-        //        if (createResult.Succeeded)
-        //        {
-        //            await _signInManager.SignInAsync(user, isPersistent: false);
-        //            _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-        //            return RedirectToPage("/Account/Home");
-        //        }
-        //    }
+            //    var createResult = await _userManager.CreateAsync(user);
+            //    if (createResult.Succeeded)
+            //    {
+            //        createResult = await _userManager.AddLoginAsync(user, info);
+            //        if (createResult.Succeeded)
+            //        {
+            //            await _signInManager.SignInAsync(user, isPersistent: false);
+            //            _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+            //            return RedirectToPage("/Account/Home");
+            //        }
+            //    }
 
-        //    foreach (var error in createResult.Errors)
-        //    {
-        //        _logger.LogError("Error creating user: {Error}", error.Description);
-        //    }
-        //}
+            //    foreach (var error in createResult.Errors)
+            //    {
+            //        _logger.LogError("Error creating user: {Error}", error.Description);
+            //    }
+            //}
 
 
 
-        // If we get here, something went wrong
-        _logger.LogError("Unable to load external login information or create user.");
+            // If we get here, something went wrong
+            _logger.LogError("Unable to load external login information or create user.");
         return RedirectToPage("./Login");
     }
 }
