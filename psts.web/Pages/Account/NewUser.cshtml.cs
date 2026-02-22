@@ -112,6 +112,7 @@ public class NewUserModel : PageModel
         
         // New user is a user, generate token and forward to user profile page to setup password.
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        TempData["PasswordChange"] = "You must enter a new password to complete account setup and unlock account.";
         return RedirectToPage("/Account/Profile", new {userId = user.Id, token });
     }
 }

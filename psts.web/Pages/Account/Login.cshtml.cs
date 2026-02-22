@@ -79,6 +79,7 @@ public class LoginModel : PageModel
                 if (user.ResetPassOnLogin == true)
                 {
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    TempData["PasswordChange"] = "You must enter a new password to unlock account.";
                     return RedirectToPage("/Account/Profile", new { userId = user.Id, token });
                 }
                 else

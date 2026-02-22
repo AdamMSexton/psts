@@ -74,7 +74,11 @@
               asp-route-token="@Model.PasswordInput.SecurityTokenStash">
 
             <div>
-               
+                @if(!string.IsNullOrEmpty(Model.PasswordChangeMessage))
+                {
+                    @Model.PasswordChangeMessage
+                    <br />
+                }
                 <p>Current Password:</p>
                 @if (Model.RequireCurrentPassword)
                 {

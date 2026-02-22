@@ -66,6 +66,7 @@ namespace Psts.Web.Pages.Account
 
         public bool RequireCurrentPassword { get; set; } = true;
         public bool OIDCEnabled { get; set; }
+        public string PasswordChangeMessage {  get; set; } = string.Empty;
 
         //List of available external authentication providers(Google, Microsoft, Auth0, Okta)
         public IList<AuthenticationScheme>? ExternalLogins { get; set; }
@@ -75,6 +76,7 @@ namespace Psts.Web.Pages.Account
 
         public async Task<IActionResult> OnGetAsync(string userId, string token)
         {
+            PasswordChangeMessage = TempData["PasswordChange"] as string;
             AppUser user;       // Hold on to identity core user data for use after reasoning logic
 
             if ((!string.IsNullOrEmpty(token)) && (!string.IsNullOrEmpty(userId)))        // Forced visit for password change (usually)
