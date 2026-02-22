@@ -4,7 +4,46 @@
     ViewData["Title"] = "Manage - PSTS Solutions";
     ViewData["HideNavbar"] = false;
 }
-<p>This is the manage general page.</p>
 
-<img src="@Url.Content("~/Images/funny.gif")" alt="Funny GIF" />
-<p>This page is currently under development. Thank you for your patience.</p>
+<h2>Manage</h2>
+
+<div>
+    <h3>GET</h3>
+    <form method="get">
+        <p>Enter Short Code:</p>
+        <input type="text" name="shortcode" placeholder="Shortcode..." value="@Model.Shortcode" />
+        <br />
+        <button type="submit">Submit</button>
+        <br />
+        <button type="submit" asp-page-handler="Create">Create</button>
+    </form>
+</div>
+
+<div>
+    <h3>POST!</h3>
+    <form method="post">
+        <p>Update/Create:</p>
+        <select name="recordType">
+            <option value="">-- Select --</option>
+            <option value="Client">Client</option>
+            <option value="Project">Project</option>
+            <option value="Task">Task</option>
+        </select>
+        <br />
+        <label>Client Name:</label>
+        <input type="text" name="clientName" />
+        <br />
+        <label>Project Name:</label>
+        <input type="text" name="projectName" />
+        <br />
+        <label>Task Name:</label>
+        <input type="text" name="taskName" />
+        <br />
+        <button type="submit">Submit/Update</button>
+    </form>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <p>@Model.Message</p>
+}
