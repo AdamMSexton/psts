@@ -5,45 +5,87 @@
     ViewData["HideNavbar"] = false;
 }
 
-<h2>Manage</h2>
+<h2 style="text-align:center; margin-top:1rem;">Manage Codes</h2>
 
-<div>
-    <h3>GET</h3>
-    <form method="get">
-        <p>Enter Short Code:</p>
-        <input type="text" name="shortcode" placeholder="Shortcode..." value="@Model.Shortcode" />
-        <br />
-        <button type="submit">Submit</button>
-        <br />
-        <button type="submit" asp-page-handler="Create">Create</button>
-    </form>
-</div>
+<div class="profile-grid">
 
-<div>
-    <h3>POST!</h3>
-    <form method="post">
-        <p>Update/Create:</p>
-        <select name="recordType">
-            <option value="">-- Select --</option>
-            <option value="Client">Client</option>
-            <option value="Project">Project</option>
-            <option value="Task">Task</option>
-        </select>
-        <br />
-        <label>Client Name:</label>
-        <input type="text" name="clientName" />
-        <br />
-        <label>Project Name:</label>
-        <input type="text" name="projectName" />
-        <br />
-        <label>Task Name:</label>
-        <input type="text" name="taskName" />
-        <br />
-        <button type="submit">Submit/Update</button>
-    </form>
+    <!-- -------------------------------------------------- -->
+    <!-- GET SHORTCODE BOX -->
+    <!-- -------------------------------------------------- -->
+    <div class="profile-box grid-item">
+
+        <h2>Lookup Short Code</h2>
+
+        <form method="get">
+
+            <div class="form-group">
+                <p>Enter Short Code:</p>
+                <input type="text"
+                       name="shortcode"
+                       placeholder="Shortcode..."
+                       value="@Model.Shortcode" />
+            </div>
+
+            <button type="submit" class="btn-primary">Submit</button>
+
+            <button type="submit"
+                    asp-page-handler="Create"
+                    class="btn-secondary"
+                    style="margin-top:0.75rem;">
+                Create New
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- -------------------------------------------------- -->
+    <!-- POST / UPDATE BOX -->
+    <!-- -------------------------------------------------- -->
+    <div class="password-box grid-item">
+
+        <h2>Create or Update</h2>
+
+        <form method="post">
+
+            <div class="form-group">
+                <p>Record Type:</p>
+                <select name="recordType"
+                        style="width:100%; padding:0.625rem; background-color:var(--primary-bg-color); color:white; border:0.0625rem solid var(--border-bg); border-radius:0.25rem;">
+                    <option value="">-- Select --</option>
+                    <option value="Client">Client</option>
+                    <option value="Project">Project</option>
+                    <option value="Task">Task</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <p>Client Name:</p>
+                <input type="text" name="clientName" placeholder="Client name..." />
+            </div>
+
+            <div class="form-group">
+                <p>Project Name:</p>
+                <input type="text" name="projectName" placeholder="Project name..." />
+            </div>
+
+            <div class="form-group">
+                <p>Task Name:</p>
+                <input type="text" name="taskName" placeholder="Task name..." />
+            </div>
+
+            <button type="submit" class="btn-primary">Submit / Update</button>
+
+        </form>
+
+    </div>
+
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Message))
 {
-    <p>@Model.Message</p>
+    <p class="error-text" style="margin-top:1.5rem; text-align:center;">
+        @Model.Message
+    </p>
 }
