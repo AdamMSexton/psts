@@ -3,16 +3,23 @@
 @{
     ViewData["Title"] = "Manage - PSTS Solutions";
     ViewData["HideNavbar"] = false;
+
+    var mode = Request.Query["mode"].ToString()?.ToLower() ?? "";
+    var isCreate = mode == "create";
+    var isUpdate = mode == "update";
+
+    string rightHeader = isCreate ? "Create" : isUpdate ? "Update" : "Create or Update";
+    string rightButton = isCreate ? "Submit" : isUpdate ? "Update" : "Submit / Update";
 }
 
 <h2 style="text-align:center; margin-top:1rem;">Manage Codes</h2>
 
-<div class="profile-grid">
+<div class="profile-grid" style="align-items:center;">
 
     <!-- -------------------------------------------------- -->
-    <!-- GET SHORTCODE BOX -->
+    <!-- LEFT PANEL — ALWAYS VISIBLE -->
     <!-- -------------------------------------------------- -->
-    <div class="profile-box grid-item">
+    <div id="manageLookup" class="profile-box grid-item" style="display:flex; flex-direction:column; justify-content:center;">
 
         <h2>Lookup Short Code</h2>
 
@@ -26,60 +33,85 @@
                        value="@Model.Shortcode" />
             </div>
 
-            <button type="submit" class="btn-primary">Submit</button>
+            <!-- FIX: vertical stack, full width, identical styling -->
+            <div style="display:flex; flex-direction:column; gap:0.75rem; width:100%;">
 
-            <button type="submit"
-                    asp-page-handler="Create"
-                    class="btn-secondary"
-                    style="margin-top:0.75rem;">
-                Create New
-            </button>
+                <button type="submit" class="btn-primary" style="width:100%;">
+                    Submit
+                </button>
+
+                <button type="submit"
+                        name="mode"
+                        value="create"
+                        class="btn-primary"
+                        style="width:100%;">
+                    Create New
+                </button>
+
+                <button type="submit"
+                        name="mode"
+                        value="update"
+                        class="btn-primary"
+                        style="width:100%;">
+                    Update
+                </button>
+
+            </div>
 
         </form>
 
     </div>
 
 
+
+
+
+
     <!-- -------------------------------------------------- -->
-    <!-- POST / UPDATE BOX -->
+    <!-- RIGHT PANEL — ONLY VISIBLE WHEN A MODE IS SELECTED -->
     <!-- -------------------------------------------------- -->
-    <div class="password-box grid-item">
+    @if (isCreate || isUpdate)
+    {
+        <div id="manageUpdate" class="password-box grid-item">
 
-        <h2>Create or Update</h2>
+            <h2>@rightHeader</h2>
 
-        <form method="post">
+            <form method="post">
 
-            <div class="form-group">
-                <p>Record Type:</p>
-                <select name="recordType"
-                        style="width:100%; padding:0.625rem; background-color:var(--primary-bg-color); color:white; border:0.0625rem solid var(--border-bg); border-radius:0.25rem;">
-                    <option value="">-- Select --</option>
-                    <option value="Client">Client</option>
-                    <option value="Project">Project</option>
-                    <option value="Task">Task</option>
-                </select>
-            </div>
+                <input type="hidden" name="mode" value="@mode" />
 
-            <div class="form-group">
-                <p>Client Name:</p>
-                <input type="text" name="clientName" placeholder="Client name..." />
-            </div>
+                <div class="form-group">
+                    <p>Record Type:</p>
+                    <select name="recordType"
+                            style="width:100%; padding:0.625rem; background-color:var(--primary-bg-color); color:white; border:0.0625rem solid var(--border-bg); border-radius:0.25rem;">
+                        <option value="">-- Select --</option>
+                        <option value="Client">Client</option>
+                        <option value="Project">Project</option>
+                        <option value="Task">Task</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <p>Project Name:</p>
-                <input type="text" name="projectName" placeholder="Project name..." />
-            </div>
+                <div class="form-group">
+                    <p>Client Name:</p>
+                    <input type="text" name="clientName" placeholder="Client name..." />
+                </div>
 
-            <div class="form-group">
-                <p>Task Name:</p>
-                <input type="text" name="taskName" placeholder="Task name..." />
-            </div>
+                <div class="form-group">
+                    <p>Project Name:</p>
+                    <input type="text" name="projectName" placeholder="Project name..." />
+                </div>
 
-            <button type="submit" class="btn-primary">Submit / Update</button>
+                <div class="form-group">
+                    <p>Task Name:</p>
+                    <input type="text" name="taskName" placeholder="Task name..." />
+                </div>
 
-        </form>
+                <button type="submit" class="btn-primary">@rightButton</button>
 
-    </div>
+            </form>
+
+        </div>
+    }
 
 </div>
 
