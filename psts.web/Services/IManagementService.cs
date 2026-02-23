@@ -1,5 +1,6 @@
 ﻿using psts.web.Domain.Enums;
 using psts.web.Dto;
+using Psts.Web.Data;
 
 namespace psts.web.Services
 {
@@ -12,5 +13,10 @@ namespace psts.web.Services
         Task<ServiceResult<Guid>> AddNewTask(string _requestorId, RoleTypes _requestorRole, CreateTaskDto _newTask);
         Task<ServiceResult<bool>> UpdateTask(string _requestorId, RoleTypes _requestorRole, UpdateTaskDto _newTaskData);
         Task<ServiceResult<bool>> ChangeUserRole(string _requestorId, RoleTypes _requestorRole, string _targetEmployee, RoleTypes _newRole);
+
+        // Get methods for fetching existing records by ID with their children
+        Task<ServiceResult<PstsClientProfile>> GetClient(Guid clientId);
+        Task<ServiceResult<PstsProjectDefinition>> GetProject(Guid projectId);
+        Task<ServiceResult<PstsTaskDefinition>> GetTask(Guid taskId);
     }
 }

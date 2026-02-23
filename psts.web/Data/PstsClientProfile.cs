@@ -4,6 +4,7 @@
     {
         public Guid ClientId { get; set; }
         public AppUser? EmployeePOC { get; set; }                           // "Pointer" to AppUser. Fields in this class are related to fields in AppUser
+        public PstsProjectDefinition? Project { get; set; }                 // Child project under this client
         public string? EmployeePOCId { get; set; }                          // UUID of Employee Point of Contact, must remain as string type as all ASP.NET userId
         public string ClientName { get; set; } = string.Empty;              // Client company name
         public string ClientPOCfName { get; set; } = string.Empty;          // Client POC First Name
