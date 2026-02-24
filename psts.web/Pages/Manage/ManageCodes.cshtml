@@ -3,12 +3,16 @@
 @{
     ViewData["Title"] = "Manage - PSTS Solutions";
     ViewData["HideNavbar"] = false;
+
     var mode = Request.Query["mode"].ToString()?.ToLower() ?? "";
     var isCreate = mode == "create";
     var isUpdate = mode == "update" || Model.FoundType != null;
+
+    // FIX: Show right panel whenever a record type is selected
+    bool showRight = !string.IsNullOrEmpty(Model.RecordTypeSearch) || isCreate || isUpdate;
+
     string rightHeader = isCreate ? "Create" : isUpdate ? "Update" : "Create or Update";
     string rightButton = isCreate ? "Submit" : isUpdate ? "Update" : "Submit / Update";
-    bool showRight = isCreate || isUpdate;
 }
 
 <h2 style="text-align:center; margin-top:1rem;">Manage Codes</h2>
@@ -17,20 +21,22 @@
 
     <!-- LEFT PANEL -->
     <div id="manageLookup"
-         class="profile-box grid-item"
+         class="profile-box"
          style="display:flex; flex-direction:column; justify-content:center; min-height:18rem;">
         <h2>Lookup Short Code</h2>
+
         <form method="get">
             <div class="form-group">
                 <p>Record Type:</p>
                 <select name="recordTypeSearch"
                         style="width:100%; padding:0.625rem; background-color:var(--primary-bg-color); color:white; border:0.0625rem solid var(--border-bg); border-radius:0.25rem;">
                     <option value="">-- Select --</option>
-                    <option value="Client" selected="@(Model.RecordTypeSearch == "Client" ? "selected" : null)">Client</option>
-                    <option value="Project" selected="@(Model.RecordTypeSearch == "Project" ? "selected" : null)">Project</option>
-                    <option value="Task" selected="@(Model.RecordTypeSearch == "Task" ? "selected" : null)">Task</option>
+                    <option value="Client" selected="@(Model.RecordTypeSearch == "Client")">Client</option>
+                    <option value="Project" selected="@(Model.RecordTypeSearch == "Project")">Project</option>
+                    <option value="Task" selected="@(Model.RecordTypeSearch == "Task")">Task</option>
                 </select>
             </div>
+
             <div class="form-group">
                 <p>Enter Short Code:</p>
                 <input type="text"
@@ -38,22 +44,15 @@
                        placeholder="Short code..."
                        value="@Model.Shortcode" />
             </div>
+
             <div style="display:flex; flex-direction:column; gap:0.75rem; width:100%;">
-                <button type="submit" class="btn-primary" style="width:100%;">
-                    Submit
-                </button>
-                <button type="submit"
-                        name="mode"
-                        value="create"
-                        class="btn-primary"
-                        style="width:100%;">
+                <button type="submit" class="btn-primary" style="width:100%;">Submit</button>
+
+                <button type="submit" name="mode" value="create" class="btn-primary" style="width:100%;">
                     Create New
                 </button>
-                <button type="submit"
-                        name="mode"
-                        value="update"
-                        class="btn-primary"
-                        style="width:100%;">
+
+                <button type="submit" name="mode" value="update" class="btn-primary" style="width:100%;">
                     Update
                 </button>
             </div>
@@ -64,97 +63,92 @@
     @if (showRight)
     {
         <div id="manageUpdate"
-             class="password-box grid-item"
-             style="display:flex; flex-direction:column; justify-content:center; min-height:18rem;">
+             class="password-box"
+             style="display:flex; flex-direction:column; justify-content:flex-start; min-height:18rem;">
             <h2>@rightHeader</h2>
+
             <form method="post" style="flex:1; display:flex; flex-direction:column; justify-content:flex-start;">
                 <input type="hidden" name="mode" value="@mode" />
                 <input type="hidden" name="recordId" value="@Model.RecordId" />
                 <input type="hidden" name="parentId" value="@Model.ParentId" />
                 <input type="hidden" name="recordType" value="@Model.RecordTypeSearch" />
 
-                <!-- CLIENT FIELDS — only editable when looking up a Client -->
-                @if (Model.RecordTypeSearch == "Client" || Model.FoundType == psts.web.Domain.Enums.ShortCodeType.Client)
+                <!-- CLIENT FIELDS -->
+                @if (Model.RecordTypeSearch == "Client")
                 {
                     <h3>Client</h3>
+
                     <div class="form-group">
                         <p>Client Name:</p>
-                        <input type="text" name="clientName" placeholder="Client name..." value="@Model.ClientName" />
+                        <input type="text" name="clientName" value="@Model.ClientName" placeholder="Client name..." />
                     </div>
+
                     <div class="form-group">
-                        <p>Client POC First Name:</p>
-                        <input type="text" name="clientPOCfName" placeholder="First name..." value="@Model.ClientPOCfName" />
+                        <p>POC First Name:</p>
+                        <input type="text" name="clientPOCfName" value="@Model.ClientPOCfName" placeholder="First name..." />
                     </div>
+
                     <div class="form-group">
-                        <p>Client POC Last Name:</p>
-                        <input type="text" name="clientPOClName" placeholder="Last name..." value="@Model.ClientPOClName" />
+                        <p>POC Last Name:</p>
+                        <input type="text" name="clientPOClName" value="@Model.ClientPOClName" placeholder="Last name..." />
                     </div>
+
                     <div class="form-group">
-                        <p>Client POC Email:</p>
-                        <input type="text" name="clientPOCeMail" placeholder="Email..." value="@Model.ClientPOCeMail" />
+                        <p>POC Email:</p>
+                        <input type="text" name="clientPOCeMail" value="@Model.ClientPOCeMail" placeholder="Email..." />
                     </div>
+
                     <div class="form-group">
-                        <p>Client POC Phone:</p>
-                        <input type="text" name="clientPOCtPhone" placeholder="Phone..." value="@Model.ClientPOCtPhone" />
+                        <p>POC Phone:</p>
+                        <input type="text" name="clientPOCtPhone" value="@Model.ClientPOCtPhone" placeholder="Phone..." />
                     </div>
                 }
 
-                <!-- PROJECT FIELDS — editable when looking up a Project, read-only when looking up a Client -->
-                @if (Model.RecordTypeSearch == "Client" || Model.RecordTypeSearch == "Project" ||
-                            Model.FoundType == psts.web.Domain.Enums.ShortCodeType.Client ||
-                            Model.FoundType == psts.web.Domain.Enums.ShortCodeType.Project)
+                <!-- PROJECT FIELDS -->
+                @if (Model.RecordTypeSearch == "Project")
                 {
                     <h3>Project</h3>
 
-                    @* Parent client short code input — only shown in create mode for Project *@
-                    @if (isCreate && Model.RecordTypeSearch == "Project")
+                    @if (isCreate)
                     {
                         <div class="form-group">
                             <p>Parent Client Short Code:</p>
-                            <input type="text" name="parentShortCode" placeholder="Client short code..." value="@Model.ParentShortCode" />
+                            <input type="text" name="parentShortCode" value="@Model.ParentShortCode" placeholder="Client short code..." />
                         </div>
                     }
 
                     <div class="form-group">
                         <p>Project Name:</p>
-                        <input type="text" name="projectName" placeholder="Project name..."
-                               value="@Model.ProjectName"
-                               @(Model.RecordTypeSearch == "Client" ? "readonly" : "") />
+                        <input type="text" name="projectName" value="@Model.ProjectName" placeholder="Project name..." />
                     </div>
+
                     <div class="form-group">
                         <p>Project Description:</p>
-                        <input type="text" name="projectDescription" placeholder="Project description..."
-                               value="@Model.ProjectDescription"
-                               @(Model.RecordTypeSearch == "Client" ? "readonly" : "") />
+                        <input type="text" name="projectDescription" value="@Model.ProjectDescription" placeholder="Project description..." />
                     </div>
                 }
 
-                <!-- TASK FIELDS — editable when looking up a Task, read-only when looking up a Client or Project -->
-                @if (Model.RecordTypeSearch == "Client" || Model.RecordTypeSearch == "Project" || Model.RecordTypeSearch == "Task" ||
-                            Model.FoundType != null)
+                <!-- TASK FIELDS -->
+                @if (Model.RecordTypeSearch == "Task")
                 {
                     <h3>Task</h3>
 
-                    @* Parent project short code input — only shown in create mode for Task *@
-                    @if (isCreate && Model.RecordTypeSearch == "Task")
+                    @if (isCreate)
                     {
                         <div class="form-group">
                             <p>Parent Project Short Code:</p>
-                            <input type="text" name="parentShortCode" placeholder="Project short code..." value="@Model.ParentShortCode" />
+                            <input type="text" name="parentShortCode" value="@Model.ParentShortCode" placeholder="Project short code..." />
                         </div>
                     }
 
                     <div class="form-group">
                         <p>Task Name:</p>
-                        <input type="text" name="taskName" placeholder="Task name..."
-                               value="@Model.TaskName"
-                               @(Model.RecordTypeSearch != "Task" ? "readonly" : "") />
+                        <input type="text" name="taskName" value="@Model.TaskName" placeholder="Task name..." />
                     </div>
+
                     <div class="form-group">
                         <p>Task Description:</p>
-                        <input type="text" name="taskDescription" placeholder="Task description..."
-                               value="@Model.TaskDescription"
-                               @(Model.RecordTypeSearch != "Task" ? "readonly" : "") />
+                        <input type="text" name="taskDescription" value="@Model.TaskDescription" placeholder="Task description..." />
                     </div>
                 }
 
