@@ -80,7 +80,7 @@ public class PstsDbContext : IdentityDbContext<AppUser>
 
         builder.Entity<PstsProjectDefinition>()             // Foreign Key
             .HasOne(c => c.Client)
-            .WithOne()
+            .WithOne(b => b.Project)
             .HasForeignKey<PstsProjectDefinition>(c => c.ClientId)
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -113,7 +113,7 @@ public class PstsDbContext : IdentityDbContext<AppUser>
 
         builder.Entity<PstsTaskDefinition>()                // Foreign Key
             .HasOne(d => d.Project)
-            .WithOne()
+            .WithOne(p => p.Task)
             .HasForeignKey<PstsTaskDefinition>(d => d.ProjectId)
             .OnDelete(DeleteBehavior.Restrict);
 

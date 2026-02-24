@@ -1,69 +1,110 @@
 ﻿@page
 @model psts.web.Pages.Manage.ManageRolesModel
 @{
-    ViewData["Title"] = "Role Management";
+    ViewData["Title"] = "Role Management - PSTS Solutions";
 }
 
-<h2>Role Management</h2>
+<h2 style="text-align:center; margin-top:1rem;">Role Management</h2>
 
-<div style="display:flex; gap:24px; align-items:flex-start;">
+<div class="profile-grid">
 
-    <form method="get" style="display:flex; gap:8px; margin:6px 0 10px;">
-        <input type="text" name="q" value="@Model.Query" placeholder="First and/or Last Name" style="flex:1;" />
-        <button type="submit">Search</button>
-    </form>
-    <form method="post">
-        <!-- User List Box -->
-        <div style="width: 420px;">
-            <label><b>Find User</b></label>
-            <select name="SelectedUserId" size="8" style="width:100%;">
-                @if (Model.SearchResults.Count > 0)
-                {
-                    @foreach (var user in Model.SearchResults)
+    <!-- -------------------------------------------------- -->
+    <!-- SEARCH BOX -->
+    <!-- -------------------------------------------------- -->
+    <div class="profile-box grid-item">
+
+        <h2>Find User</h2>
+
+        <form method="get">
+
+            <div class="form-group">
+                <p>Search by Name:</p>
+                <input type="text"
+                       name="q"
+                       value="@Model.Query"
+                       placeholder="First and/or last name..." />
+            </div>
+
+            <button type="submit" class="btn-primary">Search</button>
+
+        </form>
+
+    </div>
+
+
+    <!-- -------------------------------------------------- -->
+    <!-- ROLE MANAGEMENT BOX -->
+    <!-- -------------------------------------------------- -->
+    <div class="password-box grid-item">
+
+        <h2>Assign Role</h2>
+
+        <form method="post">
+
+            <!-- USER LIST -->
+            <div class="form-group">
+                <p>Select User:</p>
+
+                <select name="SelectedUserId"
+                        size="8"
+                        style="width:100%; padding:0.625rem; background-color:var(--primary-bg-color); color:white; border:0.0625rem solid var(--border-bg); border-radius:0.25rem;">
+                    @if (Model.SearchResults.Count > 0)
                     {
-                        <option title="@user.Role" value="@user.EmployeeId">@(user.LName + ", " + user.FName) </option>
+                        @foreach (var user in Model.SearchResults)
+                        {
+                            <option title="@user.Role" value="@user.EmployeeId">
+                                @(user.LName + ", " + user.FName)
+                            </option>
+                        }
                     }
-                }
 
-                @if ((Model.SearchResults.Count > 0) && (Model.PendingUsersProfiles.Count > 0))
-                {
-                    <option value=""></option>
-                }
-
-
-                @if (Model.PendingUsersProfiles.Count > 0)
-                {
-                    <option value="">Pending Users...</option>
-
-                    @foreach (var user in Model.PendingUsersProfiles)
+                    @if ((Model.SearchResults.Count > 0) && (Model.PendingUsersProfiles.Count > 0))
                     {
-                        <option title="Pending" value="@user.EmployeeId">@(user.LName + ", " + user.FName)</option>
+                        <option value=""></option>
                     }
-                }
-            </select>
-        </div>
-        <div style="width: 260px;">
-            <label><b>Set Role</b></label>
 
-            <div>
-                <label>
-                    <input type="radio" name="TargetRole" value="Clerk" />
-                    Clerk
-                </label>
+                    @if (Model.PendingUsersProfiles.Count > 0)
+                    {
+                        <option value="">Pending Users...</option>
+
+                        @foreach (var user in Model.PendingUsersProfiles)
+                        {
+                            <option title="Pending" value="@user.EmployeeId">
+                                @(user.LName + ", " + user.FName)
+                            </option>
+                        }
+                    }
+                </select>
             </div>
 
-            <div>
-                <label>
-                    <input type="radio" name="TargetRole" value="Employee" />
-                    Employee
-                </label>
+            <!-- ROLE SELECTION (Option 1 applied) -->
+            <div class="form-group">
+                <p>Set Role:</p>
+
+                <div style="display:flex; align-items:center; gap:1.5rem;">
+
+                    <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
+                        <input type="radio" name="TargetRole" value="Clerk" />
+                        Clerk
+                    </label>
+
+                    <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
+                        <input type="radio" name="TargetRole" value="Employee" />
+                        Employee
+                    </label>
+
+                </div>
             </div>
 
-            <div style="margin-top:12px;">
-                <button type="submit">Change Role</button>
-            </div>
+            <button type="submit" class="btn-primary" style="margin-top:1rem;">
+                Change Role
+            </button>
 
-            <div asp-validation-summary="All" class="text-danger"></div>
-        </div>
-    </form>
+            <!-- VALIDATION SUMMARY -->
+            <div asp-validation-summary="All" class="error-text" style="margin-top:1rem;"></div>
+
+        </form>
+
+    </div>
+
 </div>

@@ -35,12 +35,12 @@ namespace psts.web.Services
                     return ServiceResult<Guid>.Fail("Invalid role.");
                 }
 
-                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Admin))
+                if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Admin))
                 {
                     return ServiceResult<Guid>.Fail("Insufficient privileges.");
                 }
 
-                
+
                 // Check short code to make sure its not in use.
                 var shortCodeCheck = await _scs.DecodeShortCode(_newClient.ShortCode);
 
@@ -53,7 +53,7 @@ namespace psts.web.Services
                 }
                 else
                 {
-                    return ServiceResult<Guid>.Fail("Short code check failed.");
+                    return ServiceResult<Guid>.Fail($"Short code check failed: {shortCodeCheck.Error}");
                 }
 
                 // Create new profile
@@ -97,7 +97,7 @@ namespace psts.web.Services
                     return ServiceResult<bool>.Fail("Invalid Role.");
                 }
 
-                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Admin))
+                if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Admin))
                 {
                     return ServiceResult<bool>.Fail("Insufficient Privileges.");
                 }
@@ -163,7 +163,7 @@ namespace psts.web.Services
                     return ServiceResult<Guid>.Fail("Invalid Role.");
                 }
 
-                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Admin))
+                if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Admin))
                 {
                     return ServiceResult<Guid>.Fail("Insufficient Privileges.");
                 }
@@ -230,7 +230,7 @@ namespace psts.web.Services
                     return ServiceResult<bool>.Fail("Invalid Role.");
                 }
 
-                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Admin))
+                if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Admin))
                 {
                     return ServiceResult<bool>.Fail("Insufficient Privileges.");
                 }
@@ -294,7 +294,7 @@ namespace psts.web.Services
                     return ServiceResult<Guid>.Fail("Invalid Role.");
                 }
 
-                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Admin))
+                if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Admin))
                 {
                     return ServiceResult<Guid>.Fail("Insufficient Privileges.");
                 }
@@ -361,7 +361,7 @@ namespace psts.web.Services
                     return ServiceResult<bool>.Fail("Invalid Role.");
                 }
 
-                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Admin))
+                if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Admin))
                 {
                     return ServiceResult<bool>.Fail("Insufficient Privileges.");
                 }
@@ -470,6 +470,92 @@ namespace psts.web.Services
             catch (Exception ex)
             {
                 return ServiceResult<bool>.Fail(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResult<PstsClientProfile>> GetClient(Guid clientId)
+        {
+            try
+            {
+                // Fetch client and include its one project, and that project's one task
+                var client = await _db.PstsClientProfiles
+                    .Include(c => c.EmployeePOC)
+                    .FirstOrDefaultAsync(c => c.ClientId == clientId);
+
+                if (client == null)
+                {
+                    return ServiceResult<PstsClientProfile>.Fail("Client not found.");
+                }
+
+                // Also fetch the project under this client if one exists
+                var project = await _db.PstsProjectDefinitions
+                    .Include(p => p.EmployeePOC)
+                    .FirstOrDefaultAsync(p => p.ClientId == clientId);
+
+                if (project != null)
+                {
+                    // Also fetch the task under this project if one exists
+                    project.Task = await _db.PstsTaskDefinitions
+                        .FirstOrDefaultAsync(t => t.ProjectId == project.ProjectId);
+
+                    client.Project = project;
+                }
+
+                return ServiceResult<PstsClientProfile>.Ok(client);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<PstsClientProfile>.Fail(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResult<PstsProjectDefinition>> GetProject(Guid projectId)
+        {
+            try
+            {
+                // Fetch project and include its parent client
+                var project = await _db.PstsProjectDefinitions
+                    .Include(p => p.Client)
+                    .Include(p => p.EmployeePOC)
+                    .FirstOrDefaultAsync(p => p.ProjectId == projectId);
+
+                if (project == null)
+                {
+                    return ServiceResult<PstsProjectDefinition>.Fail("Project not found.");
+                }
+
+                // Also fetch the task under this project if one exists
+                project.Task = await _db.PstsTaskDefinitions
+                    .FirstOrDefaultAsync(t => t.ProjectId == projectId);
+
+                return ServiceResult<PstsProjectDefinition>.Ok(project);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<PstsProjectDefinition>.Fail(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResult<PstsTaskDefinition>> GetTask(Guid taskId)
+        {
+            try
+            {
+                // Fetch task and include its parent project and grandparent client
+                var task = await _db.PstsTaskDefinitions
+                    .Include(t => t.Project)
+                        .ThenInclude(p => p.Client)
+                    .FirstOrDefaultAsync(t => t.TaskId == taskId);
+
+                if (task == null)
+                {
+                    return ServiceResult<PstsTaskDefinition>.Fail("Task not found.");
+                }
+
+                return ServiceResult<PstsTaskDefinition>.Ok(task);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<PstsTaskDefinition>.Fail(ex.Message);
             }
         }
     }
