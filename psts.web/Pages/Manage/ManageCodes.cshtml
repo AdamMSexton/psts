@@ -8,7 +8,7 @@
     var isCreate = mode == "create";
     var isUpdate = mode == "update" || Model.FoundType != null;
 
-    // FIX: Show right panel whenever a record type is selected
+    // Show right panel whenever a record type is selected or user is creating/updating
     bool showRight = !string.IsNullOrEmpty(Model.RecordTypeSearch) || isCreate || isUpdate;
 
     string rightHeader = isCreate ? "Create" : isUpdate ? "Update" : "Create or Update";
@@ -20,7 +20,7 @@
 <div class="profile-grid" style="align-items:stretch;">
 
     <!-- LEFT PANEL -->
-    <div id="manageLookup"
+    <div id="profileBox"
          class="profile-box"
          style="display:flex; flex-direction:column; justify-content:center; min-height:18rem;">
         <h2>Lookup Short Code</h2>
@@ -29,12 +29,14 @@
             <div class="form-group">
                 <p>Record Type:</p>
                 <select name="recordTypeSearch"
+                        required
                         style="width:100%; padding:0.625rem; background-color:var(--primary-bg-color); color:white; border:0.0625rem solid var(--border-bg); border-radius:0.25rem;">
                     <option value="">-- Select --</option>
                     <option value="Client" selected="@(Model.RecordTypeSearch == "Client")">Client</option>
                     <option value="Project" selected="@(Model.RecordTypeSearch == "Project")">Project</option>
                     <option value="Task" selected="@(Model.RecordTypeSearch == "Task")">Task</option>
                 </select>
+
             </div>
 
             <div class="form-group">
@@ -46,15 +48,31 @@
             </div>
 
             <div style="display:flex; flex-direction:column; gap:0.75rem; width:100%;">
-                <button type="submit" class="btn-primary" style="width:100%;">Submit</button>
+                <button type="submit"
+                        class="btn-primary"
+                        style="width:100%;"
+                        formaction="?recordTypeSearch=@Model.RecordTypeSearch">
+                    Submit
+                </button>
 
-                <button type="submit" name="mode" value="create" class="btn-primary" style="width:100%;">
+                <button type="submit"
+                        name="mode"
+                        value="create"
+                        class="btn-primary"
+                        style="width:100%;"
+                        formaction="?recordTypeSearch=@Model.RecordTypeSearch&mode=create">
                     Create New
                 </button>
 
-                <button type="submit" name="mode" value="update" class="btn-primary" style="width:100%;">
+                <button type="submit"
+                        name="mode"
+                        value="update"
+                        class="btn-primary"
+                        style="width:100%;"
+                        formaction="?recordTypeSearch=@Model.RecordTypeSearch&mode=update">
                     Update
                 </button>
+
             </div>
         </form>
     </div>
@@ -62,7 +80,7 @@
     <!-- RIGHT PANEL -->
     @if (showRight)
     {
-        <div id="manageUpdate"
+        <div id="passwordBox"
              class="password-box"
              style="display:flex; flex-direction:column; justify-content:flex-start; min-height:18rem;">
             <h2>@rightHeader</h2>

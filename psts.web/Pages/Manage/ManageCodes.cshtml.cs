@@ -9,55 +9,62 @@ using Psts.Web.Data;
 
 namespace psts.web.Pages.Manage
 {
-    [Authorize(Roles = nameof(RoleTypes.Manager))] // Restrict access to only Manager users
+    [Authorize(Roles = nameof(RoleTypes.Manager))]
     public class ManageCodesModel : PageModel
     {
         private readonly IShortCodeService _scs;
         private readonly IManagementService _management;
         private readonly UserManager<AppUser> _userManager;
 
+        // GET-bound properties
         [BindProperty(SupportsGet = true)]
         public string? Shortcode { get; set; }
 
-        // Record type selected in the left panel search dropdown
         [BindProperty(SupportsGet = true)]
         public string? RecordTypeSearch { get; set; }
 
-        // Hidden fields to carry IDs through to POST for update operations
+        // Hidden fields for POST
         [BindProperty]
         public Guid? RecordId { get; set; }
+
         [BindProperty]
         public Guid? ParentId { get; set; }
 
-        // Parent short code entered by user during create for Project or Task
+        // Parent short code for create mode
         [BindProperty]
         public string? ParentShortCode { get; set; }
 
         // Client fields
         [BindProperty]
         public string? ClientName { get; set; }
+
         [BindProperty]
         public string? ClientPOCfName { get; set; }
+
         [BindProperty]
         public string? ClientPOClName { get; set; }
+
         [BindProperty]
         public string? ClientPOCeMail { get; set; }
+
         [BindProperty]
         public string? ClientPOCtPhone { get; set; }
 
         // Project fields
         [BindProperty]
         public string? ProjectName { get; set; }
+
         [BindProperty]
         public string? ProjectDescription { get; set; }
 
         // Task fields
         [BindProperty]
         public string? TaskName { get; set; }
+
         [BindProperty]
         public string? TaskDescription { get; set; }
 
-        // Used to tell the view what type was found after a shortcode lookup
+        // Type found from shortcode lookup
         public ShortCodeType? FoundType { get; set; }
 
         public string? Message { get; set; }
@@ -71,106 +78,107 @@ namespace psts.web.Pages.Manage
 
         public async Task OnGetAsync()
         {
-            if (!string.IsNullOrEmpty(Shortcode))
+            // ⭐ FIX: If user selected a record type but did not enter a shortcode,
+            // show an empty form for create/update.
+            if (string.IsNullOrEmpty(Shortcode) && !string.IsNullOrEmpty(RecordTypeSearch))
             {
-                var decodeShortCode = await _scs.DecodeShortCode(Shortcode);
+                FoundType = null;
+                return;
+            }
 
-                if (decodeShortCode.Success)
+            // If no shortcode, nothing else to load
+            if (string.IsNullOrEmpty(Shortcode))
+                return;
+
+            // Lookup shortcode
+            var decodeShortCode = await _scs.DecodeShortCode(Shortcode);
+
+            if (!decodeShortCode.Success)
+            {
+                Message = "An error occurred while looking up the short code. Please try again.";
+                return;
+            }
+
+            var data = decodeShortCode.Data;
+
+            if (data.Type == ShortCodeType.NotFound)
+            {
+                Message = $"Short code '{Shortcode}' does not exist. You can create it using the Create New button.";
+                return;
+            }
+
+            // Valid shortcode found
+            FoundType = data.Type;
+            RecordTypeSearch = data.Type.ToString();
+            RecordId = data.Id;
+
+            // Load full record based on type
+            if (data.Type == ShortCodeType.Client && data.Id.HasValue)
+            {
+                var clientResult = await _management.GetClient(data.Id.Value);
+                if (clientResult.Success)
                 {
-                    var data = decodeShortCode.Data;
+                    ClientName = clientResult.Data.ClientName;
+                    ClientPOCfName = clientResult.Data.ClientPOCfName;
+                    ClientPOClName = clientResult.Data.ClientPOClName;
+                    ClientPOCeMail = clientResult.Data.ClientPOCeMail;
+                    ClientPOCtPhone = clientResult.Data.ClientPOCtPhone;
 
-                    if (data.Type == ShortCodeType.NotFound)
+                    if (clientResult.Data.Project != null)
                     {
-                        // Short code does not exist, prompt user to create
-                        Message = $"Short code '{Shortcode}' does not exist. You can create it using the Create New button.";
-                        return;
-                    }
+                        ProjectName = clientResult.Data.Project.ProjectName;
+                        ProjectDescription = clientResult.Data.Project.ProjectDescription;
 
-                    // Valid short code found, set the type and populate fields
-                    FoundType = data.Type;
-                    RecordTypeSearch = data.Type.ToString();
-                    RecordId = data.Id;
-
-                    if (data.Type == ShortCodeType.Client && data.Id.HasValue)
-                    {
-                        // Fetch the full client record by ID, includes child project and its child task
-                        var clientResult = await _management.GetClient(data.Id.Value);
-                        if (clientResult.Success)
+                        if (clientResult.Data.Project.Task != null)
                         {
-                            ClientName = clientResult.Data.ClientName;
-                            ClientPOCfName = clientResult.Data.ClientPOCfName;
-                            ClientPOClName = clientResult.Data.ClientPOClName;
-                            ClientPOCeMail = clientResult.Data.ClientPOCeMail;
-                            ClientPOCtPhone = clientResult.Data.ClientPOCtPhone;
-
-                            // Populate child project fields if one exists (read-only in view)
-                            if (clientResult.Data.Project != null)
-                            {
-                                ProjectName = clientResult.Data.Project.ProjectName;
-                                ProjectDescription = clientResult.Data.Project.ProjectDescription;
-
-                                // Populate grandchild task fields if one exists (read-only in view)
-                                if (clientResult.Data.Project.Task != null)
-                                {
-                                    TaskName = clientResult.Data.Project.Task.TaskName;
-                                    TaskDescription = clientResult.Data.Project.Task.TaskDescription;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Message = "Short code found but failed to load client record.";
-                        }
-                    }
-                    else if (data.Type == ShortCodeType.Project && data.Id.HasValue)
-                    {
-                        // Fetch the full project record by ID, includes parent Client and child task
-                        var projectResult = await _management.GetProject(data.Id.Value);
-                        if (projectResult.Success)
-                        {
-                            ParentId = projectResult.Data.ClientId;
-                            ProjectName = projectResult.Data.ProjectName;
-                            ProjectDescription = projectResult.Data.ProjectDescription;
-
-                            // Populate child task fields if one exists (read-only in view)
-                            if (projectResult.Data.Task != null)
-                            {
-                                TaskName = projectResult.Data.Task.TaskName;
-                                TaskDescription = projectResult.Data.Task.TaskDescription;
-                            }
-                        }
-                        else
-                        {
-                            Message = "Short code found but failed to load project record.";
-                        }
-                    }
-                    else if (data.Type == ShortCodeType.Task && data.Id.HasValue)
-                    {
-                        // Fetch the full task record by ID, includes parent Project and grandparent Client
-                        var taskResult = await _management.GetTask(data.Id.Value);
-                        if (taskResult.Success)
-                        {
-                            ParentId = taskResult.Data.ProjectId;
-                            TaskName = taskResult.Data.TaskName;
-                            TaskDescription = taskResult.Data.TaskDescription;
-                        }
-                        else
-                        {
-                            Message = "Short code found but failed to load task record.";
+                            TaskName = clientResult.Data.Project.Task.TaskName;
+                            TaskDescription = clientResult.Data.Project.Task.TaskDescription;
                         }
                     }
                 }
                 else
                 {
-                    // Failed for some reason. Not because short code does not exist. If code does not exist it will succeed with a type of NotFound
-                    Message = "An error occurred while looking up the short code. Please try again.";
+                    Message = "Short code found but failed to load client record.";
+                }
+            }
+            else if (data.Type == ShortCodeType.Project && data.Id.HasValue)
+            {
+                var projectResult = await _management.GetProject(data.Id.Value);
+                if (projectResult.Success)
+                {
+                    ParentId = projectResult.Data.ClientId;
+                    ProjectName = projectResult.Data.ProjectName;
+                    ProjectDescription = projectResult.Data.ProjectDescription;
+
+                    if (projectResult.Data.Task != null)
+                    {
+                        TaskName = projectResult.Data.Task.TaskName;
+                        TaskDescription = projectResult.Data.Task.TaskDescription;
+                    }
+                }
+                else
+                {
+                    Message = "Short code found but failed to load project record.";
+                }
+            }
+            else if (data.Type == ShortCodeType.Task && data.Id.HasValue)
+            {
+                var taskResult = await _management.GetTask(data.Id.Value);
+                if (taskResult.Success)
+                {
+                    ParentId = taskResult.Data.ProjectId;
+                    TaskName = taskResult.Data.TaskName;
+                    TaskDescription = taskResult.Data.TaskDescription;
+                }
+                else
+                {
+                    Message = "Short code found but failed to load task record.";
                 }
             }
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Get the current user's ID and role for service calls
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -189,6 +197,7 @@ namespace psts.web.Pages.Manage
             var mode = Request.Form["mode"].ToString().ToLower();
             var recordType = Request.Form["recordType"].ToString();
 
+            // CLIENT
             if (recordType == "Client")
             {
                 if (mode == "create")
@@ -202,17 +211,18 @@ namespace psts.web.Pages.Manage
                         ClientPOCtPhone = ClientPOCtPhone ?? string.Empty,
                         ShortCode = Shortcode ?? string.Empty
                     };
+
                     var result = await _management.AddNewClient(user.Id, roleType, dto);
-                    Message = result.Success ? "Client created successfully." : (result.Error ?? "An error occurred while creating the client.");
+                    Message = result.Success ? "Client created successfully." : result.Error ?? "An error occurred while creating the client.";
                 }
                 else
                 {
-                    // Update — requires RecordId
                     if (!RecordId.HasValue)
                     {
                         Message = "Missing client ID for update.";
                         return Page();
                     }
+
                     var dto = new UpdateClientDto
                     {
                         ClientId = RecordId.Value,
@@ -223,15 +233,17 @@ namespace psts.web.Pages.Manage
                         ClientPOCtPhone = ClientPOCtPhone,
                         ShortCode = Shortcode
                     };
+
                     var result = await _management.UpdateClient(user.Id, roleType, dto);
-                    Message = result.Success ? "Client updated successfully." : (result.Error ?? "An error occurred while updating the client.");
+                    Message = result.Success ? "Client updated successfully." : result.Error ?? "An error occurred while updating the client.";
                 }
             }
+
+            // PROJECT
             else if (recordType == "Project")
             {
                 if (mode == "create")
                 {
-                    // Resolve parent client short code to get ClientId
                     if (string.IsNullOrEmpty(ParentShortCode))
                     {
                         Message = "Please enter the parent client short code.";
@@ -252,17 +264,18 @@ namespace psts.web.Pages.Manage
                         ProjectDescription = ProjectDescription,
                         ShortCode = Shortcode ?? string.Empty
                     };
+
                     var result = await _management.AddNewProject(user.Id, roleType, dto);
-                    Message = result.Success ? "Project created successfully." : (result.Error ?? "An error occurred while creating the project.");
+                    Message = result.Success ? "Project created successfully." : result.Error ?? "An error occurred while creating the project.";
                 }
                 else
                 {
-                    // Update — requires RecordId and ParentId
                     if (!RecordId.HasValue || !ParentId.HasValue)
                     {
                         Message = "Missing project or client ID for update.";
                         return Page();
                     }
+
                     var dto = new UpdateProjectDto
                     {
                         ProjectId = RecordId.Value,
@@ -271,15 +284,17 @@ namespace psts.web.Pages.Manage
                         ProjectDescription = ProjectDescription,
                         ShortCode = Shortcode
                     };
+
                     var result = await _management.UpdateProject(user.Id, roleType, dto);
-                    Message = result.Success ? "Project updated successfully." : (result.Error ?? "An error occurred while updating the project.");
+                    Message = result.Success ? "Project updated successfully." : result.Error ?? "An error occurred while updating the project.";
                 }
             }
+
+            // TASK
             else if (recordType == "Task")
             {
                 if (mode == "create")
                 {
-                    // Resolve parent project short code to get ProjectId
                     if (string.IsNullOrEmpty(ParentShortCode))
                     {
                         Message = "Please enter the parent project short code.";
@@ -300,17 +315,18 @@ namespace psts.web.Pages.Manage
                         TaskDescription = TaskDescription,
                         ShortCode = Shortcode ?? string.Empty
                     };
+
                     var result = await _management.AddNewTask(user.Id, roleType, dto);
-                    Message = result.Success ? "Task created successfully." : (result.Error ?? "An error occurred while creating the task.");
+                    Message = result.Success ? "Task created successfully." : result.Error ?? "An error occurred while creating the task.";
                 }
                 else
                 {
-                    // Update — requires RecordId and ParentId
                     if (!RecordId.HasValue || !ParentId.HasValue)
                     {
                         Message = "Missing task or project ID for update.";
                         return Page();
                     }
+
                     var dto = new UpdateTaskDto
                     {
                         TaskId = RecordId.Value,
@@ -319,10 +335,12 @@ namespace psts.web.Pages.Manage
                         TaskDescription = TaskDescription,
                         ShortCode = Shortcode
                     };
+
                     var result = await _management.UpdateTask(user.Id, roleType, dto);
-                    Message = result.Success ? "Task updated successfully." : (result.Error ?? "An error occurred while updating the task.");
+                    Message = result.Success ? "Task updated successfully." : result.Error ?? "An error occurred while updating the task.";
                 }
             }
+
             else
             {
                 Message = "Please select a valid record type.";
