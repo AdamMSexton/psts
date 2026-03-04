@@ -8,6 +8,7 @@ namespace psts.web.Services
     public interface ITimeServices
     {
         Task<ServiceResult<Guid>> EnterNewTimeTransaction(string _requestorId, RoleTypes _requestorRole, NewTimeTransactionDto _newTransactionData);
+        Task<ServiceResult<Guid>> CreateTimeTransactionAdjustment(string _requestorId, RoleTypes _requestorRole, NewTimeTransactionAdjustmentDto _newAdjustmentData);
         Task<ServiceResult<bool>> AdjudicateTransactionAdjustment(string _requestorId, RoleTypes _requestorRole, ApprovalDecisionDto _decision);
     }
 }

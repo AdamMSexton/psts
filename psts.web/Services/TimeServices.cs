@@ -113,6 +113,59 @@ namespace psts.web.Services
                 return ServiceResult<Guid>.Fail(ex.Message);
             }
         }
+        public async Task<ServiceResult<Guid>> CreateTimeTransactionAdjustment(string _requestorId, RoleTypes _requestorRole, NewTimeTransactionAdjustmentDto _newAdjustmentData)
+        {
+            try
+            {
+                // Validate requestor inputs
+                bool validRequestor = await _db.PstsUserProfiles.AnyAsync(u => u.EmployeeId == _requestorId);
+
+                if ((_requestorId == null) || (validRequestor == false))
+                {
+                    return ServiceResult<Guid>.Fail("Invalid requestor Id.");
+                }
+
+                if (!Enum.IsDefined(typeof(RoleTypes), _requestorRole))
+                {
+                    return ServiceResult<Guid>.Fail("Invalid role.");
+                }
+
+                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Employee))
+                {
+                    return ServiceResult<Guid>.Fail("Insufficient privileges.");
+                }
+
+                // Get existing ticket
+                var ticketToAmmend = await _db.PstsTimeTransactionss.FindAsync(_newAdjustmentData.TransactionToAdjust);
+                if (ticketToAmmend == null)
+                {
+                    return ServiceResult<Guid>.Fail("Transaction to ammend not found.");
+                }
+
+                // Build adjustment transaction for ticket register
+                PstsTimeTransactions newAdjustment = new PstsTimeTransactions()
+                {
+                    TaskId = ticketToAmmend.TaskId,
+                    EnteredBy = _requestorId,               // The Adjustment was entered by the requestor. Does not carry from original transaction
+                    WorkCompletedBy = ticketToAmmend.WorkCompletedBy,
+                    WorkCompletedDate = ticketToAmmend.WorkCompletedDate,
+                    IsAdjustment = true,
+                    RelatedId = ticketToAmmend.RelatedId,
+                    WorkCompletedHours = _newAdjustmentData.RevisedWorkCompletedHours,          // Take new notes, old hours and notes and build new note.
+                    Notes = _newAdjustmentData.AdjustmentNotes + "\nOriginal Entry:\n Previous Hours: "
+                            + ticketToAmmend.WorkCompletedHours + "\nPrevious Notes\n" + ticketToAmmend.Notes
+                };
+
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<Guid>.Fail(ex.Message);
+            }
+        }
 
         public async Task<ServiceResult<bool>> AdjudicateTransactionAdjustment(string _requestorId, RoleTypes _requestorRole, ApprovalDecisionDto _decision)
         {
@@ -183,5 +236,6 @@ namespace psts.web.Services
                 return ServiceResult<bool>.Fail(ex.Message);
             }
         }
+
     }
 }
