@@ -33,6 +33,7 @@ namespace psts.web.Services
                     return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                     {
                         Type = ShortCodeType.Task,
+                        ShortCode = taskShortCode.ShortCode,
                         Id = taskShortCode.TaskId
                     });
                 }
@@ -44,6 +45,7 @@ namespace psts.web.Services
                     return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                     {
                         Type = ShortCodeType.Project,
+                        ShortCode = projectShortCode.ShortCode,
                         Id = projectShortCode.ProjectId
                     });
                 }
@@ -55,6 +57,7 @@ namespace psts.web.Services
                     return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                     {
                         Type = ShortCodeType.Client,
+                        ShortCode = clientShortCode.ShortCode,
                         Id = clientShortCode.ClientId
                     });
                 }
@@ -63,6 +66,7 @@ namespace psts.web.Services
                 return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                 {
                     Type = ShortCodeType.NotFound,
+                    ShortCode = null,
                     Id = null
                 });
 
@@ -71,9 +75,68 @@ namespace psts.web.Services
             {
                     return ServiceResult<ShortCodeDecodeResultDto>.Fail(ex.Message);
             }
-            
         }
-    
+        public async Task<ServiceResult<ShortCodeDecodeResultDto>> DecodeShortCode(Guid _EntityId)
+        {
+            try
+            {
+                if (_EntityId != Guid.Empty)
+                {
+                    // exit immediately
+                    return ServiceResult<ShortCodeDecodeResultDto>.Fail("Entity Id cannot be unassigned");
+                }
+
+                // Go into DB to find shortcode.  Ordered task & up as most likely task would be the code used as its most specific.
+                // Check Task
+                var taskShortCode = await _db.PstsTaskDefinitions.FindAsync(_EntityId);
+                if (taskShortCode != null)
+                {
+                    return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
+                    {
+                        Type = ShortCodeType.Task,
+                        ShortCode = taskShortCode.ShortCode,
+                        Id = taskShortCode.TaskId
+                    });
+                }
+
+                // Check Project
+                var projectShortCode = await _db.PstsProjectDefinitions.FindAsync(_EntityId);
+                if (projectShortCode != null)
+                {
+                    return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
+                    {
+                        Type = ShortCodeType.Project,
+                        ShortCode = projectShortCode.ShortCode,
+                        Id = projectShortCode.ProjectId
+                    });
+                }
+
+                // Check Client
+                var clientShortCode = await _db.PstsClientProfiles.FindAsync(_EntityId);
+                if (clientShortCode != null)
+                {
+                    return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
+                    {
+                        Type = ShortCodeType.Client,
+                        ShortCode = clientShortCode.ShortCode,
+                        Id = clientShortCode.ClientId
+                    });
+                }
+
+                // Short code not found
+                return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
+                {
+                    Type = ShortCodeType.NotFound,
+                    ShortCode = null,
+                    Id = null
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<ShortCodeDecodeResultDto>.Fail(ex.Message);
+            }
+        }
         public async Task<ServiceResult<bool>> ChangeShortCode(string _requestorId, RoleTypes _requestorRole, ShortCodeType _type, Guid _entityId, string? _newShortCode)
         {
             try
