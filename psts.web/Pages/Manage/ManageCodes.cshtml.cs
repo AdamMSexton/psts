@@ -103,19 +103,19 @@ namespace psts.web.Pages.Manage
                             ClientPOCeMail = clientResult.Data.ClientPOCeMail;
                             ClientPOCtPhone = clientResult.Data.ClientPOCtPhone;
 
-                            // Populate child project fields if one exists (read-only in view)
-                            if (clientResult.Data.Project != null)
-                            {
-                                ProjectName = clientResult.Data.Project.ProjectName;
-                                ProjectDescription = clientResult.Data.Project.ProjectDescription;
+                            //// Populate child project fields if one exists (read-only in view)
+                            //if (clientResult.Data.Project != null)
+                            //{
+                            //    ProjectName = clientResult.Data.Project.ProjectName;
+                            //    ProjectDescription = clientResult.Data.Project.ProjectDescription;
 
-                                // Populate grandchild task fields if one exists (read-only in view)
-                                if (clientResult.Data.Project.Task != null)
-                                {
-                                    TaskName = clientResult.Data.Project.Task.TaskName;
-                                    TaskDescription = clientResult.Data.Project.Task.TaskDescription;
-                                }
-                            }
+                            //    // Populate grandchild task fields if one exists (read-only in view)
+                            //    if (clientResult.Data.Project.Task != null)
+                            //    {
+                            //        TaskName = clientResult.Data.Project.Task.TaskName;
+                            //        TaskDescription = clientResult.Data.Project.Task.TaskDescription;
+                            //    }
+                            //}
                         }
                         else
                         {
@@ -132,12 +132,12 @@ namespace psts.web.Pages.Manage
                             ProjectName = projectResult.Data.ProjectName;
                             ProjectDescription = projectResult.Data.ProjectDescription;
 
-                            // Populate child task fields if one exists (read-only in view)
-                            if (projectResult.Data.Task != null)
-                            {
-                                TaskName = projectResult.Data.Task.TaskName;
-                                TaskDescription = projectResult.Data.Task.TaskDescription;
-                            }
+                            //// Populate child task fields if one exists (read-only in view)
+                            //if (projectResult.Data.Tasks != null)
+                            //{
+                            //    TaskName = projectResult.Data.Tasks.TaskName;
+                            //    TaskDescription = projectResult.Data.Tasks.TaskDescription;
+                            //}
                         }
                         else
                         {

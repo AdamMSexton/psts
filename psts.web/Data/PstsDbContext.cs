@@ -79,15 +79,15 @@ public class PstsDbContext : IdentityDbContext<AppUser>
             .HasKey(c => c.ProjectId);
 
         builder.Entity<PstsProjectDefinition>()             // Foreign Key
-            .HasOne(c => c.Client)
-            .WithOne(b => b.Project)
-            .HasForeignKey<PstsProjectDefinition>(c => c.ClientId)
+            .HasOne(p => p.Client)
+            .WithMany(c => c.Projects)
+            .HasForeignKey(p => p.ClientId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<PstsProjectDefinition>()             // Foreign Key
             .HasOne(c => c.EmployeePOC)
-            .WithOne()
-            .HasForeignKey<PstsProjectDefinition>(c => c.EmployeePOCId)
+            .WithMany()
+            .HasForeignKey(c => c.EmployeePOCId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<PstsProjectDefinition>()             // Define short code as 4 characters
@@ -113,8 +113,8 @@ public class PstsDbContext : IdentityDbContext<AppUser>
 
         builder.Entity<PstsTaskDefinition>()                // Foreign Key
             .HasOne(d => d.Project)
-            .WithOne(p => p.Task)
-            .HasForeignKey<PstsTaskDefinition>(d => d.ProjectId)
+            .WithMany(p => p.Tasks)
+            .HasForeignKey(d => d.ProjectId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<PstsTaskDefinition>()                // Define short code as 4 characters

@@ -495,10 +495,10 @@ namespace psts.web.Services
                 if (project != null)
                 {
                     // Also fetch the task under this project if one exists
-                    project.Task = await _db.PstsTaskDefinitions
-                        .FirstOrDefaultAsync(t => t.ProjectId == project.ProjectId);
+                    //project.Task = await _db.PstsTaskDefinitions
+                    //    .FirstOrDefaultAsync(t => t.ProjectId == project.ProjectId);
 
-                    client.Project = project;
+                    //client.Project = project;
                 }
 
                 return ServiceResult<PstsClientProfile>.Ok(client);
@@ -525,8 +525,8 @@ namespace psts.web.Services
                 }
 
                 // Also fetch the task under this project if one exists
-                project.Task = await _db.PstsTaskDefinitions
-                    .FirstOrDefaultAsync(t => t.ProjectId == projectId);
+                //project.Task = await _db.PstsTaskDefinitions
+                //    .FirstOrDefaultAsync(t => t.ProjectId == projectId);
 
                 return ServiceResult<PstsProjectDefinition>.Ok(project);
             }

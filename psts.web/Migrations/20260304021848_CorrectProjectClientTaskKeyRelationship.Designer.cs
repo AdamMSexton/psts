@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Psts.Web.Data;
@@ -11,9 +12,11 @@ using Psts.Web.Data;
 namespace psts.web.Migrations
 {
     [DbContext(typeof(PstsDbContext))]
-    partial class PstsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260304021848_CorrectProjectClientTaskKeyRelationship")]
+    partial class CorrectProjectClientTaskKeyRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,7 +313,8 @@ namespace psts.web.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.HasIndex("EmployeePOCId");
+                    b.HasIndex("EmployeePOCId")
+                        .IsUnique();
 
                     b.HasIndex("ShortCode")
                         .IsUnique();
@@ -324,7 +328,6 @@ namespace psts.web.Migrations
             modelBuilder.Entity("Psts.Web.Data.PstsTaskDefinition", b =>
                 {
                     b.Property<Guid>("TaskId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ProjectId")
@@ -344,8 +347,6 @@ namespace psts.web.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("TaskId");
-
-                    b.HasIndex("ProjectId");
 
                     b.HasIndex("ShortCode")
                         .IsUnique();
@@ -612,8 +613,8 @@ namespace psts.web.Migrations
                         .IsRequired();
 
                     b.HasOne("Psts.Web.Data.AppUser", "EmployeePOC")
-                        .WithMany()
-                        .HasForeignKey("EmployeePOCId")
+                        .WithOne()
+                        .HasForeignKey("Psts.Web.Data.PstsProjectDefinition", "EmployeePOCId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Client");
@@ -625,7 +626,7 @@ namespace psts.web.Migrations
                 {
                     b.HasOne("Psts.Web.Data.PstsProjectDefinition", "Project")
                         .WithMany("Tasks")
-                        .HasForeignKey("ProjectId")
+                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

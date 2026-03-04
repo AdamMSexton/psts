@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Psts.Web.Data;
@@ -11,9 +12,11 @@ using Psts.Web.Data;
 namespace psts.web.Migrations
 {
     [DbContext(typeof(PstsDbContext))]
-    partial class PstsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260304022200_CorrectProjectClientTaskKeyRelationshipAgain")]
+    partial class CorrectProjectClientTaskKeyRelationshipAgain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,7 +313,8 @@ namespace psts.web.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.HasIndex("EmployeePOCId");
+                    b.HasIndex("EmployeePOCId")
+                        .IsUnique();
 
                     b.HasIndex("ShortCode")
                         .IsUnique();
@@ -612,8 +616,8 @@ namespace psts.web.Migrations
                         .IsRequired();
 
                     b.HasOne("Psts.Web.Data.AppUser", "EmployeePOC")
-                        .WithMany()
-                        .HasForeignKey("EmployeePOCId")
+                        .WithOne()
+                        .HasForeignKey("Psts.Web.Data.PstsProjectDefinition", "EmployeePOCId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Client");
