@@ -18,7 +18,7 @@ namespace psts.web.Services
             _settings = settings;
         }
 
-        public async Task<ServiceResult<Guid>> EnterNewTimeTransaction(string _requestorId, RoleTypes _requestorRole, NewTimeTransactionDto _newTransactionData)
+        public async Task<ServiceResult<Guid>> CreateNewTimeTransaction(string _requestorId, RoleTypes _requestorRole, NewTimeTransactionDto _newTransactionData)
         {
             try
             {
@@ -226,6 +226,46 @@ namespace psts.web.Services
                 return ServiceResult<bool>.Fail(ex.Message);
             }
         }
-        public async Task<ServiceResult<List<>>>
+        public async Task<ServiceResult<List<UnadjudicatedAdjustmentItem>>> FindUnadjudicatedTransactionAdjustments(DateTime? _StartEnteredDate, DateTime? _EndEnteredDate)
+        {
+            var pendingAdjustments = await _db.PstsTimeTransactionss
+                .Where(t => t.IsAdjustment && t.RelatedApproval == null)
+                .ToListAsync();
+
+            List<UnadjudicatedAdjustmentItem> unadjudicatedAdjustments = new();
+
+            bool infiniteStartDate = false;
+            bool infiniteEndDate = false;
+
+            if (_StartEnteredDate == null)
+            {
+                infiniteStartDate = true;
+            }
+
+            if (_EndEnteredDate == null)
+            {
+                infiniteEndDate = true;
+            }
+
+            foreach (var transaction in pendingAdjustments)
+            {
+               
+                if ((transaction.EnteredTimeStamp >= _StartEnteredDate) || (infiniteStartDate))     // Transaction was after search start or infinite
+                {
+                    if ((transaction.EnteredTimeStamp <= _EndEnteredDate) || (infiniteEndDate))     // Transaction was before search end or infinite  
+                    {
+                        unadjudicatedAdjustments.Add(new UnadjudicatedAdjustmentItem
+                        {
+                            OriginalTransaction = transaction.TransactionId,
+                            OriginalDateEntered = transaction.RelatedTransaction.EnteredTimeStamp,
+                            AdjustmentTransaction = (Guid)transaction.RelatedId,
+                            AdjustmentDateEntered = transaction.EnteredTimeStamp
+                        });
+                    }
+                }
+            }
+
+            return ServiceResult<List<UnadjudicatedAdjustmentItem>>.Ok(unadjudicatedAdjustments);
+        }
     }
 }
