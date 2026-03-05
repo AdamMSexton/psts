@@ -43,6 +43,7 @@ namespace psts.web.Services
                 // Build new ticket
                 var newTimeTransaction = new PstsTimeTransactions();
                 newTimeTransaction.TransactionId = new Guid();
+                newTimeTransaction.TransactionId = Guid.NewGuid();
 
                 // Verify TaskId
                 bool validTask = await _db.PstsTaskDefinitions.AnyAsync(u => u.TaskId == _newTransactionData.TaskId);
@@ -85,23 +86,8 @@ namespace psts.web.Services
                 // Store notes
                 newTimeTransaction.Notes = _newTransactionData.Notes;
 
-                // If this is an adjustment transaction then verify a Related Id is supplied
-                if (_newTransactionData.IsAdjustment)
-                {
-                    if (_newTransactionData.RelatedId == null)
-                    {
-                        return ServiceResult<Guid>.Fail("Ticket is an adjustment but has no related ticket Id.");
-                    }
-                    
-                    bool validRelatedTicket = await _db.PstsTimeTransactionss.AnyAsync(u => u.TransactionId == _newTransactionData.RelatedId);
-                    if (!validRelatedTicket)
-                    {
-                        return ServiceResult<Guid>.Fail("Ticket is an adjustment but related ticket Id is not valid.");
-                    }
-                }
-                newTimeTransaction.IsAdjustment = _newTransactionData.IsAdjustment;
-                newTimeTransaction.RelatedId = _newTransactionData.RelatedId;
-
+                newTimeTransaction.IsAdjustment = false;
+                newTimeTransaction.RelatedId = null;
 
                 await _db.PstsTimeTransactionss.AddAsync(newTimeTransaction);
                 await _db.SaveChangesAsync();
@@ -145,6 +131,7 @@ namespace psts.web.Services
                 // Build adjustment transaction for ticket register
                 PstsTimeTransactions newAdjustment = new PstsTimeTransactions()
                 {
+                    TransactionId = 
                     TaskId = ticketToAmmend.TaskId,
                     EnteredBy = _requestorId,               // The Adjustment was entered by the requestor. Does not carry from original transaction
                     WorkCompletedBy = ticketToAmmend.WorkCompletedBy,
@@ -156,6 +143,10 @@ namespace psts.web.Services
                             + ticketToAmmend.WorkCompletedHours + "\nPrevious Notes\n" + ticketToAmmend.Notes
                 };
 
+                await _db.PstsTimeTransactionss.AddAsync(newAdjustment);
+                await _db.SaveChangesAsync();
+
+                return ServiceResult<Guid>.Ok(newAdjustment.TransactionId);
 
 
 
@@ -166,7 +157,6 @@ namespace psts.web.Services
                 return ServiceResult<Guid>.Fail(ex.Message);
             }
         }
-
         public async Task<ServiceResult<bool>> AdjudicateTransactionAdjustment(string _requestorId, RoleTypes _requestorRole, ApprovalDecisionDto _decision)
         {
             try
@@ -236,6 +226,6 @@ namespace psts.web.Services
                 return ServiceResult<bool>.Fail(ex.Message);
             }
         }
-
+        public async Task<ServiceResult<List<>>>
     }
 }

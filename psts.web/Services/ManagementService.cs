@@ -46,7 +46,7 @@ namespace psts.web.Services
 
                 if (shortCodeCheck.Success)
                 {
-                    if (shortCodeCheck.Data.Type != ShortCodeType.NotFound)
+                    if (shortCodeCheck.Data.Type != WorkItemType.NotFound)
                     {
                         return ServiceResult<Guid>.Fail("Short code in use.");
                     }
@@ -117,7 +117,7 @@ namespace psts.web.Services
 
                     if (shortCodeCheck.Success)
                     {
-                        if (shortCodeCheck.Data.Type != ShortCodeType.NotFound)
+                        if (shortCodeCheck.Data.Type != WorkItemType.NotFound)
                         {
                             return ServiceResult<bool>.Fail("Short code in use.");
                         }
@@ -174,7 +174,7 @@ namespace psts.web.Services
 
                 if (shortCodeCheck.Success)
                 {
-                    if (shortCodeCheck.Data.Type != ShortCodeType.NotFound)
+                    if (shortCodeCheck.Data.Type != WorkItemType.NotFound)
                     {
                         return ServiceResult<Guid>.Fail("Short code in use.");
                     }
@@ -250,7 +250,7 @@ namespace psts.web.Services
 
                     if (shortCodeCheck.Success)
                     {
-                        if (shortCodeCheck.Data.Type != ShortCodeType.NotFound)
+                        if (shortCodeCheck.Data.Type != WorkItemType.NotFound)
                         {
                             return ServiceResult<bool>.Fail("Short code in use.");
                         }
@@ -304,7 +304,7 @@ namespace psts.web.Services
 
                 if (shortCodeCheck.Success)
                 {
-                    if (shortCodeCheck.Data.Type != ShortCodeType.NotFound)
+                    if (shortCodeCheck.Data.Type != WorkItemType.NotFound)
                     {
                         return ServiceResult<Guid>.Fail("Short code in use.");
                     }
@@ -381,7 +381,7 @@ namespace psts.web.Services
 
                     if (shortCodeCheck.Success)
                     {
-                        if (shortCodeCheck.Data.Type != ShortCodeType.NotFound)
+                        if (shortCodeCheck.Data.Type != WorkItemType.NotFound)
                         {
                             return ServiceResult<bool>.Fail("Short code in use.");
                         }
