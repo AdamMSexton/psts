@@ -6,6 +6,31 @@
 
 <h2 style="text-align:center; margin-top:1rem;">Role Management</h2>
 
+
+
+<script> // TEST SCRIPT ONLY
+    document.addEventListener("DOMContentLoaded", async function () {
+
+        const term = "def"; // static test search
+
+        try {
+            const response = await fetch("/Manage/ManageRoles?handler=Search&term=" + term);
+
+            if (!response.ok) {
+                console.error("Request failed:", response.status);
+                return;
+            }
+
+            const data = await response.json();
+            console.log("Search results:", data);
+
+        } catch (err) {
+            console.error("Error calling search endpoint:", err);
+        }
+
+    });
+</script>
+
 <div class="profile-grid">
 
     <!-- -------------------------------------------------- -->

@@ -22,7 +22,7 @@ namespace psts.web.Pages
                 return new JsonResult(Array.Empty<UserListItemDto>());
 
             var results = await _management.SearchUsers(term);
-            return new JsonResult(results);
+            return new JsonResult(results.Data);
         }
     }
 }
