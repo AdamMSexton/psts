@@ -16,17 +16,13 @@ using Microsoft.IdentityModel.Tokens;
 namespace psts.web.Pages.Manage
 {
     [Authorize(Roles = nameof(RoleTypes.Manager))] // Restrict access to only Manager users
-    
-    
-    
-    public class ManageRolesModel : PageModel
+    public class ManageRolesModel : SearchPageModel
     {
         private readonly PstsDbContext _db;
         private readonly UserManager<AppUser> _userManager;
-        private readonly IManagementService _management;
 
         public string? Query { get; set; }
-        public IList<UserDisplayDto>? SearchResults { get; set; } = new List<UserDisplayDto>();
+        public IList<UserListItemDto>? SearchResults { get; set; } = new List<UserListItemDto>();
         public IList<PstsUserProfile>? PendingUsersProfiles { get; set; }
 
         // bind posted form fields
@@ -36,11 +32,10 @@ namespace psts.web.Pages.Manage
 
 
 
-        public ManageRolesModel(PstsDbContext db, UserManager<AppUser> userManager, IManagementService management)
+        public ManageRolesModel(PstsDbContext db, UserManager<AppUser> userManager, IManagementService management) : base(management)
         {
             _db = db;
             _userManager = userManager;
-            _management = management;
         }
 
         public async Task OnGetAsync(string? q)
@@ -84,9 +79,9 @@ namespace psts.web.Pages.Manage
                 ).ToDictionaryAsync(x => x.UserId, x => x.RoleName);
 
 
-                SearchResults = searchResults.Select(p => new UserDisplayDto
+                SearchResults = searchResults.Select(p => new UserListItemDto
                 {
-                    EmployeeId = p.EmployeeId,
+                    UserId = p.EmployeeId,
                     FName = p.FName,
                     LName = p.LName,
                     Role = roleByUserId.TryGetValue(p.EmployeeId, out var role) ? role : null

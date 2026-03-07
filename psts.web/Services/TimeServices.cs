@@ -131,7 +131,6 @@ namespace psts.web.Services
                 // Build adjustment transaction for ticket register
                 PstsTimeTransactions newAdjustment = new PstsTimeTransactions()
                 {
-                    TransactionId = 
                     TaskId = ticketToAmmend.TaskId,
                     EnteredBy = _requestorId,               // The Adjustment was entered by the requestor. Does not carry from original transaction
                     WorkCompletedBy = ticketToAmmend.WorkCompletedBy,

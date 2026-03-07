@@ -52,7 +52,7 @@
                     {
                         @foreach (var user in Model.SearchResults)
                         {
-                            <option title="@user.Role" value="@user.EmployeeId">
+                            <option title="@user.Role" value="@user.UserId">
                                 @(user.LName + ", " + user.FName)
                             </option>
                         }

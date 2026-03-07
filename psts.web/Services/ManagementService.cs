@@ -558,5 +558,59 @@ namespace psts.web.Services
                 return ServiceResult<PstsTaskDefinition>.Fail(ex.Message);
             }
         }
+
+        public async Task<ServiceResult<List<UserListItemDto>>> SearchUsers(string _searchString)
+        {
+            try
+            {
+                if (_searchString.Length >= 3)
+                {
+                    _searchString = _searchString.ToLower();
+
+                    var terms = _searchString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    var query = _db.PstsUserProfiles.AsQueryable();
+
+                    foreach (var term in terms)
+                    {
+                        query = query.Where(p =>
+                            p.FName.ToLower().StartsWith(term) ||
+                            p.LName.ToLower().StartsWith(term));
+                    }
+
+                    // Find user profiles that meet query (First or Last name, first characters)
+                    var searchResults = await query
+                        .Take(10)
+                        .ToListAsync();
+
+                    // Extract ids from searchResults
+                    var searchIds = searchResults.Select(p => p.EmployeeId).ToList();
+
+                    // Get roles for those Ids
+                    var roleByUserId = await (
+                        from ur in _db.UserRoles
+                        join r in _db.Roles on ur.RoleId equals r.Id
+                        where searchIds.Contains(ur.UserId)
+                        select new { ur.UserId, RoleName = r.Name }
+                    ).ToDictionaryAsync(x => x.UserId, x => x.RoleName);
+
+
+                    var finalResults = searchResults.Select(p => new UserListItemDto
+                    {
+                        UserId = p.EmployeeId,
+                        FName = p.FName,
+                        LName = p.LName,
+                        Role = roleByUserId.TryGetValue(p.EmployeeId, out var role) ? role : null
+                    }).ToList();
+
+                    return ServiceResult<List<UserListItemDto>>.Ok(finalResults);
+                }
+                return ServiceResult<List<UserListItemDto>>.Fail("Query String < 3 characters.");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<List<UserListItemDto>>.Fail(ex.Message);
+            }
+        }
     }
 }
