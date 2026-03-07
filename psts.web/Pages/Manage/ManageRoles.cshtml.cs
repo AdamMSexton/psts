@@ -38,7 +38,7 @@ namespace psts.web.Pages.Manage
             _userManager = userManager;
         }
 
-        public async Task OnGetAsync(string? q)
+        public async Task OnGetAsync(string? userQuery)
         {
             // Get list of pending users
             var pendingUserList = await _userManager.GetUsersInRoleAsync(nameof(RoleTypes.Pending));
@@ -47,11 +47,11 @@ namespace psts.web.Pages.Manage
 
             PendingUsersProfiles = await _db.PstsUserProfiles.Where(p => pendingIds.Contains(p.EmployeeId)).ToListAsync();
 
-            if (q != null)
+            if (userQuery != null)
             {
-                q = q.ToLower();
+                userQuery = userQuery.ToLower();
 
-                var terms = q.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var terms = userQuery.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                 var query = _db.PstsUserProfiles.AsQueryable();
 

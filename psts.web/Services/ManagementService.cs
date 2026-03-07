@@ -595,13 +595,16 @@ namespace psts.web.Services
                     ).ToDictionaryAsync(x => x.UserId, x => x.RoleName);
 
 
-                    var finalResults = searchResults.Select(p => new UserListItemDto
-                    {
-                        UserId = p.EmployeeId,
-                        FName = p.FName,
-                        LName = p.LName,
-                        Role = roleByUserId.TryGetValue(p.EmployeeId, out var role) ? role : null
-                    }).ToList();
+                    var finalResults = searchResults
+                        .OrderBy(p => p.LName)                        
+                        .ThenBy(p => p.FName)                        
+                        .Select(p => new UserListItemDto
+                        {
+                            UserId = p.EmployeeId,
+                            FName = p.FName,
+                            LName = p.LName,
+                            Role = roleByUserId.TryGetValue(p.EmployeeId, out var role) ? role : null
+                        }).ToList();
 
                     return ServiceResult<List<UserListItemDto>>.Ok(finalResults);
                 }

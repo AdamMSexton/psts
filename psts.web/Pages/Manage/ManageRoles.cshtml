@@ -9,26 +9,48 @@
 
 
 <script> // TEST SCRIPT ONLY
-    document.addEventListener("DOMContentLoaded", async function () {
+    document.addEventListener("DOMContentLoaded", async function () 
+    {
+        let debounceTimer;
 
-        const term = "def"; // static test search
+        const searchResults = document.getElementById("searchResults");
 
-        try {
-            const response = await fetch("/Manage/ManageRoles?handler=Search&term=" + term);
+        console.log(searchResults);
+        
+        document.getElementById("userQuery").addEventListener("input", function ()
+           {
+            const term = this.value;
+            if (term.length > 2)
+            {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(async () => 
+                {
+                    const response = await fetch("/Manage/ManageRoles?handler=Search&term=" + encodeURIComponent(term));
+                    const data = await response.json();
+                    console.log(data);
 
-            if (!response.ok) {
-                console.error("Request failed:", response.status);
-                return;
+                    updateSearchResults(searchResults, data);
+                }, 300);
             }
-
-            const data = await response.json();
-            console.log("Search results:", data);
-
-        } catch (err) {
-            console.error("Error calling search endpoint:", err);
-        }
+        });
 
     });
+
+    function updateSearchResults(resultsBox, results)
+    {
+        resultsBox.replaceChildren();
+        results.forEach(user => 
+            {
+                const option = document.createElement("option")
+                option.value = user.UserId;
+                option.title = user.role;
+                option.textContent = user.lName + ", " + user.fName;
+
+                resultsBox.appendChild(option);
+            });
+    }
+
+
 </script>
 
 <div class="profile-grid">
@@ -45,7 +67,7 @@
             <div class="form-group">
                 <p>Search by Name:</p>
                 <input type="text"
-                       name="q"
+                       id="userQuery"
                        value="@Model.Query"
                        placeholder="First and/or last name..." />
             </div>
@@ -70,34 +92,26 @@
             <div class="form-group">
                 <p>Select User:</p>
 
-                <select name="SelectedUserId"
+                <select id="ResultsBox"
                         size="8"
                         style="width:100%; padding:0.625rem; background-color:var(--primary-bg-color); color:white; border:0.0625rem solid var(--border-bg); border-radius:0.25rem;">
-                    @if (Model.SearchResults.Count > 0)
-                    {
-                        @foreach (var user in Model.SearchResults)
-                        {
-                            <option title="@user.Role" value="@user.UserId">
-                                @(user.LName + ", " + user.FName)
-                            </option>
-                        }
-                    }
 
-                    @if ((Model.SearchResults.Count > 0) && (Model.PendingUsersProfiles.Count > 0))
-                    {
-                        <option value=""></option>
-                    }
+                    <optgroup label="Search Results" id="searchResults">
+                        
+                    </optgroup>
+                    
+                    <option disabled></option>
 
                     @if (Model.PendingUsersProfiles.Count > 0)
                     {
-                        <option value="">Pending Users...</option>
-
+                        <optgroup label="Pending Users" id="pendingUsers">
                         @foreach (var user in Model.PendingUsersProfiles)
                         {
                             <option title="Pending" value="@user.EmployeeId">
                                 @(user.LName + ", " + user.FName)
                             </option>
                         }
+                        </optgroup>
                     }
                 </select>
             </div>
