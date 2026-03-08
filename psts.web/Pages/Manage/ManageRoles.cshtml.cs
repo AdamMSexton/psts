@@ -38,7 +38,7 @@ namespace psts.web.Pages.Manage
             _userManager = userManager;
         }
 
-        public async Task OnGetAsync(string? userQuery)
+        public async Task OnGetAsync()
         {
             // Get list of pending users
             var pendingUserList = await _userManager.GetUsersInRoleAsync(nameof(RoleTypes.Pending));
@@ -56,14 +56,14 @@ namespace psts.web.Pages.Manage
             if (string.IsNullOrWhiteSpace(SelectedUserId))
             {
                 ModelState.AddModelError(string.Empty, "No user selected.");
-                await OnGetAsync(null); // repopulate lists
+                await OnGetAsync(); // repopulate lists
                 return Page();
             }
 
             if (string.IsNullOrWhiteSpace(TargetRole))
             {
                 ModelState.AddModelError(string.Empty, "Select a target role.");
-                await OnGetAsync(null);
+                await OnGetAsync();
                 return Page();
             }
 
@@ -71,7 +71,7 @@ namespace psts.web.Pages.Manage
             if (SelectedUser == null)
             {
                 ModelState.AddModelError(string.Empty, "Unable to find selected user.");
-                await OnGetAsync(null);
+                await OnGetAsync();
                 return Page();
             }
 
@@ -85,7 +85,7 @@ namespace psts.web.Pages.Manage
                 if (!result.Success)
                 {
                     ModelState.AddModelError(string.Empty, "Unable to change role. " + result.Error);
-                    await OnGetAsync(null);
+                    await OnGetAsync();
                     return Page();
                 }
             }

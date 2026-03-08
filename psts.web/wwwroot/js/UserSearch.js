@@ -28,7 +28,7 @@ function updateSearchResults(_resultsBox, _results) {
     _resultsBox.replaceChildren();
     _results.forEach(user => {
         const option = document.createElement("option")
-        option.value = user.UserId;
+        option.value = user.userId;
         option.title = user.role;
         option.textContent = user.lName + ", " + user.fName;
 
