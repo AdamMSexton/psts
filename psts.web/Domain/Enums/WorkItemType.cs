@@ -1,6 +1,6 @@
 ﻿namespace psts.web.Domain.Enums
 {
-    public enum ShortCodeType
+    public enum WorkItemType
     {
         NotFound = 0,
         Client = 1,

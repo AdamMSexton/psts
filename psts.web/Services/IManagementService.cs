@@ -18,5 +18,7 @@ namespace psts.web.Services
         Task<ServiceResult<PstsClientProfile>> GetClient(Guid clientId);
         Task<ServiceResult<PstsProjectDefinition>> GetProject(Guid projectId);
         Task<ServiceResult<PstsTaskDefinition>> GetTask(Guid taskId);
+
+        Task<ServiceResult<List<UserListItemDto>>> SearchUsers(string _searchString);
     }
 }

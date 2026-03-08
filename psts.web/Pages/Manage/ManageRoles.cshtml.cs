@@ -16,17 +16,13 @@ using Microsoft.IdentityModel.Tokens;
 namespace psts.web.Pages.Manage
 {
     [Authorize(Roles = nameof(RoleTypes.Manager))] // Restrict access to only Manager users
-    
-    
-    
-    public class ManageRolesModel : PageModel
+    public class ManageRolesModel : SearchPageModel
     {
         private readonly PstsDbContext _db;
         private readonly UserManager<AppUser> _userManager;
-        private readonly IManagementService _management;
 
         public string? Query { get; set; }
-        public IList<UserDisplayDto>? SearchResults { get; set; } = new List<UserDisplayDto>();
+        public IList<UserListItemDto>? SearchResults { get; set; } = new List<UserListItemDto>();
         public IList<PstsUserProfile>? PendingUsersProfiles { get; set; }
 
         // bind posted form fields
@@ -36,14 +32,13 @@ namespace psts.web.Pages.Manage
 
 
 
-        public ManageRolesModel(PstsDbContext db, UserManager<AppUser> userManager, IManagementService management)
+        public ManageRolesModel(PstsDbContext db, UserManager<AppUser> userManager, IManagementService management) : base(management)
         {
             _db = db;
             _userManager = userManager;
-            _management = management;
         }
 
-        public async Task OnGetAsync(string? q)
+        public async Task OnGetAsync(string? userQuery)
         {
             // Get list of pending users
             var pendingUserList = await _userManager.GetUsersInRoleAsync(nameof(RoleTypes.Pending));
@@ -52,46 +47,6 @@ namespace psts.web.Pages.Manage
 
             PendingUsersProfiles = await _db.PstsUserProfiles.Where(p => pendingIds.Contains(p.EmployeeId)).ToListAsync();
 
-            if (q != null)
-            {
-                q = q.ToLower();
-
-                var terms = q.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                var query = _db.PstsUserProfiles.AsQueryable();
-
-                foreach (var term in terms)
-                {
-                    query = query.Where(p =>
-                        p.FName.ToLower().StartsWith(term) ||
-                        p.LName.ToLower().StartsWith(term));
-                }
-
-                // Find user profiles that meet query (First or Last name, first characters)
-                var searchResults = await query
-                    .Take(50)
-                    .ToListAsync();
-
-                // Extract ids from searchResults
-                var searchIds = searchResults.Select(p => p.EmployeeId).ToList();
-
-                // Get roles for those Ids
-                var roleByUserId = await (
-                    from ur in _db.UserRoles
-                    join r in _db.Roles on ur.RoleId equals r.Id
-                    where searchIds.Contains(ur.UserId)
-                    select new { ur.UserId, RoleName = r.Name }
-                ).ToDictionaryAsync(x => x.UserId, x => x.RoleName);
-
-
-                SearchResults = searchResults.Select(p => new UserDisplayDto
-                {
-                    EmployeeId = p.EmployeeId,
-                    FName = p.FName,
-                    LName = p.LName,
-                    Role = roleByUserId.TryGetValue(p.EmployeeId, out var role) ? role : null
-                }).ToList();
-            }
         }
 
         public async Task<IActionResult> OnPostAsync()

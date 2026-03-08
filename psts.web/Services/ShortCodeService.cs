@@ -158,7 +158,7 @@ namespace psts.web.Services
                 }
 
 
-                if ((!Enum.IsDefined(typeof(ShortCodeType), _type)) || (_type == ShortCodeType.NotFound))
+                if ((!Enum.IsDefined(typeof(WorkItemType), _type)) || (_type == WorkItemType.NotFound))
                 {
                     return ServiceResult<bool>.Fail("Invalid ShortCode Type.");
                 }
@@ -172,7 +172,7 @@ namespace psts.web.Services
                 // Branch by type then calidate there is a matching Id, then change and write teh shortcode.
                 switch (_type)
                 {
-                    case ShortCodeType.Client:
+                    case WorkItemType.Client:
                         var clientIdCheck = await _db.PstsClientProfiles.SingleOrDefaultAsync(te => te.ClientId == _entityId);
                         if (clientIdCheck == null)
                         {
@@ -182,7 +182,7 @@ namespace psts.web.Services
                         await _db.SaveChangesAsync();
                         return ServiceResult<bool>.Ok(true);
 
-                    case ShortCodeType.Project:
+                    case WorkItemType.Project:
                         var projectIdCheck = await _db.PstsProjectDefinitions.SingleOrDefaultAsync(te => te.ProjectId == _entityId);
                         if (projectIdCheck == null)
                         {
@@ -192,7 +192,7 @@ namespace psts.web.Services
                         await _db.SaveChangesAsync();
                         return ServiceResult<bool>.Ok(true);
                     
-                    case ShortCodeType.Task:
+                    case WorkItemType.Task:
                         var taskIdCheck = await _db.PstsTaskDefinitions.SingleOrDefaultAsync(te => te.TaskId == _entityId);
                         if (taskIdCheck == null)
                         {

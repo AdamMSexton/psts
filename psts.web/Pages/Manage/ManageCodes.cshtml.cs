@@ -58,7 +58,7 @@ namespace psts.web.Pages.Manage
         public string? TaskDescription { get; set; }
 
         // Used to tell the view what type was found after a shortcode lookup
-        public ShortCodeType? FoundType { get; set; }
+        public WorkItemType? FoundType { get; set; }
 
         public string? Message { get; set; }
 
@@ -79,7 +79,7 @@ namespace psts.web.Pages.Manage
                 {
                     var data = decodeShortCode.Data;
 
-                    if (data.Type == ShortCodeType.NotFound)
+                    if (data.Type == WorkItemType.NotFound)
                     {
                         // Short code does not exist, prompt user to create
                         Message = $"Short code '{Shortcode}' does not exist. You can create it using the Create New button.";
@@ -91,7 +91,7 @@ namespace psts.web.Pages.Manage
                     RecordTypeSearch = data.Type.ToString();
                     RecordId = data.Id;
 
-                    if (data.Type == ShortCodeType.Client && data.Id.HasValue)
+                    if (data.Type == WorkItemType.Client && data.Id.HasValue)
                     {
                         // Fetch the full client record by ID, includes child project and its child task
                         var clientResult = await _management.GetClient(data.Id.Value);
@@ -122,7 +122,7 @@ namespace psts.web.Pages.Manage
                             Message = "Short code found but failed to load client record.";
                         }
                     }
-                    else if (data.Type == ShortCodeType.Project && data.Id.HasValue)
+                    else if (data.Type == WorkItemType.Project && data.Id.HasValue)
                     {
                         // Fetch the full project record by ID, includes parent Client and child task
                         var projectResult = await _management.GetProject(data.Id.Value);
@@ -144,7 +144,7 @@ namespace psts.web.Pages.Manage
                             Message = "Short code found but failed to load project record.";
                         }
                     }
-                    else if (data.Type == ShortCodeType.Task && data.Id.HasValue)
+                    else if (data.Type == WorkItemType.Task && data.Id.HasValue)
                     {
                         // Fetch the full task record by ID, includes parent Project and grandparent Client
                         var taskResult = await _management.GetTask(data.Id.Value);
@@ -239,7 +239,7 @@ namespace psts.web.Pages.Manage
                     }
 
                     var parentDecode = await _scs.DecodeShortCode(ParentShortCode);
-                    if (!parentDecode.Success || parentDecode.Data.Type != ShortCodeType.Client || !parentDecode.Data.Id.HasValue)
+                    if (!parentDecode.Success || parentDecode.Data.Type != WorkItemType.Client || !parentDecode.Data.Id.HasValue)
                     {
                         Message = "Parent client short code is invalid or not a client.";
                         return Page();
@@ -287,7 +287,7 @@ namespace psts.web.Pages.Manage
                     }
 
                     var parentDecode = await _scs.DecodeShortCode(ParentShortCode);
-                    if (!parentDecode.Success || parentDecode.Data.Type != ShortCodeType.Project || !parentDecode.Data.Id.HasValue)
+                    if (!parentDecode.Success || parentDecode.Data.Type != WorkItemType.Project || !parentDecode.Data.Id.HasValue)
                     {
                         Message = "Parent project short code is invalid or not a project.";
                         return Page();

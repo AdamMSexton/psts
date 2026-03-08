@@ -18,7 +18,7 @@ namespace psts.web.Services
             _settings = settings;
         }
 
-        public async Task<ServiceResult<Guid>> EnterNewTimeTransaction(string _requestorId, RoleTypes _requestorRole, NewTimeTransactionDto _newTransactionData)
+        public async Task<ServiceResult<Guid>> CreateNewTimeTransaction(string _requestorId, RoleTypes _requestorRole, NewTimeTransactionDto _newTransactionData)
         {
             try
             {
@@ -43,6 +43,7 @@ namespace psts.web.Services
                 // Build new ticket
                 var newTimeTransaction = new PstsTimeTransactions();
                 newTimeTransaction.TransactionId = new Guid();
+                newTimeTransaction.TransactionId = Guid.NewGuid();
 
                 // Verify TaskId
                 bool validTask = await _db.PstsTaskDefinitions.AnyAsync(u => u.TaskId == _newTransactionData.TaskId);
@@ -85,23 +86,8 @@ namespace psts.web.Services
                 // Store notes
                 newTimeTransaction.Notes = _newTransactionData.Notes;
 
-                // If this is an adjustment transaction then verify a Related Id is supplied
-                if (_newTransactionData.IsAdjustment)
-                {
-                    if (_newTransactionData.RelatedId == null)
-                    {
-                        return ServiceResult<Guid>.Fail("Ticket is an adjustment but has no related ticket Id.");
-                    }
-                    
-                    bool validRelatedTicket = await _db.PstsTimeTransactionss.AnyAsync(u => u.TransactionId == _newTransactionData.RelatedId);
-                    if (!validRelatedTicket)
-                    {
-                        return ServiceResult<Guid>.Fail("Ticket is an adjustment but related ticket Id is not valid.");
-                    }
-                }
-                newTimeTransaction.IsAdjustment = _newTransactionData.IsAdjustment;
-                newTimeTransaction.RelatedId = _newTransactionData.RelatedId;
-
+                newTimeTransaction.IsAdjustment = false;
+                newTimeTransaction.RelatedId = null;
 
                 await _db.PstsTimeTransactionss.AddAsync(newTimeTransaction);
                 await _db.SaveChangesAsync();
@@ -113,7 +99,63 @@ namespace psts.web.Services
                 return ServiceResult<Guid>.Fail(ex.Message);
             }
         }
+        public async Task<ServiceResult<Guid>> CreateTimeTransactionAdjustment(string _requestorId, RoleTypes _requestorRole, NewTimeTransactionAdjustmentDto _newAdjustmentData)
+        {
+            try
+            {
+                // Validate requestor inputs
+                bool validRequestor = await _db.PstsUserProfiles.AnyAsync(u => u.EmployeeId == _requestorId);
 
+                if ((_requestorId == null) || (validRequestor == false))
+                {
+                    return ServiceResult<Guid>.Fail("Invalid requestor Id.");
+                }
+
+                if (!Enum.IsDefined(typeof(RoleTypes), _requestorRole))
+                {
+                    return ServiceResult<Guid>.Fail("Invalid role.");
+                }
+
+                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Employee))
+                {
+                    return ServiceResult<Guid>.Fail("Insufficient privileges.");
+                }
+
+                // Get existing ticket
+                var ticketToAmmend = await _db.PstsTimeTransactionss.FindAsync(_newAdjustmentData.TransactionToAdjust);
+                if (ticketToAmmend == null)
+                {
+                    return ServiceResult<Guid>.Fail("Transaction to ammend not found.");
+                }
+
+                // Build adjustment transaction for ticket register
+                PstsTimeTransactions newAdjustment = new PstsTimeTransactions()
+                {
+                    TaskId = ticketToAmmend.TaskId,
+                    EnteredBy = _requestorId,               // The Adjustment was entered by the requestor. Does not carry from original transaction
+                    WorkCompletedBy = ticketToAmmend.WorkCompletedBy,
+                    WorkCompletedDate = ticketToAmmend.WorkCompletedDate,
+                    IsAdjustment = true,
+                    RelatedId = ticketToAmmend.RelatedId,
+                    WorkCompletedHours = _newAdjustmentData.RevisedWorkCompletedHours,          // Take new notes, old hours and notes and build new note.
+                    Notes = _newAdjustmentData.AdjustmentNotes + "\nOriginal Entry:\n Previous Hours: "
+                            + ticketToAmmend.WorkCompletedHours + "\nPrevious Notes\n" + ticketToAmmend.Notes
+                };
+
+                await _db.PstsTimeTransactionss.AddAsync(newAdjustment);
+                await _db.SaveChangesAsync();
+
+                return ServiceResult<Guid>.Ok(newAdjustment.TransactionId);
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<Guid>.Fail(ex.Message);
+            }
+        }
         public async Task<ServiceResult<bool>> AdjudicateTransactionAdjustment(string _requestorId, RoleTypes _requestorRole, ApprovalDecisionDto _decision)
         {
             try
@@ -182,6 +224,47 @@ namespace psts.web.Services
             {
                 return ServiceResult<bool>.Fail(ex.Message);
             }
+        }
+        public async Task<ServiceResult<List<UnadjudicatedAdjustmentItem>>> FindUnadjudicatedTransactionAdjustments(DateTime? _StartEnteredDate, DateTime? _EndEnteredDate)
+        {
+            var pendingAdjustments = await _db.PstsTimeTransactionss
+                .Where(t => t.IsAdjustment && t.RelatedApproval == null)
+                .ToListAsync();
+
+            List<UnadjudicatedAdjustmentItem> unadjudicatedAdjustments = new();
+
+            bool infiniteStartDate = false;
+            bool infiniteEndDate = false;
+
+            if (_StartEnteredDate == null)
+            {
+                infiniteStartDate = true;
+            }
+
+            if (_EndEnteredDate == null)
+            {
+                infiniteEndDate = true;
+            }
+
+            foreach (var transaction in pendingAdjustments)
+            {
+               
+                if ((transaction.EnteredTimeStamp >= _StartEnteredDate) || (infiniteStartDate))     // Transaction was after search start or infinite
+                {
+                    if ((transaction.EnteredTimeStamp <= _EndEnteredDate) || (infiniteEndDate))     // Transaction was before search end or infinite  
+                    {
+                        unadjudicatedAdjustments.Add(new UnadjudicatedAdjustmentItem
+                        {
+                            OriginalTransaction = transaction.TransactionId,
+                            OriginalDateEntered = transaction.RelatedTransaction.EnteredTimeStamp,
+                            AdjustmentTransaction = (Guid)transaction.RelatedId,
+                            AdjustmentDateEntered = transaction.EnteredTimeStamp
+                        });
+                    }
+                }
+            }
+
+            return ServiceResult<List<UnadjudicatedAdjustmentItem>>.Ok(unadjudicatedAdjustments);
         }
     }
 }
