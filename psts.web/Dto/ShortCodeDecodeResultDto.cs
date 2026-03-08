@@ -4,7 +4,7 @@ namespace psts.web.Dto
 {
     public class ShortCodeDecodeResultDto
     {
-        public ShortCodeType Type { get; set; }
+        public WorkItemType Type { get; set; }
         public string? ShortCode { get; set; }
         public Guid? Id { get; set; }
     }

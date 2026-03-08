@@ -32,7 +32,7 @@ namespace psts.web.Services
                 {
                     return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                     {
-                        Type = ShortCodeType.Task,
+                        Type = WorkItemType.Task,
                         ShortCode = taskShortCode.ShortCode,
                         Id = taskShortCode.TaskId
                     });
@@ -44,7 +44,7 @@ namespace psts.web.Services
                 {
                     return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                     {
-                        Type = ShortCodeType.Project,
+                        Type = WorkItemType.Project,
                         ShortCode = projectShortCode.ShortCode,
                         Id = projectShortCode.ProjectId
                     });
@@ -56,7 +56,7 @@ namespace psts.web.Services
                 {
                     return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                     {
-                        Type = ShortCodeType.Client,
+                        Type = WorkItemType.Client,
                         ShortCode = clientShortCode.ShortCode,
                         Id = clientShortCode.ClientId
                     });
@@ -65,7 +65,7 @@ namespace psts.web.Services
                 // Short code not found
                 return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                 {
-                    Type = ShortCodeType.NotFound,
+                    Type = WorkItemType.NotFound,
                     ShortCode = null,
                     Id = null
                 });
@@ -93,7 +93,7 @@ namespace psts.web.Services
                 {
                     return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                     {
-                        Type = ShortCodeType.Task,
+                        Type = WorkItemType.Task,
                         ShortCode = taskShortCode.ShortCode,
                         Id = taskShortCode.TaskId
                     });
@@ -105,7 +105,7 @@ namespace psts.web.Services
                 {
                     return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                     {
-                        Type = ShortCodeType.Project,
+                        Type = WorkItemType.Project,
                         ShortCode = projectShortCode.ShortCode,
                         Id = projectShortCode.ProjectId
                     });
@@ -117,7 +117,7 @@ namespace psts.web.Services
                 {
                     return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                     {
-                        Type = ShortCodeType.Client,
+                        Type = WorkItemType.Client,
                         ShortCode = clientShortCode.ShortCode,
                         Id = clientShortCode.ClientId
                     });
@@ -126,7 +126,7 @@ namespace psts.web.Services
                 // Short code not found
                 return ServiceResult<ShortCodeDecodeResultDto>.Ok(new ShortCodeDecodeResultDto
                 {
-                    Type = ShortCodeType.NotFound,
+                    Type = WorkItemType.NotFound,
                     ShortCode = null,
                     Id = null
                 });
@@ -137,7 +137,7 @@ namespace psts.web.Services
                 return ServiceResult<ShortCodeDecodeResultDto>.Fail(ex.Message);
             }
         }
-        public async Task<ServiceResult<bool>> ChangeShortCode(string _requestorId, RoleTypes _requestorRole, ShortCodeType _type, Guid _entityId, string? _newShortCode)
+        public async Task<ServiceResult<bool>> ChangeShortCode(string _requestorId, RoleTypes _requestorRole, WorkItemType   _type, Guid _entityId, string? _newShortCode)
         {
             try
             {
