@@ -4,54 +4,17 @@
     ViewData["Title"] = "Role Management - PSTS Solutions";
 }
 
+<script src="~/js/UserSearch.js"></script>
+<script>    
+    document.addEventListener('DOMContentLoaded', function() 
+    {
+        InitalizeUserSearch("userQuery","searchResults","/Manage/ManageRoles?handler=Search");
+    });
+</script>
+
+
 <h2 style="text-align:center; margin-top:1rem;">Role Management</h2>
 
-
-
-<script> // TEST SCRIPT ONLY
-    document.addEventListener("DOMContentLoaded", async function () 
-    {
-        let debounceTimer;
-
-        const searchResults = document.getElementById("searchResults");
-
-        console.log(searchResults);
-        
-        document.getElementById("userQuery").addEventListener("input", function ()
-           {
-            const term = this.value;
-            if (term.length > 2)
-            {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(async () => 
-                {
-                    const response = await fetch("/Manage/ManageRoles?handler=Search&term=" + encodeURIComponent(term));
-                    const data = await response.json();
-                    console.log(data);
-
-                    updateSearchResults(searchResults, data);
-                }, 300);
-            }
-        });
-
-    });
-
-    function updateSearchResults(resultsBox, results)
-    {
-        resultsBox.replaceChildren();
-        results.forEach(user => 
-            {
-                const option = document.createElement("option")
-                option.value = user.UserId;
-                option.title = user.role;
-                option.textContent = user.lName + ", " + user.fName;
-
-                resultsBox.appendChild(option);
-            });
-    }
-
-
-</script>
 
 <div class="profile-grid">
 
