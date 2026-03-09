@@ -14,7 +14,7 @@ function InitalizeUserSearch(searchBoxId, resultsBoxId, url)
         if (term.length > 2) {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(async () => {
-                const response = await fetch("/Manage/ManageRoles?handler=Search&term=" + encodeURIComponent(term));
+                const response = await fetch(url + "&term=" + encodeURIComponent(term));
                 const data = await response.json();
                 console.log(data);
 
