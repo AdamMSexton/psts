@@ -6,37 +6,24 @@
 
     var mode = Request.Query["mode"].ToString()?.ToLower() ?? "";
     var isCreate = mode == "create";
-    var isUpdate = mode == "update" || Model.FoundType != null;
+    var isUpdate = Model.FoundType != null;
+    var showRight = isCreate || isUpdate;
 
-    // FIX: Show right panel whenever a record type is selected
-    bool showRight = !string.IsNullOrEmpty(Model.RecordTypeSearch) || isCreate || isUpdate;
-
-    string rightHeader = isCreate ? "Create" : isUpdate ? "Update" : "Create or Update";
-    string rightButton = isCreate ? "Submit" : isUpdate ? "Update" : "Submit / Update";
+    string rightHeader = isCreate ? "Create" : isUpdate ? "Update" : "";
+    string rightButton = isCreate ? "Create" : "Update";
 }
 
 <h2 style="text-align:center; margin-top:1rem;">Manage Codes</h2>
 
 <div class="profile-grid" style="align-items:stretch;">
 
-    <!-- LEFT PANEL -->
+    <!-- LEFT PANEL — short code lookup, always visible -->
     <div id="manageLookup"
          class="profile-box"
          style="display:flex; flex-direction:column; justify-content:center; min-height:18rem;">
         <h2>Lookup Short Code</h2>
 
         <form method="get">
-            <div class="form-group">
-                <p>Record Type:</p>
-                <select name="recordTypeSearch"
-                        style="width:100%; padding:0.625rem; background-color:var(--primary-bg-color); color:white; border:0.0625rem solid var(--border-bg); border-radius:0.25rem;">
-                    <option value="">-- Select --</option>
-                    <option value="Client" selected="@(Model.RecordTypeSearch == "Client")">Client</option>
-                    <option value="Project" selected="@(Model.RecordTypeSearch == "Project")">Project</option>
-                    <option value="Task" selected="@(Model.RecordTypeSearch == "Task")">Task</option>
-                </select>
-            </div>
-
             <div class="form-group">
                 <p>Enter Short Code:</p>
                 <input type="text"
@@ -51,15 +38,16 @@
                 <button type="submit" name="mode" value="create" class="btn-primary" style="width:100%;">
                     Create New
                 </button>
-
-                <button type="submit" name="mode" value="update" class="btn-primary" style="width:100%;">
-                    Update
-                </button>
             </div>
         </form>
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <p class="error-text" style="margin-top:1rem;">@Model.Message</p>
+        }
     </div>
 
-    <!-- RIGHT PANEL -->
+    <!-- RIGHT PANEL — appears when short code found or Create clicked -->
     @if (showRight)
     {
         <div id="manageUpdate"
@@ -73,83 +61,199 @@
                 <input type="hidden" name="parentId" value="@Model.ParentId" />
                 <input type="hidden" name="recordType" value="@Model.RecordTypeSearch" />
 
-                <!-- CLIENT FIELDS -->
-                @if (Model.RecordTypeSearch == "Client")
+                <!-- CREATE FORM — short code input, type dropdown, then type-specific fields -->
+                @if (isCreate)
                 {
-                    <h3>Client</h3>
-
                     <div class="form-group">
-                        <p>Client Name:</p>
-                        <input type="text" name="clientName" value="@Model.ClientName" placeholder="Client name..." />
+                        <p>Short Code:</p>
+                        <input type="text" name="shortcode" placeholder="Short code..." value="@Model.Shortcode" />
                     </div>
 
                     <div class="form-group">
-                        <p>POC First Name:</p>
-                        <input type="text" name="clientPOCfName" value="@Model.ClientPOCfName" placeholder="First name..." />
+                        <p>Record Type:</p>
+                        <select name="recordTypeSearch"
+                                style="width:100%; padding:0.625rem; background-color:var(--primary-bg-color); color:white; border:0.0625rem solid var(--border-bg); border-radius:0.25rem;">
+                            <option value="">-- Select --</option>
+                            <option value="Client" selected="@(Model.RecordTypeSearch == "Client")">Client</option>
+                            <option value="Project" selected="@(Model.RecordTypeSearch == "Project")">Project</option>
+                            <option value="Task" selected="@(Model.RecordTypeSearch == "Task")">Task</option>
+                        </select>
                     </div>
 
-                    <div class="form-group">
-                        <p>POC Last Name:</p>
-                        <input type="text" name="clientPOClName" value="@Model.ClientPOClName" placeholder="Last name..." />
-                    </div>
+                    <!-- Client create fields — only shown when Client selected -->
+                    @if (Model.RecordTypeSearch == "Client")
+                    {
+                        <div class="form-group">
+                            <p>Client Name:</p>
+                            <input type="text" name="clientName" value="@Model.ClientName" placeholder="Client name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>POC First Name:</p>
+                            <input type="text" name="clientPOCfName" value="@Model.ClientPOCfName" placeholder="First name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>POC Last Name:</p>
+                            <input type="text" name="clientPOClName" value="@Model.ClientPOClName" placeholder="Last name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>POC Email:</p>
+                            <input type="text" name="clientPOCeMail" value="@Model.ClientPOCeMail" placeholder="Email..." />
+                        </div>
+                        <div class="form-group">
+                            <p>POC Phone:</p>
+                            <input type="text" name="clientPOCtPhone" value="@Model.ClientPOCtPhone" placeholder="Phone..." />
+                        </div>
+                    }
 
-                    <div class="form-group">
-                        <p>POC Email:</p>
-                        <input type="text" name="clientPOCeMail" value="@Model.ClientPOCeMail" placeholder="Email..." />
-                    </div>
-
-                    <div class="form-group">
-                        <p>POC Phone:</p>
-                        <input type="text" name="clientPOCtPhone" value="@Model.ClientPOCtPhone" placeholder="Phone..." />
-                    </div>
-                }
-
-                <!-- PROJECT FIELDS -->
-                @if (Model.RecordTypeSearch == "Project")
-                {
-                    <h3>Project</h3>
-
-                    @if (isCreate)
+                    <!-- Project create fields — only shown when Project selected -->
+                    @if (Model.RecordTypeSearch == "Project")
                     {
                         <div class="form-group">
                             <p>Parent Client Short Code:</p>
                             <input type="text" name="parentShortCode" value="@Model.ParentShortCode" placeholder="Client short code..." />
                         </div>
+                        <div class="form-group">
+                            <p>Project Name:</p>
+                            <input type="text" name="projectName" value="@Model.ProjectName" placeholder="Project name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>Project Description:</p>
+                            <input type="text" name="projectDescription" value="@Model.ProjectDescription" placeholder="Project description..." />
+                        </div>
                     }
 
-                    <div class="form-group">
-                        <p>Project Name:</p>
-                        <input type="text" name="projectName" value="@Model.ProjectName" placeholder="Project name..." />
-                    </div>
-
-                    <div class="form-group">
-                        <p>Project Description:</p>
-                        <input type="text" name="projectDescription" value="@Model.ProjectDescription" placeholder="Project description..." />
-                    </div>
-                }
-
-                <!-- TASK FIELDS -->
-                @if (Model.RecordTypeSearch == "Task")
-                {
-                    <h3>Task</h3>
-
-                    @if (isCreate)
+                    <!-- Task create fields — only shown when Task selected -->
+                    @if (Model.RecordTypeSearch == "Task")
                     {
                         <div class="form-group">
                             <p>Parent Project Short Code:</p>
                             <input type="text" name="parentShortCode" value="@Model.ParentShortCode" placeholder="Project short code..." />
                         </div>
+                        <div class="form-group">
+                            <p>Task Name:</p>
+                            <input type="text" name="taskName" value="@Model.TaskName" placeholder="Task name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>Task Description:</p>
+                            <input type="text" name="taskDescription" value="@Model.TaskDescription" placeholder="Task description..." />
+                        </div>
+                    }
+                }
+
+                <!-- UPDATE FORM — populated from short code lookup, children shown below, never parents -->
+                @if (isUpdate)
+                {
+                    <!-- Client lookup — shows client fields + child projects + their tasks -->
+                    @if (Model.FoundType == psts.web.Domain.Enums.WorkItemType.Client)
+                    {
+                        <h3>Client</h3>
+                        <div class="form-group">
+                            <p>Client Name:</p>
+                            <input type="text" name="clientName" value="@Model.ClientName" placeholder="Client name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>POC First Name:</p>
+                            <input type="text" name="clientPOCfName" value="@Model.ClientPOCfName" placeholder="First name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>POC Last Name:</p>
+                            <input type="text" name="clientPOClName" value="@Model.ClientPOClName" placeholder="Last name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>POC Email:</p>
+                            <input type="text" name="clientPOCeMail" value="@Model.ClientPOCeMail" placeholder="Email..." />
+                        </div>
+                        <div class="form-group">
+                            <p>POC Phone:</p>
+                            <input type="text" name="clientPOCtPhone" value="@Model.ClientPOCtPhone" placeholder="Phone..." />
+                        </div>
+
+                        <!-- Child projects — read-only, look up project directly to edit -->
+                        @if (Model.EditableProjects.Any())
+                        {
+                            <h3>Projects</h3>
+                            @for (int i = 0; i < Model.EditableProjects.Count; i++)
+                            {
+                                <input type="hidden" name="EditableProjects[@i].ProjectId" value="@Model.EditableProjects[i].ProjectId" />
+                                <div class="form-group">
+                                    <p>Project Name:</p>
+                                    <input type="text" value="@Model.EditableProjects[i].ProjectName" readonly />
+                                </div>
+                                <div class="form-group">
+                                    <p>Short Code:</p>
+                                    <input type="text" value="@Model.EditableProjects[i].ShortCode" readonly />
+                                </div>
+
+                                <!-- Child tasks under each project — also read-only at client level -->
+                                @if (Model.EditableProjects[i].Tasks.Any())
+                                {
+                                    <p><strong>Tasks:</strong></p>
+                                    @for (int j = 0; j < Model.EditableProjects[i].Tasks.Count; j++)
+                                    {
+                                        <input type="hidden" name="EditableProjects[@i].Tasks[@j].TaskId" value="@Model.EditableProjects[i].Tasks[j].TaskId" />
+                                        <div class="form-group">
+                                            <p>Task Name:</p>
+                                            <input type="text" value="@Model.EditableProjects[i].Tasks[j].TaskName" readonly />
+                                        </div>
+                                        <div class="form-group">
+                                            <p>Short Code:</p>
+                                            <input type="text" value="@Model.EditableProjects[i].Tasks[j].ShortCode" readonly />
+                                        </div>
+                                    }
+                                }
+                            }
+                        }
                     }
 
-                    <div class="form-group">
-                        <p>Task Name:</p>
-                        <input type="text" name="taskName" value="@Model.TaskName" placeholder="Task name..." />
-                    </div>
+                    <!-- Project lookup — shows project fields + child tasks only, no parent client -->
+                    @if (Model.FoundType == psts.web.Domain.Enums.WorkItemType.Project)
+                    {
+                        <h3>Project</h3>
+                        <div class="form-group">
+                            <p>Project Name:</p>
+                            <input type="text" name="projectName" value="@Model.ProjectName" placeholder="Project name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>Project Description:</p>
+                            <input type="text" name="projectDescription" value="@Model.ProjectDescription" placeholder="Project description..." />
+                        </div>
 
-                    <div class="form-group">
-                        <p>Task Description:</p>
-                        <input type="text" name="taskDescription" value="@Model.TaskDescription" placeholder="Task description..." />
-                    </div>
+                        <!-- Child tasks — editable inline list, all save on one submit -->
+                        @if (Model.EditableTasks.Any())
+                        {
+                            <h3>Tasks</h3>
+                            @for (int i = 0; i < Model.EditableTasks.Count; i++)
+                            {
+                                <input type="hidden" name="EditableTasks[@i].TaskId" value="@Model.EditableTasks[i].TaskId" />
+                                <div class="form-group">
+                                    <p>Task Name:</p>
+                                    <input type="text" name="EditableTasks[@i].TaskName" value="@Model.EditableTasks[i].TaskName" />
+                                </div>
+                                <div class="form-group">
+                                    <p>Task Description:</p>
+                                    <input type="text" name="EditableTasks[@i].TaskDescription" value="@Model.EditableTasks[i].TaskDescription" />
+                                </div>
+                                <div class="form-group">
+                                    <p>Short Code:</p>
+                                    <input type="text" name="EditableTasks[@i].ShortCode" value="@Model.EditableTasks[i].ShortCode" />
+                                </div>
+                            }
+                        }
+                    }
+
+                    <!-- Task lookup — shows task fields only, no parent project or client -->
+                    @if (Model.FoundType == psts.web.Domain.Enums.WorkItemType.Task)
+                    {
+                        <h3>Task</h3>
+                        <div class="form-group">
+                            <p>Task Name:</p>
+                            <input type="text" name="taskName" value="@Model.TaskName" placeholder="Task name..." />
+                        </div>
+                        <div class="form-group">
+                            <p>Task Description:</p>
+                            <input type="text" name="taskDescription" value="@Model.TaskDescription" placeholder="Task description..." />
+                        </div>
+                    }
                 }
 
                 <button type="submit" class="btn-primary">@rightButton</button>
@@ -157,10 +261,3 @@
         </div>
     }
 </div>
-
-@if (!string.IsNullOrEmpty(Model.Message))
-{
-    <p class="error-text" style="margin-top:1.5rem; text-align:center;">
-        @Model.Message
-    </p>
-}

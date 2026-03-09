@@ -477,9 +477,10 @@ namespace psts.web.Services
         {
             try
             {
-                // Fetch client and include its one project, and that project's one task
+                // Fetch client and include all its projects, and each project's tasks
                 var client = await _db.PstsClientProfiles
-                    .Include(c => c.EmployeePOC)
+                    .Include(c => c.Projects)
+                        .ThenInclude(p => p.Tasks)
                     .FirstOrDefaultAsync(c => c.ClientId == clientId);
 
                 if (client == null)
@@ -487,25 +488,11 @@ namespace psts.web.Services
                     return ServiceResult<PstsClientProfile>.Fail("Client not found.");
                 }
 
-                // Also fetch the project under this client if one exists
-                var project = await _db.PstsProjectDefinitions
-                    .Include(p => p.EmployeePOC)
-                    .FirstOrDefaultAsync(p => p.ClientId == clientId);
-
-                if (project != null)
-                {
-                    // Also fetch the task under this project if one exists
-                    //project.Task = await _db.PstsTaskDefinitions
-                    //    .FirstOrDefaultAsync(t => t.ProjectId == project.ProjectId);
-
-                    //client.Project = project;
-                }
-
                 return ServiceResult<PstsClientProfile>.Ok(client);
             }
             catch (Exception ex)
             {
-                return ServiceResult<PstsClientProfile>.Fail(ex.Message);
+                return ServiceResult<PstsClientProfile>.Fail(ex.InnerException?.Message ?? ex.Message);
             }
         }
 
@@ -513,10 +500,10 @@ namespace psts.web.Services
         {
             try
             {
-                // Fetch project and include its parent client
+                // Fetch project and include its parent client and all its tasks
                 var project = await _db.PstsProjectDefinitions
                     .Include(p => p.Client)
-                    .Include(p => p.EmployeePOC)
+                    .Include(p => p.Tasks)
                     .FirstOrDefaultAsync(p => p.ProjectId == projectId);
 
                 if (project == null)
@@ -524,15 +511,11 @@ namespace psts.web.Services
                     return ServiceResult<PstsProjectDefinition>.Fail("Project not found.");
                 }
 
-                // Also fetch the task under this project if one exists
-                //project.Task = await _db.PstsTaskDefinitions
-                //    .FirstOrDefaultAsync(t => t.ProjectId == projectId);
-
                 return ServiceResult<PstsProjectDefinition>.Ok(project);
             }
             catch (Exception ex)
             {
-                return ServiceResult<PstsProjectDefinition>.Fail(ex.Message);
+                return ServiceResult<PstsProjectDefinition>.Fail(ex.InnerException?.Message ?? ex.Message);
             }
         }
 
@@ -555,7 +538,7 @@ namespace psts.web.Services
             }
             catch (Exception ex)
             {
-                return ServiceResult<PstsTaskDefinition>.Fail(ex.Message);
+                return ServiceResult<PstsTaskDefinition>.Fail(ex.InnerException?.Message ?? ex.Message);
             }
         }
 
