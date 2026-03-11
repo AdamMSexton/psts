@@ -615,5 +615,61 @@ namespace psts.web.Services
                 return ServiceResult<List<UserListItemDto>>.Fail(ex.Message);
             }
         }
+    
+        public async Task<ServiceResult<UserSettingsListItemDTO>> GetUserSettings(string _requestorId, RoleTypes _requestorRole, string _targetUser)
+        {
+            try
+            {
+                // Validate requestor inputs
+                if (_requestorId == null)
+                {
+                    return ServiceResult<UserSettingsListItemDTO>.Fail("Invalid Requestor Id.");
+                }
+
+                if (!Enum.IsDefined(typeof(RoleTypes), _requestorRole))
+                {
+                    return ServiceResult<UserSettingsListItemDTO>.Fail("Invalid Role.");
+                }
+
+                // This function is for Admins only
+                if (_requestorRole != RoleTypes.Admin)
+                {
+                    return ServiceResult<UserSettingsListItemDTO>.Fail("Insufficient Privileges.");
+                }
+
+                // Find target employee
+                var targetUserSettings = await _userManager.FindByIdAsync(_targetUser);
+                if (targetUserSettings == null)
+                {
+                    return ServiceResult<UserSettingsListItemDTO>.Fail("User Id not found.");
+                }
+                var targetUserName = await _db.PstsUserProfiles.FindAsync(_targetUser);
+                if (targetUserName == null)
+                {
+                    return ServiceResult<UserSettingsListItemDTO>.Fail("User Id not found.");
+                }
+                var targetUserRole = await _userManager.GetRolesAsync(targetUserSettings);
+                if (targetUserRole == null)
+                {
+                    return ServiceResult<UserSettingsListItemDTO>.Fail("User Id not found.");
+                }
+
+                UserSettingsListItemDTO returnData = new UserSettingsListItemDTO();
+                returnData.UserId = targetUserSettings.Id;
+                returnData.FName = targetUserName.FName;
+                returnData.LName = targetUserName.LName;
+                returnData.Role = targetUserRole[0];
+                returnData.LoginPassAllowed = targetUserSettings.LoginPassAllowed;
+                returnData.OIDCAllowed = targetUserSettings.OIDCAllowed;
+                returnData.ResetPassOnLogin = targetUserSettings.ResetPassOnLogin;
+                returnData.StaleAccountLockoutEnabled = targetUserSettings.StaleAccountLockoutEnabled;
+
+                return ServiceResult<UserSettingsListItemDTO>.Ok(returnData);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<UserSettingsListItemDTO>.Fail("Employee Id not found.");
+            }
+        }
     }
 }
