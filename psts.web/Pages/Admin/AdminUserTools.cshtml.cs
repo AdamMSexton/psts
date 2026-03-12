@@ -16,10 +16,10 @@ using Microsoft.IdentityModel.Tokens;
 namespace psts.web.Pages.Admin
 {
     [Authorize(Roles = nameof(RoleTypes.Admin))] // Restrict access to only Admin users
-    public class AdminUserToolsModel : SearchPageModel
+    public class AdminUserToolsModel : UserAdminPageModel
     {
         private readonly PstsDbContext _db;
-        private readonly UserManager<AppUser> _userManager;
+        //private readonly UserManager<AppUser> _userManager;
 
         public string? Query { get; set; }
         public IList<UserListItemDto>? SearchResults { get; set; } = new List<UserListItemDto>();
@@ -31,10 +31,9 @@ namespace psts.web.Pages.Admin
 
 
 
-        public AdminUserToolsModel(PstsDbContext db, UserManager<AppUser> userManager, IManagementService management) : base(management)
+        public AdminUserToolsModel(PstsDbContext db, UserManager<AppUser> userManager, IManagementService management) : base(management,userManager)
         {
             _db = db;
-            _userManager = userManager;
         }
 
         public async Task OnGetAsync()

@@ -5,10 +5,12 @@
 }
 
 <script src="~/js/UserSearch.js"></script>
+<script src="~/js/UserSettings.js"></script>
 <script>    
     document.addEventListener('DOMContentLoaded', function() 
     {
         InitalizeUserSearch("userQuery","searchResults","/Admin/AdminUserTools?handler=Search");
+        InitalizeUserSettingsFetcher("SelectedUserId","/Admin/AdminUserTools?handler=UserSettings");
     });
 </script>
 
@@ -63,26 +65,26 @@
             <div class="form-group">
                 <p>Set Role:</p>
 
-                <div style="display:flex; align-items:center; gap:1.5rem;">
+                <div style="display:flex; gap:1.5rem;">
 
-                    <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
-                        <input type="radio" name="TargetRole" value="Clerk" />
+                    <label style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; margin:0;">
                         Clerk
+                        <input type="radio" name="SelectedUserRole" value="Clerk" />
                     </label>
 
-                    <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
-                        <input type="radio" name="TargetRole" value="Employee" />
+                    <label style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; margin:0;">
                         Employee
+                        <input type="radio" name="SelectedUserRole" value="Employee" />
                     </label>
 
-                    <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
-                        <input type="radio" name="TargetRole" value="Manager" />
+                    <label style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; margin:0;">
                         Manager
+                        <input type="radio" name="SelectedUserRole" value="Manager" />
                     </label>
 
-                    <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
-                        <input type="radio" name="TargetRole" value="Admin" />
+                    <label style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; margin:0;">
                         Admin
+                        <input type="radio" name="SelectedUserRole" value="Admin" />
                     </label>
                 </div>
             </div>
@@ -94,17 +96,17 @@
             <div class="form-group">
                 <div style="display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem;">
                     <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
-                        <input type="checkbox" name="LoginPassAllowed" value="true" />
+                    <input type="checkbox" id="LoginPassAllowed" name="LoginPassAllowed" value="true" />
                         Allow login & password
                     </label>
                     <br />
                     <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
-                        <input type="checkbox" name="OIDCAllowed" value="false" />
+                    <input type="checkbox" id="OIDCAllowed" name="OIDCAllowed" value="false" />
                         Allow OIDC login
                     </label>
                     <br />
                     <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
-                        <input type="checkbox" name="ResetPassOnLogin" value="false" />
+                    <input type="checkbox" id="ResetPassOnLogin" name="ResetPassOnLogin" value="false" />
                         Force password reset on next login
                     </label>
                     <br />

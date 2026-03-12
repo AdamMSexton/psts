@@ -16,15 +16,15 @@ namespace psts.web.Pages
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> OnGetSearchAsync(string _targetUser)
+        public async Task<IActionResult> OnGetUserSettingsAsync(string selectedUser)
         {
             // Find target employee
-            var targetUser = await _userManager.FindByIdAsync(_targetUser);
+            var targetUser = await _userManager.FindByIdAsync(selectedUser);
 
-            if ((string.IsNullOrWhiteSpace(_targetUser)) || (targetUser == null))
+            if ((string.IsNullOrWhiteSpace(selectedUser)) || (targetUser == null))
                 return new JsonResult(new UserSettingsListItemDTO { });
 
-            var results = await _management.GetUserSettings(LoggedInUser.UserId, (Domain.Enums.RoleTypes)LoggedInUser.Role, _targetUser);
+            var results = await _management.GetUserSettings(LoggedInUser.UserId, (Domain.Enums.RoleTypes)LoggedInUser.Role, selectedUser);
             return new JsonResult(results.Data);
         }
     }

@@ -6,8 +6,8 @@ function InitalizeUserSearch(searchBoxId, resultsBoxId, url)
     
     let debounceTimer;
 
-    console.log(inputBox);
-    console.log(resultsBox);
+    //console.log(inputBox);
+    //console.log(resultsBox);
 
     inputBox.addEventListener("input", function () {
         const term = this.value;
@@ -16,7 +16,7 @@ function InitalizeUserSearch(searchBoxId, resultsBoxId, url)
             debounceTimer = setTimeout(async () => {
                 const response = await fetch(url + "&term=" + encodeURIComponent(term));
                 const data = await response.json();
-                console.log(data);
+                //console.log(data);
 
                 updateSearchResults(resultsBox, data);
             }, 300);
