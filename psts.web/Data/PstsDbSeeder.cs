@@ -22,15 +22,51 @@ namespace psts.web.Data
             _logger = logger;
         }
 
-        private static readonly Dictionary<SystemSettings, string> DefaultSettings = new()
+        // Set Defaults for app settings
+        private static readonly List<AppSettings> DefaultSettings = new()
         {
-            {SystemSettings.MakeOIDCAvailable, "true" },
-            {SystemSettings.OIDCEnabledByDefault, "false" },
-            {SystemSettings.DisableAccountAfterXDaysStale, "0" },
-            {SystemSettings.ManagerApprovalForAdjustments, "false" },
-            {SystemSettings.MaxDaysInPastForEntry, "14" },
-            {SystemSettings.MaxDaysInFutureForEntry, "0" },
-            {SystemSettings.MaxHoursByEmployeePerDay, "8" }
+            new AppSettings
+            {
+                Setting = SystemSettings.MakeOIDCAvailable.ToString(),
+                Value = "true",
+                Descriptor = "Controls whether OIDC can be offered as a login option."
+            },
+            new AppSettings
+            {
+                Setting = SystemSettings.OIDCEnabledByDefault.ToString(),
+                Value = "false",
+                Descriptor = "Determines whether new users have OIDC enabled by default."
+            },
+            new AppSettings
+            {
+                Setting = SystemSettings.DisableAccountAfterXDaysStale.ToString(),
+                Value = "0",
+                Descriptor = "Number of stale days before disabling an account. Zero disables this rule."
+            },
+            new AppSettings
+            {
+                Setting = SystemSettings.ManagerApprovalForAdjustments.ToString(),
+                Value = "false",
+                Descriptor = "Whether manager approval is required for adjustments."
+            },
+            new AppSettings
+            {
+                Setting = SystemSettings.MaxDaysInPastForEntry.ToString(),
+                Value = "14",
+                Descriptor = "Maximum number of days in the past allowed for entry."
+            },
+            new AppSettings
+            {
+                Setting = SystemSettings.MaxDaysInFutureForEntry.ToString(),
+                Value = "0",
+                Descriptor = "Maximum number of days in the future allowed for entry."
+            },
+            new AppSettings
+            {
+                Setting = SystemSettings.MaxHoursByEmployeePerDay.ToString(),
+                Value = "8",
+                Descriptor = "Maximum allowed hours per employee per day."
+            }
         };
 
 
@@ -176,10 +212,13 @@ namespace psts.web.Data
 
             // ********** Populate Application settings **********
 
+
+
             foreach (var setting in DefaultSettings)
             {
-                var key = setting.Key;
+                var key = setting.Setting;
                 var defaultVale = setting.Value;
+                var descriptor = setting.Descriptor;
 
                 bool settingExists = await _db.AppSettingss.AnyAsync(u => u.Setting == key.ToString());
                 if (!settingExists)
@@ -187,6 +226,7 @@ namespace psts.web.Data
                     var newSettingRecord = new AppSettings();
                     newSettingRecord.Setting = key.ToString();
                     newSettingRecord.Value = defaultVale;
+                    newSettingRecord.Descriptor = descriptor;
                     try
                     {
                         _db.AppSettingss.Add(newSettingRecord);

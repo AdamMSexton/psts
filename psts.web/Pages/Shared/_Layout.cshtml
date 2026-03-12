@@ -107,18 +107,8 @@
 
                     @if (User.IsInRole("Admin"))
                     {
-                        <li>
-                            <a asp-page="/Admin/AdminUserTool"
-                               class="@(IsActive("/Admin/AdminUserTool") ? "active-link" : "")">
-                                Tools
-                            </a>
-                        </li>
-                        <li>
-                            <a asp-page="/appSettings/appSettings"
-                               class="@(IsActive("/appSettings/appSettings") ? "active-link" : "")">
-                                App Settings
-                            </a>
-                        </li>
+                        <li><a asp-page="/Admin/AdminUserTools">User Management</a></li>
+                        <li><a asp-page="/Admin/AdminSettingsTool">Settings</a></li>
                     }
 
                     <li>

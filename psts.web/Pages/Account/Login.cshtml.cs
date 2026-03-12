@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using psts.web.Services;
 using Psts.Web.Data;
-using Psts.Web.Pages.appSettings;
 
 namespace Psts.Web.Pages.Account
 {

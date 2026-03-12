@@ -1,0 +1,42 @@
+﻿@page
+@model psts.web.Pages.Admin.AdminSettingsToolModel
+@{}
+
+
+<h2 style="text-align:center; margin-top:1rem;">Admin User Tool</h2>
+
+
+<div class="profile-grid">
+
+    <!-- -------------------------------------------------- -->
+    <!-- SEARCH BOX -->
+    <!-- -------------------------------------------------- -->
+    <div class="profile-box grid-item">
+        <h2>System Settings</h2>
+        <div class="form-group">
+            @if (Model.SettingsList != null)
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <td>Setting</td>
+                            <td>Value</td>
+                            <td>Description</td>
+                        </tr>
+                    </thead>
+                    @foreach(var setting in Model.SettingsList)
+                    {
+                        <tr>
+                            <td>@setting.Setting</td>
+                        </tr>
+                        <tr>
+                            <td>@setting.Value</td>
+                        </tr>
+                        <tr>
+                            <td>@setting.Descriptor</td>
+                        </tr>
+                    }
+                </table>
+            }
+        </div>
+    </div>
