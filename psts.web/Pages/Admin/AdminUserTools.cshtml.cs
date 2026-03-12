@@ -26,7 +26,10 @@ namespace psts.web.Pages.Admin
 
         // bind posted form fields
         [BindProperty] public string? SelectedUserId { get; set; }
-        [BindProperty] public string? TargetRole { get; set; } // "Client" or "Employee"
+        [BindProperty] public string? SelectedUserRole { get; set; }
+        [BindProperty] public bool LoginPassAllowed { get; set; }
+        [BindProperty] public bool OIDCAllowed { get; set; }
+        [BindProperty] public bool ResetPassOnLogin { get; set; }
         public string? CurrentRole { get; set; }
 
 
@@ -51,7 +54,7 @@ namespace psts.web.Pages.Admin
                 return Page();
             }
 
-            if (string.IsNullOrWhiteSpace(TargetRole))
+            if (string.IsNullOrWhiteSpace(SelectedUserRole))
             {
                 ModelState.AddModelError(string.Empty, "Select a target role.");
                 await OnGetAsync();
@@ -72,7 +75,7 @@ namespace psts.web.Pages.Admin
 
             if ((!string.IsNullOrEmpty(user.Id)) && (!roles.IsNullOrEmpty()))
             {
-                var result = await _management.ChangeUserRole(user.Id.ToString(), Enum.Parse<RoleTypes>(roles[0]), SelectedUserId, Enum.Parse<RoleTypes>(TargetRole));
+                var result = await _management.ChangeUserRole(user.Id.ToString(), Enum.Parse<RoleTypes>(roles[0]), SelectedUserId, Enum.Parse<RoleTypes>(SelectedUserRole));
                 if (!result.Success)
                 {
                     ModelState.AddModelError(string.Empty, "Unable to change role. " + result.Error);
@@ -81,6 +84,11 @@ namespace psts.web.Pages.Admin
                 }
             }
 
+            SelectedUser.LoginPassAllowed = LoginPassAllowed;
+            SelectedUser.OIDCAllowed = OIDCAllowed;
+            SelectedUser.ResetPassOnLogin = ResetPassOnLogin;
+
+            await _userManager.UpdateAsync(SelectedUser);
 
             return RedirectToPage(); // refresh page after success
         }

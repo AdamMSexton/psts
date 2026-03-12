@@ -425,18 +425,21 @@ namespace psts.web.Services
                     return ServiceResult<bool>.Fail("Invalid Role.");
                 }
 
-                // This function is for managers only, Admins will have their own tool in AdminServices
-                if (_requestorRole != RoleTypes.Manager)
+                // This function is for Managers or Admins only
+                if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Admin))
                 {
                     return ServiceResult<bool>.Fail("Insufficient Privileges.");
                 }
 
                 // Managers cannot create admins or managers
-                if ((_newRole == RoleTypes.Manager) || (_newRole == RoleTypes.Admin))
+                if (_requestorRole == RoleTypes.Manager)
                 {
-                    return ServiceResult<bool>.Fail("Only Admin can create Manager or Admin");
+                    if ((_newRole == RoleTypes.Manager) || (_newRole == RoleTypes.Admin))
+                    {
+                        return ServiceResult<bool>.Fail("Only Admin can create Manager or Admin");
+                    }
                 }
-                
+
                 // Find target employee
                 var targetUser = await _userManager.FindByIdAsync(_targetEmployee);
                 if (targetUser == null)
