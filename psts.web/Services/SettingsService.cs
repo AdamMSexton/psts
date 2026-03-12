@@ -1,4 +1,6 @@
-﻿using psts.web.Data;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Primitives;
+using psts.web.Data;
 using psts.web.Domain.Enums;
 using psts.web.Dto;
 using Psts.Web.Data;
@@ -34,6 +36,23 @@ namespace psts.web.Services
             // Return the typed value
             return (T) value;
             
+        }
+
+        public async Task<ServiceResult<SystemSettingItemDto>> GetSettingDetail(SystemSettings setting)
+        {
+            var row = await _db.AppSettingss.FindAsync(setting.ToString());
+            if (row == null)
+            {
+                //Setting not found
+                throw new InvalidOperationException($"Setting {setting} not found.");
+            }
+
+            return ServiceResult<SystemSettingItemDto>.Ok(new SystemSettingItemDto
+            {
+                Setting = Enum.Parse<SystemSettings>(row.Setting),
+                Value = row.Value,
+                Descriptor = row.Descriptor
+            });
         }
 
     }
