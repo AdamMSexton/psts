@@ -5,111 +5,141 @@
     ViewData["HideNavbar"] = true;
 }
 
-<div id="app-container">
-    <div class="login-container">
+<div id="app-container" class="login-scene">
 
-        <div class="grid-item welcome-box">
-            <div class="welcome-inner">
-                <h1>Greetings, User.</h1>
-                <h2>Please sign in or create an account.</h2>
+    <!-- Particle Layer -->
+    <canvas id="loginParticles" class="particles-layer"></canvas>
+
+    <!-- Vignette Overlay -->
+    <div class="vignette-overlay"></div>
+
+    <!-- Parallax Wrapper -->
+    <div class="login-parallax">
+
+        <div class="login-container">
+
+            <!-- WELCOME -->
+            <div class="grid-item glass-card welcome-box">
+                <div class="welcome-inner">
+                    <h1>Greetings, User.</h1>
+                    <h2>Please sign in or create an account.</h2>
+                </div>
             </div>
-        </div>
 
-        <!-- LOGIN -->
-        <div id="login" class="grid-item">
-            <h2>Sign in</h2>
+            <!-- LOGIN -->
+            <div id="login" class="grid-item glass-card">
+                <h2>Sign in</h2>
 
-            <form method="post" id="local-login-form">
-                @Html.AntiForgeryToken()
+                <form method="post" id="local-login-form">
+                    @Html.AntiForgeryToken()
 
-                <div class="form-group">
-                    <label>User Name</label>
-                    <input name="UserName" type="text" placeholder="Enter your username..." autocomplete="username" />
-                </div>
+                    <!-- Floating Input: Username -->
+                    <div class="form-group floating-group" data-tooltip="Use your PSTS username.">
+                        <input id="UserName"
+                               name="UserName"
+                               type="text"
+                               placeholder=" "
+                               autocomplete="username"
+                               required
+                               class="floating-input" />
+                        <label for="UserName">Username...</label>
+                        <span class="input-underline"></span>
+                    </div>
 
-                <div class="form-group">
-                    <label>Password</label>
-                    <input name="Password" type="password" placeholder="Enter your password..." autocomplete="current-password" />
-                </div>
+                    <!-- Floating Input: Password -->
+                    <div class="form-group floating-group" data-tooltip="Your password is case-sensitive.">
+                        <input id="Password"
+                               name="Password"
+                               type="password"
+                               placeholder=" "
+                               autocomplete="current-password"
+                               required
+                               class="floating-input" />
+                        <label for="Password">Password...</label>
+                        <span class="input-underline"></span>
+                    </div>
 
-                <button type="submit" id="local-login-submit" class="btn-primary">
-                    Login
-                </button>
-
-                <div class="action-row">
-                    <a asp-page="" class="btn-secondary">Forgot Login?</a>
-                    <a asp-page="./NewUser" class="btn-secondary">Create an account</a>
-                   
                  
-                </div>
-            </form>
 
-            
+                    <!-- Login Button -->
+                    <button type="submit" id="local-login-submit" class="btn-primary glass-btn">
+                        Login
+                    </button>
 
-            @if (Model.LoginFailed)
-            {
-                <p class="error-text">Login failed</p>
-            }
-        </div>
+                    <!-- Links -->
+                    <div class="action-row">
+                        <a asp-page="" class="btn-secondary glass-btn-secondary">Forgot Login?</a>
+                        <a asp-page="./NewUser" class="btn-secondary glass-btn-secondary">Create an account</a>
+                    </div>
+                </form>
 
-        <!-- EXTERNAL LOGIN -->
-       @if (Model.OIDCEnabled)
-       {
-            <div id="loginExternal" class="grid-item">
-                <h3>Sign in with:</h3>
-
-                @if (Model.ExternalLogins?.Count > 0)
+                @if (Model.LoginFailed)
                 {
-                    <form method="post" asp-page-handler="ExternalLogin">
-                        @Html.AntiForgeryToken()
-
-                        <div class="external-grid">
-                            @foreach (var provider in Model.ExternalLogins)
-                            {
-                                var backgroundColor = provider.Name switch
-                                {
-                                    "Google" => "google",
-                                    "Microsoft" => "microsoft",
-                                    "Auth0" => "auth0",
-                                    "Okta" => "okta",
-                                    _ => "default"
-                                };
-
-                                // Build the image path under wwwroot/Images/ExternalLoginLogos
-                                var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{provider.Name}.png");
-
-                                <button type="submit"
-                                        name="provider"
-                                        value="@provider.Name"
-                                        class="external-btn @backgroundColor">
-                                    <div class="external-btn-top">Sign in with:</div>
-                                    <div class="external-btn-bottom">
-                                        <span class="provider-name">@provider.Name</span>
-                                        <img src="@logoPath" alt="@provider.Name logo" class="provider-logo" />
-                                    </div>
-                                </button>
-                            }
-                        </div>
-                    </form>
-                    @if (!string.IsNullOrEmpty(Model.LoginErrorText))
-                    {
-                        <p class="error-text">@Model.LoginErrorText</p>
-                    }
-
+                    <p class="error-text">Login failed</p>
                 }
             </div>
-        }
-        <!-- COMPANY CONTENT -->
-        <div id="companyContent" class="grid-item">
-            <h2>PSTS SOLUTIONS</h2>
-            <p>Providing efficient consultant hour tracking, and keeping you focused on your business.</p>
 
-            <img src="@Url.Content("~/Images/BCO.eb2e4f5c-29cf-4e37-9a8c-8dd773714c58.png")"
-                 alt="PSTS Solutions Logo"
-                 title="PSTS Solutions Logo"
-                 class="company-logo" />
+            <!-- EXTERNAL LOGIN -->
+            @if (Model.OIDCEnabled)
+            {
+                <div id="loginExternal" class="grid-item glass-card">
+                    <h3>Sign in with:</h3>
+
+                    @if (Model.ExternalLogins?.Count > 0)
+                    {
+                        <form method="post" asp-page-handler="ExternalLogin">
+                            @Html.AntiForgeryToken()
+
+                            <div class="external-grid">
+                                @foreach (var provider in Model.ExternalLogins)
+                                {
+                                    var backgroundColor = provider.Name switch
+                                    {
+                                                        "Google" => "google",
+                                                        "Microsoft" => "microsoft",
+                                                        "Auth0" => "auth0",
+                                                        "Okta" => "okta",
+                                        _ => "default"
+                                    };
+
+                                    var logoPath = Url.Content($"~/Images/ExternalLoginLogos/{provider.Name}.png");
+
+                                    <button type="submit"
+                                            name="provider"
+                                            value="@provider.Name"
+                                            class="external-btn glass-card @backgroundColor">
+                                        <div class="external-btn-top">Sign in with:</div>
+                                        <div class="external-btn-bottom">
+                                            <span class="provider-name">@provider.Name</span>
+                                            <img src="@logoPath" alt="@provider.Name logo" class="provider-logo" />
+                                        </div>
+                                    </button>
+                                }
+                            </div>
+                        </form>
+
+                        @if (!string.IsNullOrEmpty(Model.LoginErrorText))
+                        {
+                            <p class="error-text">@Model.LoginErrorText</p>
+                        }
+                    }
+                </div>
+            }
+
+            <!-- COMPANY CONTENT -->
+            <div id="companyContent" class="grid-item glass-card">
+                <div class="logo-glow">
+                    <h2>PSTS SOLUTIONS</h2>
+                    <p>Providing efficient consultant hour tracking, and keeping you focused on your business.</p>
+
+                    <img src="@Url.Content("~/Images/BCO.eb2e4f5c-29cf-4e37-9a8c-8dd773714c58.png")"
+                         alt="PSTS Solutions Logo"
+                         title="PSTS Solutions Logo"
+                         class="company-logo" />
+                </div>
+            </div>
+
         </div>
-
     </div>
 </div>
 

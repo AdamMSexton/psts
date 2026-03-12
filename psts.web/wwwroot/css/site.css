@@ -866,3 +866,361 @@ input[type="password"] {
         transform: translateY(0);
     }
 }
+
+
+
+/* ============================================================
+   GLASSMORPHISM — PSTS LOGIN PAGE UPGRADE
+   ============================================================ */
+
+/* Background upgrade */
+body {
+    background: radial-gradient(circle at top left, #11243A, #0A1A2F 60%);
+    background-attachment: fixed;
+}
+
+/* ------------------------------------------------------------
+   GLASS CARD PANELS
+   ------------------------------------------------------------ */
+.glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 18px rgba(0, 168, 255, 0.15);
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+    .glass-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(0, 168, 255, 0.35);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 22px rgba(0, 168, 255, 0.25);
+    }
+
+/* ------------------------------------------------------------
+   GLASS INPUT FIELDS
+   ------------------------------------------------------------ */
+.glass-input {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0.35rem;
+    padding: 0.75rem;
+    color: white;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+    .glass-input:focus {
+        border-color: var(--main-button);
+        box-shadow: 0 0 8px rgba(0, 168, 255, 0.45);
+        outline: none;
+    }
+
+/* ------------------------------------------------------------
+   GLASS PRIMARY BUTTON
+   ------------------------------------------------------------ */
+.glass-btn {
+    background: rgba(0, 168, 255, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 168, 255, 0.45);
+    border-radius: 0.35rem;
+    transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+
+    .glass-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.15);
+        box-shadow: 0 0 12px rgba(0, 168, 255, 0.45);
+    }
+
+/* ------------------------------------------------------------
+   GLASS SECONDARY BUTTONS
+   ------------------------------------------------------------ */
+.glass-btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 0.35rem;
+    transition: background-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+}
+
+    .glass-btn-secondary:hover {
+        background: rgba(0, 168, 255, 0.12);
+        color: white;
+        box-shadow: 0 0 10px rgba(0, 168, 255, 0.35);
+    }
+
+/* ------------------------------------------------------------
+   GLASS EXTERNAL LOGIN BUTTONS
+   ------------------------------------------------------------ */
+.external-btn.glass-card {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+    .external-btn.glass-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35), 0 0 14px rgba(0, 168, 255, 0.25);
+    }
+
+/* ------------------------------------------------------------
+   GLASS FADE-IN ANIMATIONS
+   ------------------------------------------------------------ */
+@keyframes glassFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        backdrop-filter: blur(14px);
+    }
+}
+
+#login,
+#loginExternal,
+#companyContent,
+.welcome-box {
+    animation: glassFadeIn 0.6s ease-out forwards;
+}
+
+/* ------------------------------------------------------------
+   OPTIONAL: SOFT TEXT GLOW FOR HEADERS
+   ------------------------------------------------------------ */
+h1, h2, h3 {
+    text-shadow: 0 0 8px rgba(0, 168, 255, 0.25);
+}
+
+/* ============================================================
+   LOGIN PAGE — GLASSMORPHISM + FLOATING LABELS + PARALLAX
+   ============================================================ */
+
+/* Animated Background */
+body {
+    background: linear-gradient(135deg, #0A1A2F, #11243A, #1E3A5F);
+    background-size: 220% 220%;
+    animation: bgShift 28s ease-in-out infinite;
+}
+@keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Scene Layers */
+.login-scene {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+.particles-layer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 1;
+}
+.vignette-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, transparent 55%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+.login-parallax {
+    position: relative;
+    z-index: 3;
+    padding: 3rem 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* Grid Layout */
+.login-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    max-width: 75rem;
+    width: 100%;
+}
+
+/* Glass Cards */
+.glass-card {
+    position: relative;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(18px);
+    border-radius: 0.9rem;
+    border: 1px solid rgba(255,255,255,0.16);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.55), 0 0 26px rgba(0,168,255,0.18);
+    padding: 1.25rem;
+    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+.glass-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0,168,255,0.45);
+    box-shadow: 0 24px 50px rgba(0,0,0,0.7), 0 0 32px rgba(0,168,255,0.35);
+}
+
+
+/* Floating Inputs */
+.floating-group {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+/* more specific selector so it wins */
+input.floating-input[type="text"],
+input.floating-input[type="password"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1.65rem 1.1rem 1.5rem; /* taller: increase top/bottom */
+    line-height: 1.6;
+    background: rgba(10,26,47,0.65);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 0.55rem;
+    color: white;
+    font-size: 1.2rem;
+    backdrop-filter: blur(12px);
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+input.floating-input::placeholder {
+    color: transparent;
+}
+
+.floating-group label {
+    position: absolute;
+    left: 0.9rem;
+    top: 1.35rem; /* nudged down to match taller input */
+    font-size: 0.98rem;
+    color: rgba(255,255,255,0.78);
+    transition: 160ms ease;
+}
+
+input.floating-input:focus + label,
+input.floating-input:not(:placeholder-shown) + label {
+    top: 0.5rem;
+    font-size: 0.78rem;
+    color: rgba(0,168,255,0.9);
+}
+
+.input-underline {
+    position: absolute;
+    left: 0.85rem;
+    right: 0.85rem;
+    bottom: 0.45rem;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(0,168,255,0), rgba(0,168,255,0.85), rgba(0,168,255,0));
+    transform: scaleX(0);
+    transition: transform 180ms ease-out;
+}
+
+input.floating-input:focus ~ .input-underline {
+    transform: scaleX(1);
+}
+
+/* Toggle Switch */
+.glass-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    cursor: pointer;
+}
+.glass-toggle input {
+    display: none;
+}
+.toggle-track {
+    width: 2.5rem;
+    height: 1.35rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.25);
+    position: relative;
+}
+.toggle-thumb {
+    position: absolute;
+    top: 0.1rem;
+    left: 0.15rem;
+    width: 1.05rem;
+    height: 1.05rem;
+    background: white;
+    border-radius: 50%;
+    transition: transform 160ms ease;
+}
+.glass-toggle input:checked + .toggle-track .toggle-thumb {
+    transform: translateX(1.05rem);
+}
+
+/* Buttons */
+.glass-btn {
+    width: 35%;
+    padding: 0.75rem;
+    background: rgba(0,168,255,0.25);
+    border: 1px solid rgba(0,168,255,0.55);
+    border-radius: 0.45rem;
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: 150ms ease;
+}
+.glass-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 12px rgba(0,168,255,0.45);
+}
+
+/* Secondary Buttons */
+.glass-btn-secondary {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.35rem;
+    transition: 150ms ease;
+}
+.glass-btn-secondary:hover {
+    background: rgba(0,168,255,0.12);
+    color: white;
+}
+
+/* External Login Buttons */
+.external-btn.glass-card {
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.20);
+    transition: 150ms ease;
+}
+.external-btn.glass-card:hover {
+    transform: translateY(-3px);
+}
+
+/* Fade-in Animations */
+#login, #loginExternal, #companyContent, .welcome-box {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: glassFadeIn 0.6s ease-out forwards;
+}
+@keyframes glassFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Logo Glow */
+.logo-glow img {
+    animation: logoPulse 6s ease-in-out infinite;
+}
+@keyframes logoPulse {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(0,168,255,0.4)); }
+    50% { filter: drop-shadow(0 0 18px rgba(0,168,255,0.7)); }
+}
