@@ -150,6 +150,18 @@
         @RenderBody()
     </main>
 
+    @if (!hideNavbar)
+    {
+        <footer class="site-footer">
+            <a href=" https://www.youtube.com/watch?v=ral4VgIEeHg&msockid=4e83e5421e5111f1bfc4574db2920fd7" class="footer-link">
+                &copy; @DateTime.Now.Year PSTS Solutions
+            </a>
+
+        </footer>
+    }
+
+   
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>
