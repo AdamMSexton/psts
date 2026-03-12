@@ -52,8 +52,7 @@
                     @if (User.IsInRole("Manager"))
                     {
                         <li class="has-dropdown">
-                            <a asp-page="/Hours/Hours"
-                               class="@(IsActive("/Hours/Hours") ? "active-link" : "")">
+                            <a>
                                 Hours
                             </a>
                             <ul class="dropdown">
@@ -86,8 +85,7 @@
                     @if (User.IsInRole("Manager"))
                     {
                         <li class="has-dropdown">
-                            <a asp-page="/Manage/Index"
-                               class="@(IsActive("/Manage/Index") ? "active-link" : "")">
+                            <a>
                                 Manage
                             </a>
                             <ul class="dropdown">
