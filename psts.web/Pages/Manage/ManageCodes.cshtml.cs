@@ -19,7 +19,7 @@ namespace psts.web.Pages.Manage
         [BindProperty(SupportsGet = true)]
         public string? Shortcode { get; set; }
 
-        // Record type selected in the left panel search dropdown
+        // Record type — comes from POST create form dropdown, or set from decoded shortcode on GET
         [BindProperty(SupportsGet = true)]
         public string? RecordTypeSearch { get; set; }
 
@@ -57,6 +57,12 @@ namespace psts.web.Pages.Manage
         [BindProperty]
         public string? TaskDescription { get; set; }
 
+        // Editable inline list fields — indexed by position for bulk save
+        [BindProperty]
+        public List<EditableProject> EditableProjects { get; set; } = new();
+        [BindProperty]
+        public List<EditableTask> EditableTasks { get; set; } = new();
+
         // Used to tell the view what type was found after a shortcode lookup
         public WorkItemType? FoundType { get; set; }
 
@@ -82,7 +88,7 @@ namespace psts.web.Pages.Manage
                     if (data.Type == WorkItemType.NotFound)
                     {
                         // Short code does not exist, prompt user to create
-                        Message = $"Short code '{Shortcode}' does not exist. You can create it using the Create New button.";
+                        Message = $"Short code '{Shortcode}' does not exist. Use Create New to add it.";
                         return;
                     }
 
@@ -93,7 +99,7 @@ namespace psts.web.Pages.Manage
 
                     if (data.Type == WorkItemType.Client && data.Id.HasValue)
                     {
-                        // Fetch the full client record by ID, includes child project and its child task
+                        // Fetch the full client record by ID, includes all child projects and their tasks
                         var clientResult = await _management.GetClient(data.Id.Value);
                         if (clientResult.Success)
                         {
@@ -103,19 +109,21 @@ namespace psts.web.Pages.Manage
                             ClientPOCeMail = clientResult.Data.ClientPOCeMail;
                             ClientPOCtPhone = clientResult.Data.ClientPOCtPhone;
 
-                            //// Populate child project fields if one exists (read-only in view)
-                            //if (clientResult.Data.Project != null)
-                            //{
-                            //    ProjectName = clientResult.Data.Project.ProjectName;
-                            //    ProjectDescription = clientResult.Data.Project.ProjectDescription;
-
-                            //    // Populate grandchild task fields if one exists (read-only in view)
-                            //    if (clientResult.Data.Project.Task != null)
-                            //    {
-                            //        TaskName = clientResult.Data.Project.Task.TaskName;
-                            //        TaskDescription = clientResult.Data.Project.Task.TaskDescription;
-                            //    }
-                            //}
+                            // Populate editable project list with their tasks (read-only in view at client level)
+                            EditableProjects = clientResult.Data.Projects.Select(p => new EditableProject
+                            {
+                                ProjectId = p.ProjectId,
+                                ProjectName = p.ProjectName,
+                                ProjectDescription = p.ProjectDescription,
+                                ShortCode = p.ShortCode,
+                                Tasks = p.Tasks.Select(t => new EditableTask
+                                {
+                                    TaskId = t.TaskId,
+                                    TaskName = t.TaskName,
+                                    TaskDescription = t.TaskDescription,
+                                    ShortCode = t.ShortCode
+                                }).ToList()
+                            }).ToList();
                         }
                         else
                         {
@@ -124,7 +132,7 @@ namespace psts.web.Pages.Manage
                     }
                     else if (data.Type == WorkItemType.Project && data.Id.HasValue)
                     {
-                        // Fetch the full project record by ID, includes parent Client and child task
+                        // Fetch the full project record by ID, includes parent client and all child tasks
                         var projectResult = await _management.GetProject(data.Id.Value);
                         if (projectResult.Success)
                         {
@@ -132,12 +140,14 @@ namespace psts.web.Pages.Manage
                             ProjectName = projectResult.Data.ProjectName;
                             ProjectDescription = projectResult.Data.ProjectDescription;
 
-                            //// Populate child task fields if one exists (read-only in view)
-                            //if (projectResult.Data.Tasks != null)
-                            //{
-                            //    TaskName = projectResult.Data.Tasks.TaskName;
-                            //    TaskDescription = projectResult.Data.Tasks.TaskDescription;
-                            //}
+                            // Populate editable task list (editable when looking up project)
+                            EditableTasks = projectResult.Data.Tasks.Select(t => new EditableTask
+                            {
+                                TaskId = t.TaskId,
+                                TaskName = t.TaskName,
+                                TaskDescription = t.TaskDescription,
+                                ShortCode = t.ShortCode
+                            }).ToList();
                         }
                         else
                         {
@@ -146,7 +156,7 @@ namespace psts.web.Pages.Manage
                     }
                     else if (data.Type == WorkItemType.Task && data.Id.HasValue)
                     {
-                        // Fetch the full task record by ID, includes parent Project and grandparent Client
+                        // Fetch the full task record by ID, includes parent project and grandparent client
                         var taskResult = await _management.GetTask(data.Id.Value);
                         if (taskResult.Success)
                         {
@@ -189,6 +199,14 @@ namespace psts.web.Pages.Manage
             var mode = Request.Form["mode"].ToString().ToLower();
             var recordType = Request.Form["recordType"].ToString();
 
+            // Enforce short code format — must be 4 characters and uppercase
+            Shortcode = Shortcode?.Trim().ToUpper();
+            if (string.IsNullOrEmpty(Shortcode) || Shortcode.Length != 4)
+            {
+                Message = "Short code must be exactly 4 characters.";
+                return Page();
+            }
+
             if (recordType == "Client")
             {
                 if (mode == "create")
@@ -200,7 +218,7 @@ namespace psts.web.Pages.Manage
                         ClientPOClName = ClientPOClName ?? string.Empty,
                         ClientPOCeMail = ClientPOCeMail ?? string.Empty,
                         ClientPOCtPhone = ClientPOCtPhone ?? string.Empty,
-                        ShortCode = Shortcode ?? string.Empty
+                        ShortCode = Shortcode
                     };
                     var result = await _management.AddNewClient(user.Id, roleType, dto);
                     Message = result.Success ? "Client created successfully." : (result.Error ?? "An error occurred while creating the client.");
@@ -232,6 +250,7 @@ namespace psts.web.Pages.Manage
                 if (mode == "create")
                 {
                     // Resolve parent client short code to get ClientId
+                    ParentShortCode = ParentShortCode?.Trim().ToUpper();
                     if (string.IsNullOrEmpty(ParentShortCode))
                     {
                         Message = "Please enter the parent client short code.";
@@ -250,19 +269,20 @@ namespace psts.web.Pages.Manage
                         ClientId = parentDecode.Data.Id.Value,
                         ProjectName = ProjectName ?? string.Empty,
                         ProjectDescription = ProjectDescription,
-                        ShortCode = Shortcode ?? string.Empty
+                        ShortCode = Shortcode
                     };
                     var result = await _management.AddNewProject(user.Id, roleType, dto);
                     Message = result.Success ? "Project created successfully." : (result.Error ?? "An error occurred while creating the project.");
                 }
                 else
                 {
-                    // Update — requires RecordId and ParentId
+                    // Update project and all its editable tasks in one submit
                     if (!RecordId.HasValue || !ParentId.HasValue)
                     {
                         Message = "Missing project or client ID for update.";
                         return Page();
                     }
+
                     var dto = new UpdateProjectDto
                     {
                         ProjectId = RecordId.Value,
@@ -272,7 +292,33 @@ namespace psts.web.Pages.Manage
                         ShortCode = Shortcode
                     };
                     var result = await _management.UpdateProject(user.Id, roleType, dto);
-                    Message = result.Success ? "Project updated successfully." : (result.Error ?? "An error occurred while updating the project.");
+                    if (!result.Success)
+                    {
+                        Message = result.Error ?? "An error occurred while updating the project.";
+                        return Page();
+                    }
+
+                    // Save all editable tasks in the inline list
+                    foreach (var task in EditableTasks)
+                    {
+                        task.ShortCode = task.ShortCode?.Trim().ToUpper();
+                        var taskDto = new UpdateTaskDto
+                        {
+                            TaskId = task.TaskId,
+                            ProjectId = RecordId.Value,
+                            TaskName = task.TaskName,
+                            TaskDescription = task.TaskDescription,
+                            ShortCode = task.ShortCode
+                        };
+                        var taskResult = await _management.UpdateTask(user.Id, roleType, taskDto);
+                        if (!taskResult.Success)
+                        {
+                            Message = $"Project updated but failed to update task '{task.TaskName}': {taskResult.Error}";
+                            return Page();
+                        }
+                    }
+
+                    Message = "Project and tasks updated successfully.";
                 }
             }
             else if (recordType == "Task")
@@ -280,6 +326,7 @@ namespace psts.web.Pages.Manage
                 if (mode == "create")
                 {
                     // Resolve parent project short code to get ProjectId
+                    ParentShortCode = ParentShortCode?.Trim().ToUpper();
                     if (string.IsNullOrEmpty(ParentShortCode))
                     {
                         Message = "Please enter the parent project short code.";
@@ -298,7 +345,7 @@ namespace psts.web.Pages.Manage
                         ProjectId = parentDecode.Data.Id.Value,
                         TaskName = TaskName ?? string.Empty,
                         TaskDescription = TaskDescription,
-                        ShortCode = Shortcode ?? string.Empty
+                        ShortCode = Shortcode
                     };
                     var result = await _management.AddNewTask(user.Id, roleType, dto);
                     Message = result.Success ? "Task created successfully." : (result.Error ?? "An error occurred while creating the task.");
@@ -330,5 +377,23 @@ namespace psts.web.Pages.Manage
 
             return Page();
         }
+    }
+
+    // Helper classes for editable inline lists
+    public class EditableProject
+    {
+        public Guid ProjectId { get; set; }
+        public string? ProjectName { get; set; }
+        public string? ProjectDescription { get; set; }
+        public string? ShortCode { get; set; }
+        public List<EditableTask> Tasks { get; set; } = new();
+    }
+
+    public class EditableTask
+    {
+        public Guid TaskId { get; set; }
+        public string? TaskName { get; set; }
+        public string? TaskDescription { get; set; }
+        public string? ShortCode { get; set; }
     }
 }
