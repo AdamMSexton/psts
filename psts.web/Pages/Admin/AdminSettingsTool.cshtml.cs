@@ -9,20 +9,23 @@ namespace psts.web.Pages.Admin
     public class AdminSettingsToolModel : AppPageModel
     {
         public readonly ISettingsService _settingsService;
-
-        AdminSettingsToolModel(ISettingsService settingsService)
+        public IList<SystemSettingItemDto>? SettingsList { get; set; } = new List<SystemSettingItemDto>();
+        
+        public AdminSettingsToolModel(ISettingsService settingsService)
         {
             _settingsService = settingsService;
         }
 
-        public List<SystemSettingItemDto> SettingsList = new();
         public void OnGet()
         {
-            foreach (var settingItem in SystemSettings.GetValues<SystemSettings>())
+            foreach (var settingItem in Enum.GetValues<SystemSettings>())
             {
-                SettingsList.Add(_settingsService.GetSettingDetail(Enum.Parse<SystemSettings>(settingItem));
+                var temp = _settingsService.GetSettingDetail(settingItem);
+                if (temp.Result.Data != null)
+                {
+                    SettingsList.Add(temp.Result.Data);
+                }
             }
-
         }
 
 
