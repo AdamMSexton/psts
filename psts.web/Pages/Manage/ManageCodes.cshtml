@@ -140,10 +140,10 @@
                     }
                 }
 
-                <!-- UPDATE FORM — populated from short code lookup, children shown below, never parents -->
+                <!-- UPDATE FORM — populated from short code lookup, exact record only -->
                 @if (isUpdate)
                 {
-                    <!-- Client lookup — shows client fields + child projects + their tasks -->
+                    <!-- Client lookup — shows client fields only -->
                     @if (Model.FoundType == psts.web.Domain.Enums.WorkItemType.Client)
                     {
                         <h3>Client</h3>
@@ -167,45 +167,9 @@
                             <p>POC Phone:</p>
                             <input type="text" name="clientPOCtPhone" value="@Model.ClientPOCtPhone" placeholder="Phone..." />
                         </div>
-
-                        <!-- Child projects — read-only, look up project directly to edit -->
-                        @if (Model.EditableProjects.Any())
-                        {
-                            <h3>Projects</h3>
-                            @for (int i = 0; i < Model.EditableProjects.Count; i++)
-                            {
-                                <input type="hidden" name="EditableProjects[@i].ProjectId" value="@Model.EditableProjects[i].ProjectId" />
-                                <div class="form-group">
-                                    <p>Project Name:</p>
-                                    <input type="text" value="@Model.EditableProjects[i].ProjectName" readonly />
-                                </div>
-                                <div class="form-group">
-                                    <p>Short Code:</p>
-                                    <input type="text" value="@Model.EditableProjects[i].ShortCode" readonly />
-                                </div>
-
-                                <!-- Child tasks under each project — also read-only at client level -->
-                                @if (Model.EditableProjects[i].Tasks.Any())
-                                {
-                                    <p><strong>Tasks:</strong></p>
-                                    @for (int j = 0; j < Model.EditableProjects[i].Tasks.Count; j++)
-                                    {
-                                        <input type="hidden" name="EditableProjects[@i].Tasks[@j].TaskId" value="@Model.EditableProjects[i].Tasks[j].TaskId" />
-                                        <div class="form-group">
-                                            <p>Task Name:</p>
-                                            <input type="text" value="@Model.EditableProjects[i].Tasks[j].TaskName" readonly />
-                                        </div>
-                                        <div class="form-group">
-                                            <p>Short Code:</p>
-                                            <input type="text" value="@Model.EditableProjects[i].Tasks[j].ShortCode" readonly />
-                                        </div>
-                                    }
-                                }
-                            }
-                        }
                     }
 
-                    <!-- Project lookup — shows project fields + child tasks only, no parent client -->
+                    <!-- Project lookup — shows project fields only, no parent client or child tasks -->
                     @if (Model.FoundType == psts.web.Domain.Enums.WorkItemType.Project)
                     {
                         <h3>Project</h3>
@@ -217,28 +181,6 @@
                             <p>Project Description:</p>
                             <input type="text" name="projectDescription" value="@Model.ProjectDescription" placeholder="Project description..." />
                         </div>
-
-                        <!-- Child tasks — editable inline list, all save on one submit -->
-                        @if (Model.EditableTasks.Any())
-                        {
-                            <h3>Tasks</h3>
-                            @for (int i = 0; i < Model.EditableTasks.Count; i++)
-                            {
-                                <input type="hidden" name="EditableTasks[@i].TaskId" value="@Model.EditableTasks[i].TaskId" />
-                                <div class="form-group">
-                                    <p>Task Name:</p>
-                                    <input type="text" name="EditableTasks[@i].TaskName" value="@Model.EditableTasks[i].TaskName" />
-                                </div>
-                                <div class="form-group">
-                                    <p>Task Description:</p>
-                                    <input type="text" name="EditableTasks[@i].TaskDescription" value="@Model.EditableTasks[i].TaskDescription" />
-                                </div>
-                                <div class="form-group">
-                                    <p>Short Code:</p>
-                                    <input type="text" name="EditableTasks[@i].ShortCode" value="@Model.EditableTasks[i].ShortCode" />
-                                </div>
-                            }
-                        }
                     }
 
                     <!-- Task lookup — shows task fields only, no parent project or client -->

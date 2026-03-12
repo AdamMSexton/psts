@@ -35,7 +35,7 @@ namespace psts.web.Services
                     return ServiceResult<Guid>.Fail("Invalid role.");
                 }
 
-                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Employee))
+                if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Employee))
                 {
                     return ServiceResult<Guid>.Fail("Insufficient privileges.");
                 }
@@ -74,7 +74,7 @@ namespace psts.web.Services
                 DateOnly maxFuture = DateOnly.FromDateTime(DateTime.Today.AddDays(days));
 
                 // Validate date work was completed on is within allowed window
-                if ((_newTransactionData.WorkCompletedDate < maxPast) || (_newTransactionData.WorkCompletedDate < maxFuture))
+                if ((_newTransactionData.WorkCompletedDate < maxPast) || (_newTransactionData.WorkCompletedDate > maxFuture))
                 {
                     return ServiceResult<Guid>.Fail("Work Completed outside range of " + maxPast.ToString() + " - " + maxFuture.ToString());
                 }
@@ -116,7 +116,7 @@ namespace psts.web.Services
                     return ServiceResult<Guid>.Fail("Invalid role.");
                 }
 
-                if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Employee))
+                if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Employee))
                 {
                     return ServiceResult<Guid>.Fail("Insufficient privileges.");
                 }
@@ -184,7 +184,7 @@ namespace psts.web.Services
                 }
                 else
                 {
-                    if ((_requestorRole != RoleTypes.Manager) || (_requestorRole != RoleTypes.Employee))
+                    if ((_requestorRole != RoleTypes.Manager) && (_requestorRole != RoleTypes.Employee))
                     {
                         return ServiceResult<bool>.Fail("Insufficient privileges.");
                     }

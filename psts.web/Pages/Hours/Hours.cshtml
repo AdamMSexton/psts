@@ -5,8 +5,153 @@
     ViewData["HideNavbar"] = false;
 }
 
+<h2 style="text-align:center; margin-top:1rem;">Hours</h2>
 
-<p>This is the Hours page.</p>
+<div class="profile-grid" style="align-items:stretch;">
 
-<img src="@Url.Content("~/Images/funny.gif")" alt="Funny GIF" />
-<p>This page is currently under development. Thank you for your patience.</p>
+    <!-- PANEL 1 — Short code lookup, always visible -->
+    <div id="hoursLookup"
+         class="profile-box"
+         style="display:flex; flex-direction:column; justify-content:center; min-height:18rem;">
+        <h2>Lookup Short Code</h2>
+
+        <form method="get">
+            <div class="form-group">
+                <p>Enter Short Code:</p>
+                <input type="text"
+                       name="shortcode"
+                       placeholder="Short code..."
+                       value="@Model.Shortcode" />
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.75rem; width:100%;">
+                <button type="submit" class="btn-primary" style="width:100%;">Submit</button>
+            </div>
+        </form>
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <p class="error-text" style="margin-top:1rem;">@Model.Message</p>
+        }
+    </div>
+
+    <!-- PANEL 2 — Appears when short code found, shows record info and children if any -->
+    @if (Model.FoundType.HasValue)
+    {
+        <div id="hoursRecord"
+             class="password-box"
+             style="display:flex; flex-direction:column; justify-content:flex-start; min-height:18rem;">
+
+            <!-- Client found — show client name and list of projects to click -->
+            @if (Model.FoundType == psts.web.Domain.Enums.WorkItemType.Client)
+            {
+                <h2>@Model.ClientName</h2>
+                <p>Select a project:</p>
+                @if (Model.ChildProjects.Any())
+                {
+                    @foreach (var project in Model.ChildProjects)
+                    {
+                        <a href="?shortcode=@project.ShortCode&selectedTaskId=@Model.SelectedTaskId"
+                               class="btn-primary"
+                               style="margin-bottom:0.5rem; display:block; text-align:center;">
+                            @project.ProjectName
+                        </a>
+                    }
+                }
+                else
+                {
+                    <p>No projects found under this client.</p>
+                }
+            }
+
+            <!-- Project found — show project name/description and list of tasks to click -->
+            @if (Model.FoundType == psts.web.Domain.Enums.WorkItemType.Project)
+            {
+                <h2>@Model.ProjectName</h2>
+                @if (!string.IsNullOrEmpty(Model.ProjectDescription))
+                {
+                    <p>@Model.ProjectDescription</p>
+                }
+                <p>Select a task:</p>
+                @if (Model.ChildTasks.Any())
+                {
+                    @foreach (var task in Model.ChildTasks)
+                    {
+                        <a href="?shortcode=@Model.Shortcode&selectedTaskId=@task.TaskId"
+                               class="btn-primary"
+                               style="margin-bottom:0.5rem; display:block; text-align:center;">
+                            @task.TaskName
+                        </a>
+                    }
+                }
+                else
+                {
+                    <p>No tasks found under this project.</p>
+                }
+            }
+
+            <!-- Task found directly — show task name/description, go straight to time entry -->
+            @if (Model.FoundType == psts.web.Domain.Enums.WorkItemType.Task)
+            {
+                <h2>@Model.TaskName</h2>
+                @if (!string.IsNullOrEmpty(Model.TaskDescription))
+                {
+                    <p>@Model.TaskDescription</p>
+                }
+            }
+        </div>
+    }
+
+    <!-- PANEL 3 — Time entry form, appears when a task is selected or task short code entered -->
+    @if (Model.SelectedTaskId.HasValue)
+    {
+        <div id="hoursEntry"
+             class="profile-box"
+             style="display:flex; flex-direction:column; justify-content:flex-start; min-height:18rem;">
+            <h2>Log Hours</h2>
+            <h3>@Model.SelectedTaskName</h3>
+            @if (!string.IsNullOrEmpty(Model.SelectedTaskDescription))
+            {
+                <p>@Model.SelectedTaskDescription</p>
+            }
+
+            <form method="post">
+                <input type="hidden" name="taskId" value="@Model.SelectedTaskId" />
+                <input type="hidden" name="shortcode" value="@Model.Shortcode" />
+
+                <div class="form-group">
+                    <p>Date:</p>
+                    <input type="date"
+                           name="workCompletedDate"
+                           value="@Model.WorkCompletedDate.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="form-group">
+                    <p>Hours:</p>
+                    <input type="number"
+                           name="workCompletedHours"
+                           min="0.25"
+                           max="24"
+                           step="0.25"
+                           placeholder="0.00"
+                           value="@Model.WorkCompletedHours" />
+                </div>
+
+                <div class="form-group">
+                    <p>Notes:</p>
+                    <input type="text"
+                           name="notes"
+                           placeholder="Notes..."
+                           value="@Model.Notes" />
+                </div>
+
+                <button type="submit" class="btn-primary">Submit</button>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.SubmitMessage))
+            {
+                <p class="error-text" style="margin-top:1rem;">@Model.SubmitMessage</p>
+            }
+        </div>
+    }
+</div>
