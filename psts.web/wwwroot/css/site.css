@@ -592,26 +592,38 @@ transition: background-color 150ms ease, box-shadow 150ms ease, transform 120ms 
 .has-dropdown {
     position: relative;
 }
+    /* Invisible hover bridge to keep dropdown open */
+    .has-dropdown::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%; /* directly under the parent link */
+        height: 12px; /* size of the bridge */
+        background: transparent;
+        pointer-events: auto;
+    }
+
 
 /* Dropdowns — now glass */
-.has-dropdown .dropdown {
-    position: absolute;
-    top: 2.75rem;
-    left: 50%;
-    background: rgba(255,255,255,0.06);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 0.5rem;
-    padding: 0.5rem 0;
-    min-width: 12rem;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-50%) translateY(6px);
-    transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
-    box-shadow: 0 10px 22px rgba(0,0,0,0.35);
-    z-index: 50;
-}
+    .has-dropdown .dropdown {
+        position: absolute;
+        top: 2.75rem;
+        left: 50%;
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 0.5rem;
+        padding: 0.5rem 0;
+        min-width: 12rem;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-50%) translateY(6px);
+        transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease 100ms;
+        box-shadow: 0 10px 22px rgba(0,0,0,0.35);
+        z-index: 50;
+    }
 
 .has-dropdown:hover .dropdown {
     opacity: 1;
@@ -784,3 +796,74 @@ transition: background-color 150ms ease, box-shadow 150ms ease, transform 120ms 
         transform: translateY(-4px) scale(1.03);
         filter: brightness(1.15);
     }
+
+/* New User Page — 3 Column Grid, Full-Width Rows */
+
+/* Row 1: Welcome box spans all 3 columns */
+.newuser-welcome-box {
+    grid-column: 1 / 4;
+    width: 100%;
+    max-width: none; /* override previous 40rem */
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: glassFadeIn 0.55s ease-out forwards;
+    animation-delay: 0.15s;
+}
+
+/* Row 2: Form spans all 3 columns */
+.newuser-form-box {
+    grid-column: 1 / 4;
+    width: 100%;
+    max-width: none; /* override previous 40rem */
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: glassFadeIn 0.55s ease-out forwards;
+    animation-delay: 0.30s;
+}
+
+/* Remove hover effect from Home button only */
+.navBar li:first-child .icon-button:hover,
+.navBar li:first-child .icon-button:focus,
+.navBar li:first-child .icon-button:active {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+    filter: brightness(0) invert(1) !important; /* keep icon white */
+}
+
+.has-dropdown .dropdown {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(6px);
+    transition: opacity 250ms ease, transform 250ms ease, visibility 0s linear 250ms; /* visibility flips after fade-out */
+}
+
+    /* Dropdown stays open as long as the navbar is hovered */
+    .navBar:hover .has-dropdown .dropdown,
+    .has-dropdown .dropdown:hover {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
+
+
+    /* Navbar-wide hover keeps dropdown open */
+    .navBar:hover .has-dropdown .dropdown,
+    .has-dropdown .dropdown:hover {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+        transition: opacity 250ms ease, transform 250ms ease, visibility 0s;
+    }
+
+/* Hidden state */
+.has-dropdown .dropdown {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(6px);
+    transition: opacity 250ms ease, transform 250ms ease, visibility 0s linear 250ms;
+}
+
