@@ -608,8 +608,8 @@ transition: background-color 150ms ease, box-shadow 150ms ease, transform 120ms 
 /* Dropdowns — now glass */
     .has-dropdown .dropdown {
         position: absolute;
-        top: 2.75rem;
-        left: 50%;
+        top: 1.8rem;
+        left: 0;
         background: rgba(255,255,255,0.06);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
@@ -619,17 +619,20 @@ transition: background-color 150ms ease, box-shadow 150ms ease, transform 120ms 
         min-width: 12rem;
         opacity: 0;
         visibility: hidden;
-        transform: translateX(-50%) translateY(6px);
+        transform: translateY(1rem);
         transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease 100ms;
         box-shadow: 0 10px 22px rgba(0,0,0,0.35);
         z-index: 50;
     }
+        /* Show dropdown when hovering the parent or the dropdown itself */
+        .navBar:hover .has-dropdown:hover .dropdown,
+        .has-dropdown .dropdown:hover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
 
-.has-dropdown:hover .dropdown {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
-}
+
 
 .dropdown li a:hover {
     background-color: rgba(0,168,255,0.12);
@@ -833,37 +836,13 @@ transition: background-color 150ms ease, box-shadow 150ms ease, transform 120ms 
     filter: brightness(0) invert(1) !important; /* keep icon white */
 }
 
-.has-dropdown .dropdown {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-50%) translateY(6px);
-    transition: opacity 250ms ease, transform 250ms ease, visibility 0s linear 250ms; /* visibility flips after fade-out */
+.has-dropdown > a {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
 
-    /* Dropdown stays open as long as the navbar is hovered */
-    .navBar:hover .has-dropdown .dropdown,
-    .has-dropdown .dropdown:hover {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) translateY(0);
-    }
 
 
 
-    /* Navbar-wide hover keeps dropdown open */
-    .navBar:hover .has-dropdown .dropdown,
-    .has-dropdown .dropdown:hover {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) translateY(0);
-        transition: opacity 250ms ease, transform 250ms ease, visibility 0s;
-    }
 
-/* Hidden state */
-.has-dropdown .dropdown {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-50%) translateY(6px);
-    transition: opacity 250ms ease, transform 250ms ease, visibility 0s linear 250ms;
-}
 
