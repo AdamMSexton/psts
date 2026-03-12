@@ -1,358 +1,285 @@
-﻿:root {
-    --primary-bg-color: #0A1A2F; /* global scope */
+﻿/* ===========================================================================
+   PSTS Consolidated Stylesheet
+   - Single source of truth for variables, layout, components, animations
+   - Preserves glassmorphism, floating inputs, and existing spacing
+   - Human readable: sections, comments, and consistent variable usage
+   =========================================================================== */
+
+/* -------------------------
+   Theme variables
+   ------------------------- */
+:root {
+    --primary-bg-color: #0A1A2F;
     --secondary-bg-color: #11243A;
     --border-bg: #182E45;
     --main-button: #00A8FF;
-    --button-gap: 0.625rem; /* consistent spacing between buttons */
+    --button-gap: 0.625rem;
+    --card-radius: 0.9rem;
+    --card-padding: 1.25rem;
+    --card-border: 0.0625rem;
+    --card-shadow: 0 18px 40px rgba(0,0,0,0.55);
+    --glass-blur: 18px;
+    --input-radius: 0.55rem;
+    --input-padding-vertical: 1.4rem;
+    --input-padding-horizontal: 1.1rem;
+    --max-layout-width: 75rem;
+}
+
+/* -------------------------
+   Base / Body
+   ------------------------- */
+* {
+    box-sizing: border-box;
+    font-family: 'Lato', sans-serif;
 }
 
 body {
-    font-family: 'Lato', sans-serif;
     color: white;
-    background-color: var(--primary-bg-color);
-}
-
-/*
-    Colors:
-    Dark blue: #0A1A2F
-    Bright Eletric Blue: #00A8FF
-    Medium Blue: #1E3A5F
-*/
-
-
-/* ============================================================
-   NAVBAR — PSTS THEME (FULL STYLING WITH DROPDOWNS)
-   ============================================================ */
-
-.navBar {
-    background: linear-gradient(to bottom, var(--secondary-bg-color), var(--primary-bg-color));
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    border: 0.0625rem solid var(--border-bg);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-    /* dynamic width */
-    width: fit-content;
-    /* keep centered */
-    margin: 1rem auto 2rem auto;
-    position: relative;
-    z-index: 10;
-}
-
-    .navBar ul {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 2.25rem;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    /* ------------------------------
-   NAV LINKS (TEXT)
-   ------------------------------ */
-
-    .navBar li a {
-        color: white;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 1.15rem;
-        padding: 0.35rem 0.75rem;
-        border-radius: 0.35rem;
-        transition: color 150ms ease, background-color 150ms ease, transform 120ms ease, box-shadow 150ms ease;
-    }
-
-      
-
-/* ------------------------------
-   ICON LINKS (HOME + LOGOUT)
-   ------------------------------ */
-
-/* Shared wrapper for both <a> and <button> */
-.icon-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    padding: 0;
     margin: 0;
-    cursor: pointer;
+    background: linear-gradient(135deg, #0A1A2F, #11243A, #1E3A5F);
+    background-size: 220% 220%;
+    animation: bgShift 28s ease-in-out infinite;
+    min-height: 100vh;
 }
 
-    /* Shared icon styling */
-    .icon-button img {
-        width: 2rem;
-        height: 2rem;
-        object-fit: contain;
-        filter: brightness(0) invert(1);
-        transition: filter 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+/* -------------------------
+   Animations
+   ------------------------- */
+@keyframes bgShift {
+    0% {
+        background-position: 0% 50%;
     }
 
-    /* Shared hover behavior */
-    .icon-button:hover img {
-        filter: brightness(0) invert(1) brightness(1.25);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    50% {
+        background-position: 100% 50%;
     }
 
-/* Remove default button styling */
-.logout-form button {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-
-/* ============================================================
-   DROPDOWN MENUS
-   ============================================================ */
-
-.has-dropdown {
-    position: relative;
-}
-
-    /* Hidden by default */
-    .has-dropdown .dropdown {
-        position: absolute;
-        top: 2.75rem;
-        left: 0;
-        background: var(--secondary-bg-color);
-        border: 0.0625rem solid var(--border-bg);
-        border-radius: 0.5rem;
-        padding: 0.5rem 0;
-        list-style: none;
-        min-width: 12rem;
+@keyframes glassFadeIn {
+    from {
         opacity: 0;
-        visibility: hidden;
-        transform: translateY(6px);
-        transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-        z-index: 50;
+        transform: translateY(12px);
+        backdrop-filter: blur(0px);
     }
 
-    /* Show on hover */
-    .has-dropdown:hover .dropdown {
+    to {
         opacity: 1;
-        visibility: visible;
         transform: translateY(0);
-    }
-
-/* Dropdown items */
-.dropdown li {
-    width: 100%;
-}
-
-    .dropdown li a {
-        display: block;
-        padding: 0.6rem 1rem;
-        color: white;
-        text-decoration: none;
-        font-size: 1rem;
-        transition: background-color 150ms ease, color 150ms ease, transform 120ms ease;
-    }
-
-        .dropdown li a:hover {
-            background-color: rgba(0,168,255,0.15);
-            color: var(--main-button);
-            transform: translateX(3px);
-        }
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-
-@media (max-width: 720px) {
-    .navBar ul {
-        gap: 1.25rem;
-    }
-
-    .navBar img {
-        width: 1.75rem;
-        height: 1.75rem;
-    }
-
-    .navBar li a {
-        font-size: 1rem;
-    }
-
-    .has-dropdown .dropdown {
-        min-width: 10rem;
+        backdrop-filter: blur(var(--glass-blur));
     }
 }
 
-.navBar li a:hover {
-    color: var(--main-button);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-    filter: brightness(1.25);
+/* -------------------------
+   Layout containers
+   ------------------------- */
+.login-scene {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
 }
 
-
-
-
-
-
-
-/*===========================================================================*/
-/*Login Page Styling                        */
-/*===========================================================================*/
-
-/* GLOBAL FONT */
-* {
-    font-family: 'Lato', sans-serif;
+.particles-layer,
+.vignette-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
 }
 
-/* GRID CONTAINER */
+.vignette-overlay {
+    background: radial-gradient(circle at center, transparent 0%, transparent 55%, rgba(0,0,0,0.65) 100%);
+    z-index: 2;
+}
+
+.login-parallax {
+    position: relative;
+    z-index: 3;
+    padding: 3rem 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* Single grid used across login/new-user/profile pages */
 .login-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
-    grid-template-rows: auto auto; /* 2 rows */
-    gap: 1.25rem; /* 20px -> 1.25rem */
-    max-width: 75rem; /* 1200px -> 75rem */
-    margin: 3.125rem auto; /* 50px -> 3.125rem */
-}
-
-/* GENERAL GRID ITEM */
-.grid-item {
-    padding: 1.25rem; /* 20px -> 1.25rem */
-    border: 0.0625rem solid #ddd; /* 1px -> 0.0625rem */
-    border-radius: 0.375rem; /* 6px -> 0.375rem */
-    background-color: var(--secondary-bg-color);
-    border-color: var(--border-bg);
-}
-
-/* WELCOME BOX — spans all columns but centers content */
-.welcome-box {
-    grid-column: 1 / 4; /* spans columns 1, 2, 3 */
-    grid-row: 1;
-    display: flex;
-    justify-content: center; /* centers content horizontally */
-    text-align: center;
-    background: none;
-    border: none;
-    padding: 0.625rem; /* 10px -> 0.625rem */
-}
-
-    /* Optional: limit width of welcome content */
-    .welcome-box .welcome-inner {
-        max-width: 31.25rem; /* 500px -> 31.25rem */
-    }
-
-/* FORM ELEMENTS */
-.form-group {
-    margin-bottom: 0.9375rem; /* 15px -> 0.9375rem */
-}
-
-/* Make inputs and primary button visually identical in outer size and box-model.
-   Inputs match the button padding, border, font-size and box-sizing so they line up. */
-input[type="text"],
-input[type="password"] {
-    display: block;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    max-width: var(--max-layout-width);
     width: 100%;
-    box-sizing: border-box;
-    padding: 0.625rem; /* match .btn-primary padding */
-    font-size: 1rem;
-    line-height: 1.2;
-    border: 0.0625rem solid var(--border-bg); /* same border color as buttons */
-    border-radius: 0.25rem;
-    background-color: var(--primary-bg-color); /* changed: inputs use primary-bg-color */
-    color: inherit;
+    margin: 3.125rem auto;
 }
 
-    /* Improve placeholder contrast when inputs use dark background */
-    input[type="text"]::placeholder,
-    input[type="password"]::placeholder {
-        color: rgba(255,255,255,0.7);
+/* Generic grid item baseline */
+.grid-item {
+    padding: var(--card-padding);
+    border: var(--card-border) solid var(--border-bg);
+    border-radius: 0.375rem;
+    background-color: var(--secondary-bg-color);
+}
+
+/* -------------------------
+   Glass card (single canonical definition)
+   ------------------------- */
+.glass-card {
+    position: relative;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow), 0 0 26px rgba(0,168,255,0.18);
+    padding: var(--card-padding);
+    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+    animation: glassFadeIn 0.6s ease-out forwards;
+}
+
+    .glass-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(0,168,255,0.45);
+        box-shadow: 0 24px 50px rgba(0,0,0,0.7), 0 0 32px rgba(0,168,255,0.35);
     }
 
-/* BUTTONS */
-/* Secondary button (styled anchor) */
+/* -------------------------
+   Welcome header (full width)
+   ------------------------- */
+.welcome-box {
+    grid-column: 1 / 4;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    padding: var(--card-padding);
+}
+
+.welcome-inner {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* -------------------------
+   Buttons (single canonical set)
+   ------------------------- */
+.btn-primary {
+    display: block;
+    width: 35%;
+    padding: 0.625rem;
+    background-color: var(--main-button);
+    color: white;
+    border: var(--card-border) solid var(--border-bg);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1.1;
+    margin: var(--button-gap) 0 var(--button-gap) 0;
+    transition: transform 120ms ease, box-shadow 150ms ease, filter 120ms ease;
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+        filter: brightness(1.03);
+        outline: none;
+    }
+
+    .btn-primary:focus-visible {
+        box-shadow: 0 0 0 3px rgba(0,168,255,0.18);
+    }
+
 .btn-secondary {
     display: inline-block;
     padding: 0.5rem 0.75rem;
     font-size: 1rem;
     color: var(--main-button);
     background-color: transparent;
-    border: 0.0625rem solid var(--border-bg);
+    border: var(--card-border) solid var(--border-bg);
     border-radius: 0.25rem;
-    text-decoration: none;
-    box-sizing: border-box;
-    /* spacing: right and bottom so that horizontal/vertical gaps match primary/external buttons */
     margin: 0 var(--button-gap) var(--button-gap) 0;
     transition: background-color 150ms ease, color 150ms ease, transform 120ms ease, box-shadow 150ms ease;
 }
 
-    /* Hover / focus for secondary buttons */
     .btn-secondary:hover,
     .btn-secondary:focus {
-        background-color: rgba(0,168,255,0.12); /* subtle highlight using --main-button tone */
-        color: white; /* invert text color for clearer contrast */
+        background-color: rgba(0,168,255,0.12);
+        color: white;
         box-shadow: 0 4px 10px rgba(0,0,0,0.25);
         transform: translateY(-1px);
         outline: none;
     }
 
-    /* Provide an accessible focus-visible style */
     .btn-secondary:focus-visible {
         box-shadow: 0 0 0 3px rgba(0,168,255,0.18);
     }
 
-/* Primary (submit) button */
-.btn-primary {
-    display: block;
-    width: 35%;
-    box-sizing: border-box;
-    padding: 0.625rem; /* same as inputs */
-    background-color: var(--main-button); /* use --main-button */
-    color: white;
-    border: 0.0625rem solid var(--border-bg); /* consistent border color */
-    border-radius: 0.25rem;
-    cursor: pointer;
-    font-size: 2rem; /* matches h1 (kept from previous change) */
-    line-height: 1.1;
-    /* vertical spacing consistent with other buttons */
-    margin: var(--button-gap) 0 var(--button-gap) 0;
-    transition: transform 120ms ease, box-shadow 150ms ease, filter 120ms ease;
+/* Glass variants for buttons */
+.glass-btn {
+    background: rgba(0,168,255,0.25);
+    border: 1px solid rgba(0,168,255,0.45);
+    border-radius: 0.35rem;
 }
 
-    /* Apply hover/focus effects to primary button similar to secondary */
-    .btn-primary:hover,
-    .btn-primary:focus {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.28);
-        filter: brightness(1.03); /* slight brighten on hover */
-        outline: none;
+    .glass-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.15);
+        box-shadow: 0 0 12px rgba(0,168,255,0.45);
     }
 
-    /* Accessible focus-visible ring for primary button */
-    .btn-primary:focus-visible {
-        box-shadow: 0 0 0 3px rgba(0,168,255,0.18);
-    }
+.glass-btn-secondary {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.18);
+}
 
-/* EXTERNAL LOGIN BUTTONS */
+/* -------------------------
+   External provider buttons (single merged definition)
+   ------------------------- */
+.external-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    align-items: stretch;
+}
+
 .external-btn {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    gap: 0.5rem;
+    min-height: 4.5rem;
     width: 100%;
-    box-sizing: border-box;
-    padding: 0.75rem;
-    margin: 0 0 var(--button-gap) 0; /* bottom spacing consistent with others */
-    font-size: 1rem;
-    cursor: pointer;
-    border: 0.0625rem solid var(--border-bg);
+    border: var(--card-border) solid var(--border-bg);
     border-radius: 0.25rem;
     color: white;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
-    /* External button hover to match style family */
-    .external-btn:hover,
-    .external-btn:focus {
-        filter: brightness(0.95);
-        transform: translateY(-1px);
+    .external-btn .external-btn-top {
+        font-size: 0.95rem;
+        opacity: 0.95;
     }
 
-    /* Provider-specific colors */
+    .external-btn .external-btn-bottom {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .external-btn .provider-logo {
+        width: 1.5rem;
+        height: 1.5rem;
+        object-fit: contain;
+        display: inline-block;
+    }
+
+    /* Provider color classes */
     .external-btn.google {
         background-color: #4285F4;
     }
@@ -373,725 +300,26 @@ input[type="password"] {
         background-color: #666;
     }
 
-    /* provider logo inside external button */
-    .external-btn .provider-logo {
-        width: 1.5rem; /* adjust size as needed */
-        height: 1.5rem;
-        object-fit: contain;
-        vertical-align: middle;
-        margin-right: 0.75rem;
-        display: inline-block;
-    }
-
-    /* ensure text aligns nicely */
-    .external-btn span {
-        vertical-align: middle;
-        display: inline-block;
-    }
-
-/* --- External login 2x2 grid & button layout (append after existing external-btn rules) --- */
-
-/* Grid container: 2 columns, wraps to 1 column on narrow screens */
-.external-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    align-items: stretch;
-}
-
-/* Make external buttons a two-line stacked card */
-.external-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1rem;
-    text-align: center;
-    gap: 0.5rem;
-    min-height: 4.5rem;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-    /* Top line: "Sign in with" */
-    .external-btn .external-btn-top {
-        font-size: 0.95rem;
-        opacity: 0.95;
-    }
-
-    /* Bottom line: provider name + logo */
-    .external-btn .external-btn-bottom {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 700;
-        font-size: 1rem;
-    }
-
-    /* Provider logo sizing */
-    .external-btn .provider-logo {
-        width: 1.5rem;
-        height: 1.5rem;
-        object-fit: contain;
-        display: inline-block;
-    }
-
-    /* Provider name spacing/overflow handling */
-    .external-btn .provider-name {
-        display: inline-block;
-        white-space: nowrap;
-    }
-
-/* Responsive: single column and slightly larger gaps on narrow screens */
-@media (max-width: 640px) {
-    .external-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .external-btn {
-        padding: 0.75rem;
-    }
-}
-
-#companyContent {
-    text-align: center;
-}
-
-
-/* Company logo: doubled size, rounded edges, responsive */
-.company-logo {
-    width: 90%;
-    max-width: 16rem; /* doubled from 8rem */
-    height: auto;
-    display: block;
-    margin: 0.9375rem auto 0 auto; /* auto left/right centers the image */
-    border-radius: 0.375rem;
-    object-fit: contain;
-}
-
-@media (max-width: 640px) {
-    .company-logo {
-        width: 40%;
-        max-width: 20rem; 
-        margin-left: auto; 
-        margin-right: auto;
-    }
-}
-
-
-
-
-
-.action-row {
-    display: flex;
-    flex-direction: column; /* stack rows */
-    align-items: flex-start;
-    gap: 0.75rem;
-}
-
-    /* First row: the two links stay side-by-side */
-    .action-row .btn-secondary {
-        display: inline-block;
-        margin-right: 0.75rem; /* spacing between links */
-    }
-
-    /* Second row: Login button on its own line */
-    .action-row .btn-primary {
-        display: block;
-        width: 35%; /* keep your existing width */
-        margin: 0; /* remove inline spacing */
-
-    }
-
-/* -------------------------------------------------- */
-/* --- LOGIN PAGE LAZY-LOAD ANIMATION --- */
-/* -------------------------------------------------- */
-
-/* 1. Login box fades in first */
-#login {
-    opacity: 0;
-    transform: translateY(12px);
-    animation: loginFadeIn 0.55s ease-out 0.15s forwards;
-}
-
-/* 2. External login fades in second */
-#loginExternal {
-    opacity: 0;
-    transform: translateY(12px);
-    animation: externalFadeIn 0.55s ease-out 0.35s forwards;
-}
-
-/* 3. Company content fades in last */
-#companyContent {
-    opacity: 0;
-    transform: translateY(12px);
-    animation: companyFadeIn 0.55s ease-out 0.55s forwards;
-}
-
-/* Keyframes for all three */
-@keyframes loginFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes externalFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes companyFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-
-
-
-/* -------------------------------------------------- */
-/* --- NEW USER PAGE STYLING --- */
-/* -------------------------------------------------- */
-
-/* Center the New User box and reduce its width */
-#newUser {
-    grid-column: 2 / 3; /* center column only */
-    justify-self: center; /* center inside the column */
-    width: 100%;
-    max-width: 20rem; /* reduces box width so no empty right space */
-}
-
-    /* Header spacing */
-    #newUser h2 {
-        margin-bottom: 1rem;
-    }
-
-/* Label styling */
-#new-user-form .form-group label {
-    font-weight: 600;
-}
-
-/* Input spacing */
-#new-user-form input {
-    margin-bottom: 0.75rem;
-}
-
-    /* Fully styled inputs (including Email) at 50% width */
-    #new-user-form input[type="text"],
-    #new-user-form input[type="email"],
-    #new-user-form input[type="tel"],
-    #new-user-form input[type="password"] {
-        display: block;
-        width: 80%; /* reduce width by 50% */
-        box-sizing: border-box;
-        padding: 0.625rem;
-    
-        font-size: 1rem;
-        line-height: 1.2;
-        border: 0.0625rem solid var(--border-bg);
-        border-radius: 0.25rem;
-        background-color: var(--primary-bg-color);
-        color: inherit;
-    }
-
-/* Submit button reduced by 50% */
-#new-user-form .submit-btn {
-    width: 35%; /* half of your 35% login button */
-    font-size: 1.5rem;
-    margin-top: 1rem;
-}
-
-/* Make email placeholder match all other placeholders */
-#new-user-form input[type="email"]::placeholder {
-    color: rgba(255,255,255,0.7);
-}
-
-/* Make <p> labels match the styling of <label> */
-#new-user-form .form-group p {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: inherit;
-}
-
-/* Start hidden + slightly lowered */
-#newUser {
-    opacity: 0;
-    transform: translateY(12px);
-    animation: newUserFadeIn 0.55s ease-out 0.25s forwards;
-}
-
-/* Keyframes for smooth fade + rise */
-@keyframes newUserFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-/* -------------------------------------------------- */
-/* --- PROFILE PAGE */
-/* -------------------------------------------------- */
-
-
-
-.profile-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
-    max-width: 75rem;
-    margin: 3rem auto;
-}
-
-.profile-box,
-.password-box,
-.external-box {
-    padding: 1.25rem;
-    border: 0.0625rem solid var(--border-bg);
-    border-radius: 0.375rem;
-    background-color: var(--secondary-bg-color);
-    animation: profileFadeIn 0.55s ease-out forwards;
-    opacity: 0;
-    transform: translateY(12px);
-}
-
-#profileBox {
-    animation-delay: 0.15s;
-}
-
-#passwordBox {
-    animation-delay: 0.30s;
-}
-
-#externalBox {
-    animation-delay: 0.45s;
-}
-
-@keyframes profileFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* -------------------------------------------------- */
-/* --- HEADERS INSIDE BOXES --- */
-/* -------------------------------------------------- */
-
-.profile-box h2,
-.password-box h2,
-.external-box h3,
-.external-box h4 {
-    text-align: center;
-    margin-bottom: 1rem;
-    font-weight: 700;
-}
-
-/* -------------------------------------------------- */
-/* --- FORM ELEMENTS --- */
-/* -------------------------------------------------- */
-
-.profile-box input,
-.password-box input,
-.external-box input {
-    width: 100%;
-    padding: 0.625rem;
-    margin-bottom: 0.75rem;
-    box-sizing: border-box;
-    border: 0.0625rem solid var(--border-bg);
-    border-radius: 0.25rem;
-    background-color: var(--primary-bg-color);
-    color: inherit;
-}
-
-.profile-box label,
-.password-box label,
-.external-box label {
-    font-weight: 600;
-    margin-bottom: 0.35rem;
-    display: block;
-}
-
-/* -------------------------------------------------- */
-/* --- BUTTONS (MATCH LOGIN PAGE BUTTONS) --- */
-/* -------------------------------------------------- */
-
-.profile-box button,
-.password-box button,
-.external-box button {
-    display: inline-block;
-    padding: 0.625rem 1rem;
-    background-color: var(--main-button);
-    border: 0.0625rem solid var(--border-bg);
-    border-radius: 0.25rem;
-    color: white;
-    cursor: pointer;
-    font-size: 1.25rem;
-    transition: transform 120ms ease, box-shadow 150ms ease, filter 120ms ease;
-}
-
-    .profile-box button:hover,
-    .password-box button:hover,
-    .external-box button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.28);
-        filter: brightness(1.03);
-    }
-
-/* -------------------------------------------------- */
-/* --- EXTERNAL LOGIN PROVIDERS (MATCH LOGIN PAGE) --- */
-/* -------------------------------------------------- */
-
-.external-provider {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: inherit; /* allow provider color */
-    border: 0.0625rem solid var(--border-bg);
-    border-radius: 0.25rem;
-    padding: 0.75rem;
-    margin-bottom: 0.75rem;
-    transition: transform 120ms ease, box-shadow 150ms ease, filter 120ms ease;
-}
-
-    .external-provider:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.28);
-        filter: brightness(1.05);
-    }
-
-    /* Provider name + logo row */
-    .external-provider .external-btn-bottom {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 700;
-        font-size: 1rem;
-    }
-
-    /* Provider logos */
-    .external-provider .provider-logo {
-        width: 1.5rem;
-        height: 1.5rem;
-        object-fit: contain;
-    }
-
-    /* -------------------------------------------------- */
-    /* --- REMOVE BUTTON (FORCE BORDER COLOR) --- */
-    /* -------------------------------------------------- */
-
-    .external-provider button.btn-secondary {
-        border: 0.0625rem solid var(--border-bg) !important; /* force our border */
-        color: var(--main-button);
-        background-color: transparent;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.25rem;
-        transition: background-color 150ms ease, color 150ms ease, transform 120ms ease, box-shadow 150ms ease;
-    }
-
-        .external-provider button.btn-secondary:hover {
-            background-color: rgba(0,168,255,0.12);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-        }
-
-/* -------------------------------------------------- */
-/* --- RESPONSIVE --- */
-/* -------------------------------------------------- */
-
-@media (max-width: 640px) {
-    .profile-grid {
-        grid-template-columns: 1fr;
-    }
-}
-/* ============================================================
-   FORM VALIDATION — PSTS THEME
-   ============================================================ */
-
-.error-text {
-    color: #FF6B6B;
-    font-weight: 600;
-    font-size: 1rem;
-    margin: 1rem auto;
-    padding: 0.5rem 0.75rem;
-    background-color: rgba(255, 80, 80, 0.12);
-    border: 0.0625rem solid rgba(255, 80, 80, 0.35);
-    border-radius: 0.25rem;
-    display: block;
-    width: fit-content;
-    text-align: center;
-    text-shadow: 0 0 4px rgba(0,0,0,0.4);
-    animation: fadeError 0.35s ease-out forwards;
-}
-
-@keyframes fadeError {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-
-/* ============================================================
-   GLASSMORPHISM — PSTS LOGIN PAGE UPGRADE
-   ============================================================ */
-
-/* Background upgrade */
-body {
-    background: radial-gradient(circle at top left, #11243A, #0A1A2F 60%);
-    background-attachment: fixed;
-}
-
-/* ------------------------------------------------------------
-   GLASS CARD PANELS
-   ------------------------------------------------------------ */
-.glass-card {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 0.75rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 18px rgba(0, 168, 255, 0.15);
-    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
-}
-
-    .glass-card:hover {
-        transform: translateY(-3px);
-        border-color: rgba(0, 168, 255, 0.35);
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 22px rgba(0, 168, 255, 0.25);
-    }
-
-/* ------------------------------------------------------------
-   GLASS INPUT FIELDS
-   ------------------------------------------------------------ */
-.glass-input {
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 0.35rem;
-    padding: 0.75rem;
-    color: white;
-    transition: border-color 150ms ease, box-shadow 150ms ease;
-}
-
-    .glass-input:focus {
-        border-color: var(--main-button);
-        box-shadow: 0 0 8px rgba(0, 168, 255, 0.45);
-        outline: none;
-    }
-
-/* ------------------------------------------------------------
-   GLASS PRIMARY BUTTON
-   ------------------------------------------------------------ */
-.glass-btn {
-    background: rgba(0, 168, 255, 0.25);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 168, 255, 0.45);
-    border-radius: 0.35rem;
-    transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
-}
-
-    .glass-btn:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.15);
-        box-shadow: 0 0 12px rgba(0, 168, 255, 0.45);
-    }
-
-/* ------------------------------------------------------------
-   GLASS SECONDARY BUTTONS
-   ------------------------------------------------------------ */
-.glass-btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border-radius: 0.35rem;
-    transition: background-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
-}
-
-    .glass-btn-secondary:hover {
-        background: rgba(0, 168, 255, 0.12);
-        color: white;
-        box-shadow: 0 0 10px rgba(0, 168, 255, 0.35);
-    }
-
-/* ------------------------------------------------------------
-   GLASS EXTERNAL LOGIN BUTTONS
-   ------------------------------------------------------------ */
-.external-btn.glass-card {
-    background: rgba(255, 255, 255, 0.10);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.20);
-    transition: transform 150ms ease, box-shadow 150ms ease;
-}
-
-    .external-btn.glass-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35), 0 0 14px rgba(0, 168, 255, 0.25);
-    }
-
-/* ------------------------------------------------------------
-   GLASS FADE-IN ANIMATIONS
-   ------------------------------------------------------------ */
-@keyframes glassFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-        backdrop-filter: blur(0px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-        backdrop-filter: blur(14px);
-    }
-}
-
-#login,
-#loginExternal,
-#companyContent,
-.welcome-box {
-    animation: glassFadeIn 0.6s ease-out forwards;
-}
-
-/* ------------------------------------------------------------
-   OPTIONAL: SOFT TEXT GLOW FOR HEADERS
-   ------------------------------------------------------------ */
-h1, h2, h3 {
-    text-shadow: 0 0 8px rgba(0, 168, 255, 0.25);
-}
-
-/* ============================================================
-   LOGIN PAGE — GLASSMORPHISM + FLOATING LABELS + PARALLAX
-   ============================================================ */
-
-/* Animated Background */
-body {
-    background: linear-gradient(135deg, #0A1A2F, #11243A, #1E3A5F);
-    background-size: 220% 220%;
-    animation: bgShift 28s ease-in-out infinite;
-}
-@keyframes bgShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Scene Layers */
-.login-scene {
-    position: relative;
-    min-height: 100vh;
-    overflow: hidden;
-}
-.particles-layer {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.18;
-    pointer-events: none;
-    z-index: 1;
-}
-.vignette-overlay {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at center, transparent 0%, transparent 55%, rgba(0,0,0,0.65) 100%);
-    pointer-events: none;
-    z-index: 2;
-}
-.login-parallax {
-    position: relative;
-    z-index: 3;
-    padding: 3rem 1.5rem;
-    display: flex;
-    justify-content: center;
-}
-
-/* Grid Layout */
-.login-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
-    max-width: 75rem;
-    width: 100%;
-}
-
-/* Glass Cards */
-.glass-card {
-    position: relative;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(18px);
-    border-radius: 0.9rem;
-    border: 1px solid rgba(255,255,255,0.16);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.55), 0 0 26px rgba(0,168,255,0.18);
-    padding: 1.25rem;
-    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
-}
-.glass-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(0,168,255,0.45);
-    box-shadow: 0 24px 50px rgba(0,0,0,0.7), 0 0 32px rgba(0,168,255,0.35);
-}
-
-
-/* Floating Inputs */
+/* -------------------------
+   Floating inputs (canonical)
+   ------------------------- */
 .floating-group {
     position: relative;
     margin-bottom: 1.25rem;
 }
 
-/* more specific selector so it wins */
 input.floating-input[type="text"],
-input.floating-input[type="password"] {
+input.floating-input[type="password"],
+input.floating-input[type="email"],
+input.floating-input[type="tel"] {
     width: 100%;
-    box-sizing: border-box;
-    padding: 1.65rem 1.1rem 1.5rem; /* taller: increase top/bottom */
+    padding: var(--input-padding-vertical) var(--input-padding-horizontal) 1.2rem;
     line-height: 1.6;
     background: rgba(10,26,47,0.65);
     border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 0.55rem;
+    border-radius: var(--input-radius);
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     backdrop-filter: blur(12px);
     transition: border-color 160ms ease, box-shadow 160ms ease;
 }
@@ -1103,7 +331,7 @@ input.floating-input::placeholder {
 .floating-group label {
     position: absolute;
     left: 0.9rem;
-    top: 1.35rem; /* nudged down to match taller input */
+    bottom: 0.9rem;
     font-size: 0.98rem;
     color: rgba(255,255,255,0.78);
     transition: 160ms ease;
@@ -1127,100 +355,432 @@ input.floating-input:not(:placeholder-shown) + label {
     transition: transform 180ms ease-out;
 }
 
-input.floating-input:focus ~ .input-underline {
+/* show underline on focus (via JS or :focus-within) */
+.floating-group:focus-within .input-underline {
     transform: scaleX(1);
 }
 
-/* Toggle Switch */
-.glass-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    cursor: pointer;
-}
-.glass-toggle input {
-    display: none;
-}
-.toggle-track {
-    width: 2.5rem;
-    height: 1.35rem;
-    background: rgba(255,255,255,0.08);
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.25);
-    position: relative;
-}
-.toggle-thumb {
-    position: absolute;
-    top: 0.1rem;
-    left: 0.15rem;
-    width: 1.05rem;
-    height: 1.05rem;
-    background: white;
-    border-radius: 50%;
-    transition: transform 160ms ease;
-}
-.glass-toggle input:checked + .toggle-track .toggle-thumb {
-    transform: translateX(1.05rem);
+/* -------------------------
+   Form / action row
+   ------------------------- */
+.action-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
 }
 
-/* Buttons */
-.glass-btn {
-    width: 35%;
-    padding: 0.75rem;
-    background: rgba(0,168,255,0.25);
-    border: 1px solid rgba(0,168,255,0.55);
-    border-radius: 0.45rem;
-    color: white;
-    font-size: 1.6rem;
-    cursor: pointer;
-    transition: 150ms ease;
-}
-.glass-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 12px rgba(0,168,255,0.45);
+    .action-row .btn-secondary {
+        display: inline-block;
+        margin-right: 0.75rem;
+    }
+
+/* -------------------------
+   Company logo and content
+   ------------------------- */
+.company-logo {
+    width: 90%;
+    max-width: 16rem;
+    height: auto;
+    display: block;
+    margin: 0.9375rem auto 0;
+    border-radius: 0.375rem;
+    object-fit: contain;
 }
 
-/* Secondary Buttons */
-.glass-btn-secondary {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.18);
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.35rem;
-    transition: 150ms ease;
-}
-.glass-btn-secondary:hover {
-    background: rgba(0,168,255,0.12);
-    color: white;
+/* -------------------------
+   Profile grid (reuses login-container)
+   ------------------------- */
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    max-width: var(--max-layout-width);
+    margin: 3rem auto;
 }
 
-/* External Login Buttons */
-.external-btn.glass-card {
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.20);
-    transition: 150ms ease;
-}
-.external-btn.glass-card:hover {
-    transform: translateY(-3px);
-}
-
-/* Fade-in Animations */
-#login, #loginExternal, #companyContent, .welcome-box {
+/* Profile boxes inherit glass-card look */
+.profile-box, .password-box, .external-box {
+    padding: var(--card-padding);
+    border: var(--card-border) solid var(--border-bg);
+    border-radius: 0.375rem;
+    background-color: var(--secondary-bg-color);
+    animation: glassFadeIn 0.55s ease-out forwards;
     opacity: 0;
     transform: translateY(12px);
-    animation: glassFadeIn 0.6s ease-out forwards;
 }
-@keyframes glassFadeIn {
+
+/* staggered animation delays */
+#profileBox {
+    animation-delay: 0.15s;
+}
+
+#passwordBox {
+    animation-delay: 0.30s;
+}
+
+#externalBox {
+    animation-delay: 0.45s;
+}
+
+/* Inputs inside profile boxes use floating style where present */
+.profile-box input, .password-box input, .external-box input {
+    width: 100%;
+    padding: 0.625rem;
+    margin-bottom: 0.75rem;
+    border: var(--card-border) solid var(--border-bg);
+    border-radius: 0.25rem;
+    background-color: var(--primary-bg-color);
+    color: inherit;
+}
+
+/* -------------------------
+   Form validation / error
+   ------------------------- */
+.error-text {
+    color: #FF6B6B;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 1rem auto;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(255,80,80,0.12);
+    border: 0.0625rem solid rgba(255,80,80,0.35);
+    border-radius: 0.25rem;
+    display: block;
+    width: fit-content;
+    text-align: center;
+    text-shadow: 0 0 4px rgba(0,0,0,0.4);
+    animation: fadeError 0.35s ease-out forwards;
+}
+
+@keyframes fadeError {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Logo Glow */
-.logo-glow img {
-    animation: logoPulse 6s ease-in-out infinite;
+/* -------------------------
+   Responsive tweaks
+   ------------------------- */
+@media (max-width: 720px) {
+    .login-container {
+        gap: 1rem;
+    }
+
+        .login-container img, .company-logo {
+            max-width: 100%;
+        }
+
+    .welcome-inner {
+        padding: 0 0.5rem;
+    }
 }
-@keyframes logoPulse {
-    0%, 100% { filter: drop-shadow(0 0 0 rgba(0,168,255,0.4)); }
-    50% { filter: drop-shadow(0 0 18px rgba(0,168,255,0.7)); }
+
+@media (max-width: 640px) {
+    .external-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-primary {
+        width: 100%;
+    }
+
+    .company-logo {
+        width: 40%;
+        max-width: 20rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
+
+/* ============================================================
+   NAVBAR — GLASSMORPHISM UPGRADE
+   ============================================================ */
+
+.navBar {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: var(--card-radius);
+    padding: 0.75rem 1.5rem;
+    box-shadow: var(--card-shadow), 0 0 18px rgba(0,168,255,0.15);
+    width: fit-content;
+    margin: 1rem auto 2rem auto;
+    position: relative;
+    z-index: 1000;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+    .navBar:hover {
+        transform: translateY(-2px);
+        border-color: rgba(0,168,255,0.35);
+        box-shadow: 0 24px 50px rgba(0,0,0,0.55), 0 0 32px rgba(0,168,255,0.25);
+    }
+
+    /* Layout inside navbar */
+    .navBar ul {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2.25rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Links */
+    .navBar li a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.15rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.35rem;
+        transition: color 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+    }
+
+        .navBar li a:hover {
+            color: var(--main-button);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+        }
+
+        /* Focus ring */
+        .navBar li a:focus-visible,
+        .icon-button:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(0,168,255,0.18);
+            border-radius: 0.35rem;
+        }
+
+/* Icon buttons */
+/* Icon buttons */
+.icon-button img {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: filter 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+}
+.icon-button {
+padding: 0.35rem;
+border-radius: 0.35rem;
+background: none;
+border: none;
+cursor: pointer;
+transition: background-color 150ms ease, box-shadow 150ms ease, transform 120ms ease;
+}
+
+.icon-button:hover {
+    background-color: rgba(255,255,255,0.08);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transform: translateY(-2px);
+}
+
+
+.has-dropdown {
+    position: relative;
+}
+
+/* Dropdowns — now glass */
+.has-dropdown .dropdown {
+    position: absolute;
+    top: 2.75rem;
+    left: 50%;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0;
+    min-width: 12rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(6px);
+    transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.35);
+    z-index: 50;
+}
+
+.has-dropdown:hover .dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.dropdown li a:hover {
+    background-color: rgba(0,168,255,0.12);
+    color: var(--main-button);
+    transform: translateX(3px);
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+    .navBar {
+        width: calc(100% - 2rem);
+        margin: 1rem auto;
+        padding: 0.5rem 1rem;
+    }
+
+        .navBar ul {
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .navBar li a {
+            font-size: 1rem;
+            padding: 0.5rem;
+        }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .navBar, .navBar * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+
+.logout-form {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+
+.navBar li a:not(.icon-button):hover {
+    background-color: rgba(255,255,255,0.08);
+    color: var(--main-button);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+/* Enhanced secondary glass buttons */
+.btn-secondary.glass-btn-secondary {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--main-button);
+    background: rgba(255,255,255,0.10); /* stronger glass surface */
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 0.45rem;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    text-decoration: none; /* removes underline */
+    transition: background-color 160ms ease, color 160ms ease, transform 140ms ease, box-shadow 160ms ease;
+}
+
+    /* Hover + focus */
+    .btn-secondary.glass-btn-secondary:hover,
+    .btn-secondary.glass-btn-secondary:focus {
+        background-color: rgba(0,168,255,0.18);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.28);
+        outline: none;
+    }
+
+    .btn-secondary.glass-btn-secondary:focus-visible {
+        box-shadow: 0 0 0 3px rgba(0,168,255,0.25);
+    }
+/* Center and size-match the New User form box */
+#newUser {
+    grid-column: 1 / 4;
+    max-width: 40rem;
+    margin: 0 auto;
+}
+
+.image-frame {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.45), 0 0 22px rgba(0,168,255,0.25);
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.company-logo {
+    transition: transform 180ms ease, filter 180ms ease;
+}
+
+    .company-logo:hover {
+        transform: translateY(-4px) scale(1.03);
+        filter: brightness(1.15);
+    }
+
+.image-frame::before {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle, rgba(0,168,255,0.25), transparent 70%);
+    filter: blur(25px);
+    z-index: -1;
+}
+
+.company-logo {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: glassFadeIn 0.55s ease-out forwards;
+    animation-delay: 0.45s;
+}
+/* Glass frame for the image */
+.image-frame {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    width: 100%;
+    max-width: 40rem;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: inset 0 0 18px rgba(255,255,255,0.08), 0 12px 28px rgba(0,0,0,0.45), 0 0 22px rgba(0,168,255,0.25);
+}
+
+    /* Glow behind the frame */
+    .image-frame::before {
+        content: "";
+        position: absolute;
+        inset: -20px;
+        background: radial-gradient(circle, rgba(0,168,255,0.25), transparent 70%);
+        filter: blur(25px);
+        z-index: -1;
+    }
+
+/* Image styling */
+.company-logo {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    transition: transform 180ms ease, filter 180ms ease;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: glassFadeIn 0.55s ease-out forwards;
+    animation-delay: 0.45s;
+}
+
+    .company-logo:hover {
+        transform: translateY(-4px) scale(1.03);
+        filter: brightness(1.15);
+    }

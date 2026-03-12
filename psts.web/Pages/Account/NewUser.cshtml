@@ -5,53 +5,95 @@
     ViewData["HideNavbar"] = true;
 }
 
-<div id="app-container">
-    <div class="login-container">
+<div id="app-container" class="login-scene">
 
-        <!-- HEADER -->
-        <div class="grid-item welcome-box">
-            <div class="welcome-inner">
-                <h1>Create Your Account</h1>
-                <h3>Please enter your information below.</h3>
+    <!-- Particle Layer -->
+    <canvas id="loginParticles" class="particles-layer"></canvas>
+
+    <!-- Vignette Overlay -->
+    <div class="vignette-overlay"></div>
+
+    <!-- Parallax Wrapper -->
+    <div class="login-parallax">
+
+        <div class="login-container">
+
+            <!-- HEADER (full-width glass card, matching login page) -->
+            <div class="grid-item glass-card newuser-welcome-box">
+
+                <div class="welcome-inner">
+                    <h1>Create Your Account</h1>
+                    <h3>Please complete the form to join the program.</h3>
+                    <br />
+                    <br />
+                    <div class="image-frame">
+                    <img src="@Url.Content("~/Images/compile.gif")"
+                         alt="Joining the program"
+                         title="Joining the program"
+                         class="company-logo" />
+                    </div>
+                </div>
             </div>
+
+            <!-- NEW USER FORM (full-width glass card, matching login page) -->
+            <div class="grid-item glass-card newuser-form-box">
+
+                <h2>New User Information:</h2>
+
+                <form method="post" id="new-user-form">
+
+                    <!-- FIRST NAME -->
+                    <div class="form-group floating-group">
+                        <input asp-for="Input.FirstName"
+                               type="text"
+                               placeholder=" "
+                               class="floating-input" />
+                        <label asp-for="Input.FirstName">First Name...</label>
+                        <span class="input-underline"></span>
+                    </div>
+
+                    <!-- LAST NAME -->
+                    <div class="form-group floating-group">
+                        <input asp-for="Input.LastName"
+                               type="text"
+                               placeholder=" "
+                               class="floating-input" />
+                        <label asp-for="Input.LastName">Last Name...</label>
+                        <span class="input-underline"></span>
+                    </div>
+
+                    <!-- PHONE -->
+                    <div class="form-group floating-group">
+                        <input asp-for="Input.PhoneNumber"
+                               type="text"
+                               placeholder=" "
+                               class="floating-input" />
+                        <label asp-for="Input.PhoneNumber">Phone Number...</label>
+                        <span class="input-underline"></span>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="form-group floating-group">
+                        <input asp-for="Input.Email"
+                               type="email"
+                               placeholder=" "
+                               class="floating-input" />
+                        <label asp-for="Input.Email">Email...</label>
+                        <span class="input-underline"></span>
+                    </div>
+
+                    <!-- SUBMIT BUTTON -->
+                    <button type="submit" class="btn-primary glass-btn submit-btn">
+                        Submit
+                    </button>
+
+                </form>
+            </div>
+
         </div>
-
-        <!-- NEW USER FORM -->
-        <div id="newUser" class="grid-item">
-            <h2>New User Information</h2>
-
-            <form method="post" id="new-user-form">
-
-                <div class="form-group">
-                 
-                    <p>First Name:</p>
-                    <input asp-for="Input.FirstName" type="text" placeholder="Enter your first name..." />
-                </div>
-
-                <div class="form-group">
-                    
-                    <p>Last Name:</p>
-                    <input asp-for="Input.LastName" type="text" placeholder="Enter your last name..." />
-                </div>
-
-                <div class="form-group">
-                   
-                    <p>Phone Number:</p>
-                    <input asp-for="Input.PhoneNumber" type="text" placeholder="Enter your phone number..." />
-                </div>
-
-                <div class="form-group">
-              
-                    <p>Email:</p>
-                    <input asp-for="Input.Email" type="email" placeholder="Enter your email..." />
-                </div>
-
-                <button type="submit" class="btn-primary submit-btn">
-                    Submit
-                </button>
-
-            </form>
-        </div>
-
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/Login.js" asp-append-version="true"></script>
+}

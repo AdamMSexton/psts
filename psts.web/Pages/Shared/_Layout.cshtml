@@ -3,6 +3,16 @@
     var hideNavbar = false;
     if (ViewData["HideNavbar"] is bool vb && vb) { hideNavbar = true; }
     if (IsSectionDefined("HideNavbar")) { hideNavbar = true; }
+
+@functions {
+    bool IsActive(string page)
+    {
+        var current = ViewContext.ActionDescriptor.RouteValues["page"];
+        return string.Equals(current, page, StringComparison.OrdinalIgnoreCase);
+    }
+}
+
+
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -23,68 +33,114 @@
 
                     <!-- Home -->
                     <li>
-                        <a asp-page="/Account/Home" class="icon-button">
+                        <a asp-page="/Account/Home"
+                           class="icon-button @(IsActive("/Account/Home") ? "active-link" : "")">
                             <img src="~/Images/navBarIcons/home.svg" alt="Home" />
                         </a>
                     </li>
 
-                    <!-- Fix this -->
                     @if (User.IsInRole("Employee"))
                     {
-                        <li><a asp-page="/Hours/Hours">Hours</a></li>
+                        <li>
+                            <a asp-page="/Hours/Hours"
+                               class="@(IsActive("/Hours/Hours") ? "active-link" : "")">
+                                Hours
+                            </a>
+                        </li>
                     }
-
 
                     @if (User.IsInRole("Manager"))
                     {
                         <li class="has-dropdown">
-                            <a asp-page="/Hours/Hours">Hours</a>
+                            <a asp-page="/Hours/Hours"
+                               class="@(IsActive("/Hours/Hours") ? "active-link" : "")">
+                                Hours
+                            </a>
                             <ul class="dropdown">
-                                <li><a asp-page="/Manage/changeBillingRate">Billing Rate</a></li>
+                                <li>
+                                    <a asp-page="/Hours/Hours"
+                                       class="@(IsActive("/Hours/Hours") ? "active-link" : "")">
+                                        Add
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-page="/Manage/changeBillingRate"
+                                       class="@(IsActive("/Manage/changeBillingRate") ? "active-link" : "")">
+                                        Rates
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     }
-                
 
-
-
-                    <!-- Reports -->
                     @if (User.IsInRole("Clerk") || User.IsInRole("Manager") || User.IsInRole("Employee"))
                     {
-                        <li><a asp-page="/Reports/Index">Reports</a></li>
+                        <li>
+                            <a asp-page="/Reports/Index"
+                               class="@(IsActive("/Reports/Index") ? "active-link" : "")">
+                                Reports
+                            </a>
+                        </li>
                     }
 
-                    <!--Manager-->
                     @if (User.IsInRole("Manager"))
                     {
                         <li class="has-dropdown">
-                            <a asp-page="/Manage/Index">Manage</a>
+                            <a asp-page="/Manage/Index"
+                               class="@(IsActive("/Manage/Index") ? "active-link" : "")">
+                                Manage
+                            </a>
                             <ul class="dropdown">
-                                <li><a asp-page="/Manage/ManageCodes">Manage Short Codes</a></li>
-                                <li><a asp-page="/Manage/manageRoles">Manage Roles</a></li>
+                                <li>
+                                    <a asp-page="/Manage/ManageCodes"
+                                       class="@(IsActive("/Manage/ManageCodes") ? "active-link" : "")">
+                                        Codes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-page="/Manage/manageRoles"
+                                       class="@(IsActive("/Manage/manageRoles") ? "active-link" : "")">
+                                        Roles
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     }
 
-                    <!-- Admin -->
                     @if (User.IsInRole("Admin"))
                     {
-                        <li><a asp-page="/Admin/AdminUserTool">Tools</a></li>
-                        <li><a asp-page="/appSettings/appSettings">App Settings</a></li>
+                        <li>
+                            <a asp-page="/Admin/AdminUserTool"
+                               class="@(IsActive("/Admin/AdminUserTool") ? "active-link" : "")">
+                                Tools
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-page="/appSettings/appSettings"
+                               class="@(IsActive("/appSettings/appSettings") ? "active-link" : "")">
+                                App Settings
+                            </a>
+                        </li>
                     }
 
-                    <!-- Profile -->
-                    <li><a asp-page="/Account/Profile">Profile</a></li>
+                    <li>
+                        <a asp-page="/Account/Profile"
+                           class="@(IsActive("/Account/Profile") ? "active-link" : "")">
+                            Profile
+                        </a>
+                    </li>
 
                     <!-- Logout -->
                     <li>
                         <form method="post" asp-page="/Account/Logout" class="logout-form">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="icon-button">
+                            <button type="submit"
+                                    class="icon-button @(IsActive("/Account/Logout") ? "active-link" : "")">
                                 <img src="~/Images/navBarIcons/log-out.svg" alt="Logout" />
                             </button>
                         </form>
                     </li>
+
 
                 </ul>
 
